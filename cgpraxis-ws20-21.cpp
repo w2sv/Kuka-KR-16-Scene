@@ -12,41 +12,16 @@
 #include "window.h"
 #include "input.h"
 #include "light.h"
-#include "point_and_line.h"
+#include "geometry.h"
+#include "utils.h"
+#include "robot.h"
 
-void drawGrid() {
-	glColor3f(.3, .3, .3);
-	glBegin(GL_QUADS);
-	glVertex3f(-10, -0.001, -10);
-	glVertex3f(-10, -0.001, 10);
-	glVertex3f(10, -0.001, 10);
-	glVertex3f(10, -0.001, -10);
-	glEnd();
-
-
-	glBegin(GL_LINES);
-	for (int i = -10; i <= 10; i++) {
-		if (i == -10)
-			glColor3f(.6, .3, .3);
-		else
-			glColor3f(.25, .25, .25);
-
-		glVertex3f(i, 0, -10);
-		glVertex3f(i, 0, 10);
-
-		if (i == -10)
-			glColor3f(.3, .3, .6);
-		else
-			glColor3f(.25, .25, .25);
-
-		glVertex3f(-10, 0, i);
-		glVertex3f(10, 0, i);
-	};
-	glEnd();
-}
 
 void drawScene(){
-	drawGrid();
+	drawPlane(CoordinateExtrema(-10, 10), CoordinateExtrema(-10, 10), Color(.3, .3, .3));
+
+	Robot* robot = new Robot();
+	robot->draw();
 }
 
 /////////////////////////////////////////////////////////////////////////////////
