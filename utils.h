@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cmath>
+#include <cassert>
+
 #include "Include/freeglut.h"
 
 struct Vector3 {
@@ -13,7 +16,8 @@ struct Color {
 public:
 	GLfloat r, g, b, o;
 
-	Color(GLfloat r, GLfloat g, GLfloat b, GLfloat o = 1.0);
+	Color(double r, double g, double b, double o = 1.0);
+	explicit Color(int r, int g, int b, double o = 1.0);
 
 	const void render();
 };
@@ -24,4 +28,6 @@ public:
 
 	CoordinateExtrema(float min, float max);
 	CoordinateExtrema(float absValue);
+
+	const float spread();
 };

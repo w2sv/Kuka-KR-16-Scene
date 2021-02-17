@@ -1,5 +1,8 @@
 #include "geometry.h"
 
+#define SLICES 20
+#define STACKS 20
+#define LOOPS 1
 
 void drawCuboid(float length, float depth, float height, Color& color) {
 	float xCoord = length / 2;
@@ -57,27 +60,19 @@ void drawCuboid(float length, float depth, float height, Color& color) {
 	glEnd();
 }
 
-void drawGrid(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& color) {
-	glColor3f(.3, .3, .3);
+void drawQuadraticGrid(CoordinateExtrema& extrema, int tiles, Color& color) {
+	color.render();
 
 	glBegin(GL_LINES);
-	for (int i = -10; i <= 10; i++) {
-		if (i == -10)
-			glColor3f(.6, .3, .3);
-		else
-			glColor3f(.25, .25, .25);
+		for (float v = extrema.min; v <= extrema.max; v+= extrema.spread() / tiles) {
+			v == extrema.min || v == extrema.max ? glColor3f(.6, .3, .3) : color.render();
+			glVertex3f(v, 0, extrema.min);
+			glVertex3f(v, 0, extrema.max);
 
-		glVertex3f(i, 0, -10);
-		glVertex3f(i, 0, 10);
-
-		if (i == -10)
-			glColor3f(.3, .3, .6);
-		else
-			glColor3f(.25, .25, .25);
-
-		glVertex3f(-10, 0, i);
-		glVertex3f(10, 0, i);
-	};
+			v == extrema.min || v == extrema.max ? glColor3f(.3, .3, .6) : color.render();
+			glVertex3f(extrema.min, 0, v);
+			glVertex3f(extrema.max, 0, v);
+		};
 	glEnd();
 }
 
@@ -93,3 +88,35 @@ void drawPlane(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& 
 		glVertex3f(xExtrema.min, Z_COORDINATE, yExtrema.max);
 	glEnd();
 }
+
+void drawCylinder(float startRadius, float endRadius, float height) {
+
+	// Zeichnet einen Zylinder mit variablen Abmessungen ins WKS
+	// Unterteilung: RINGS, SLICES
+	// Lage: Basiskreis in X-Y-Ebene, Höhe entlang der +Z Achse
+
+	GLUquadricObj* q = gluNewQuadric();
+
+	glPushMatrix();
+		// Mantelfläche
+		gluCylinder(q, startRadius, endRadius, height, SLICES, STACKS);
+
+		// Deckel
+		glTranslatef(0, 0, height);
+		gluDisk(q, 0, endRadius, SLICES, LOOPS);
+
+		// Boden
+		glTranslatef(0, 0, -height);
+		glRotatef(180, 0, 1, 0);
+		gluDisk(q, 0, startRadius, SLICES, LOOPS);
+	glPopMatrix();
+
+	gluDeleteQuadric(q);
+};
+
+//void drawEllipsoid() {
+//	glPushMatrix();
+//		glScalef(1, 0.5, 0.5);
+//		glutSolidSphere(1, SLICES, STACKS);
+//	glPopMatrix();
+//}

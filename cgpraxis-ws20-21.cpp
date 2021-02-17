@@ -18,7 +18,10 @@
 
 
 void drawScene(){
-	drawPlane(CoordinateExtrema(-10, 10), CoordinateExtrema(-10, 10), Color(.3, .3, .3));
+	CoordinateExtrema groundMeasures = CoordinateExtrema(-10, 10);
+
+	drawPlane(groundMeasures, groundMeasures, Color(.3, .3, .3));
+	drawQuadraticGrid(groundMeasures, 20, Color(.3, .8, .8));
 
 	Robot* robot = new Robot();
 	robot->draw();

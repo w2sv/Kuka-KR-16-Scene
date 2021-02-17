@@ -116,7 +116,6 @@
     <ClCompile Include="help.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
-    <ClCompile Include="point_and_line.cpp" />
     <ClCompile Include="cgpraxis-ws20-21.cpp" />
     <ClCompile Include="robot.cpp" />
     <ClCompile Include="utils.cpp" />
@@ -127,7 +126,6 @@
     <ClInclude Include="help.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
-    <ClInclude Include="point_and_line.h" />
     <ClInclude Include="robot.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="window.h" />

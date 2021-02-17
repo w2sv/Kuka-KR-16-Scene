@@ -10,11 +10,17 @@ class Robot
 public:
 	Robot();
 
-	void moveArm(Vector3 position);
-	void draw();
+	void moveArm(Vector3& position);
+	const void draw();
 
 private:
-	void drawPedestal();
-	void drawJoint();
+	const float PEDASTEL_CEILING_Z_COORDINATE = 2.;
+	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.2;
+
+	const void drawPedestal();
+
+	const void drawArm();
+	const void drawLowerSteelCylinder();
+	const void drawLowerJoint();
 };
 
