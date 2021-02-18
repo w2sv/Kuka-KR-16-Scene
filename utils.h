@@ -34,5 +34,9 @@ public:
 
 void glRotatep(float angle, const GLfloat* axis);
 
-const GLfloat X_AXIS[3] = { 1., 0., 0. };
-const GLfloat Z_AXIS[3] = { 0., 1., 0. };
+namespace Axes {
+	extern GLfloat const X[3];
+	extern GLfloat const Y[3];
+	extern GLfloat const Z[3];
+}
+

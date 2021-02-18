@@ -86,8 +86,6 @@ void MouseMove(int x, int y)
 	glutPostRedisplay();
 }
 
-
-
 char cg_key::keyState(unsigned char  k)
 {
 	if (1 == keys[k])
@@ -98,10 +96,10 @@ char cg_key::keyState(unsigned char  k)
 	return keys[k];
 }
 
-
 char cg_key::specialKeyState(int  k)
 {
-	if (k > 99) k -= 87;
+	if (k > 99) 
+		k -= 87;
 	if (1 == specialKeys[k])
 	{
 		specialKeys[k] = 2;

@@ -49,9 +49,13 @@ const float CoordinateExtrema::spread() {
 }
 #pragma endregion
 
+#pragma region Rotation
+
 void glRotatep(float angle, const GLfloat* axis) {
 	glRotatef(angle, *(axis), *(axis + 1), *(axis + 2));
 }
 
-#pragma region Axes
+GLfloat const Axes::X[3] = { 1., 0., 0. };
+GLfloat const Axes::Y[3] = { 0., 0., 1. };
+GLfloat const Axes::Z[3] = { 0., 1., 0. };
 #pragma endregion

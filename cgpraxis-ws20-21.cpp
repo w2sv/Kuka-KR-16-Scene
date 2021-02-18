@@ -97,7 +97,7 @@ void displayFunc()
 	else if (1 == key.keyState('k') || 1 == key.keyState('K')){
 		help.toggleKoordsystem();	// Koordinatensystem on/off
 	}
-	else if (1 == key.keyState('w') || 1 == key.keyState('W')){
+	else if (1 == key.keyState('ü') || 1 == key.keyState('Ü')){
 		globState.drawMode = (globState.drawMode == GL_FILL) ? GL_LINE : GL_FILL; // Wireframe on/off
 	}
 	else if (1 == key.keyState('l') || 1 == key.keyState('L')){
