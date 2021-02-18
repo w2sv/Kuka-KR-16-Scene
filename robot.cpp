@@ -3,14 +3,12 @@
 #pragma region OrientationDimension
 cg_key* OrientationDimension::key = new cg_key;
 
-OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float angleLimit) {
-	this->angle = 0;
-
-	this->incrementationKey = incrementationKey;
-	this->decrementationKey = decrementationKey;
-
-	this->angleLimit = angleLimit;
-}
+OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float angleLimit): 
+	angle(0), 
+	incrementationKey(incrementationKey), 
+	decrementationKey(decrementationKey), 
+	angleLimit(angleLimit) 
+{}
 
 void OrientationDimension::update() {
 	float INCREMENT = 0.4;
@@ -30,10 +28,10 @@ void OrientationDimension::clipAngle() {
 #pragma endregion
 
 #pragma region Axis
-Axis::Axis(OrientationDimension& roll, OrientationDimension& tilt) {
-	this->roll = roll;
-	this->tilt = tilt;
-}
+Axis::Axis(OrientationDimension& roll, OrientationDimension& tilt):
+	roll(roll),
+	tilt(tilt)
+{}
 
 void Axis::update() {
 	this->roll.update();
@@ -42,12 +40,16 @@ void Axis::update() {
 #pragma endregion
 
 #pragma region Robot
-Robot::Robot() {}
+Robot::Robot():
+	lowerAxis(Axis(OrientationDimension('a', 'd', 360), OrientationDimension('s', 'w', 45))),
+	centralAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 45)))
+{}
 
 const void Robot::draw() {
 	this->drawPedestal();
 
 	this->lowerAxis.update();
+	this->centralAxis.update();
 	this->drawArm();
 }
 
@@ -63,6 +65,7 @@ const void Robot::drawPedestal() {
 const void Robot::drawArm() {
 	this->drawLowerSteelCylinder();
 	this->drawLowerAxis();
+	this->drawCentralAxis();
 }
 
 const void Robot::drawLowerSteelCylinder() {
@@ -75,19 +78,33 @@ const void Robot::drawLowerSteelCylinder() {
 }
 
 const void Robot::drawLowerAxis() {
-	static float HEIGHT = 3.;
-
 	glPushMatrix();
-		glTranslatef(0, this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_CEILING_Z_COORDINATE + 1.5, 0);
+		glTranslatef(0, this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_CEILING_Z_COORDINATE + this->LOWER_AXIS_HEIGHT / 2, 0);
 		
 		// rotate
 		glRotatep(this->lowerAxis.roll.angle, Axes::Z);
 
 		// tilt
-		glTranslatef(0, -HEIGHT / 2, 0);
+		glTranslatef(0, -this->LOWER_AXIS_HEIGHT / 2, 0);
 		glRotatep(this->lowerAxis.tilt.angle, Axes::X);
-		glTranslatef(0, HEIGHT / 2, 0);
-			drawCuboid(0.5, HEIGHT, 0.3, Color(230, 80, 21));
+		glTranslatef(0, this->LOWER_AXIS_HEIGHT / 2, 0);
+			drawCuboid(0.7, this->LOWER_AXIS_HEIGHT, 0.3, BASE_COLOR);
+}
+
+const void Robot::drawCentralAxis() {
+	static float HEIGHT = 2.5;
+
+	glTranslatef(0, this->LOWER_AXIS_HEIGHT / 2 + HEIGHT / 2, 0);
+
+	// rotate
+	glRotatep(this->centralAxis.roll.angle, Axes::Z);
+
+	// tilt
+	glTranslatef(0, -HEIGHT / 2, 0);
+	glRotatep(this->centralAxis.tilt.angle, Axes::X);
+	glTranslatef(0, HEIGHT / 2, 0);
+	drawCuboid(0.5, HEIGHT, 0.3, BASE_COLOR);
+
 	glPopMatrix();
 }
 #pragma endregion

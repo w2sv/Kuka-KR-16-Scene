@@ -88,25 +88,25 @@ void displayFunc()
 	if (key.keyState(27)){
 		exit(0); // Escape -> Programm beenden
 	}
-	else if (1 == key.keyState('f') || 1 == key.keyState('F')){
+	else if (1 == key.keyState('F')){
 		help.toggleFps();	// Framecounter on/off
 	}
-	else if (1 == key.keyState('h') || 1 == key.keyState('H') || 1 == key.specialKeyState(GLUT_KEY_F1)){
+	else if (1 == key.keyState('H') || 1 == key.specialKeyState(GLUT_KEY_F1)){
 		help.toggle();	// Hilfetext on/off
 	}
-	else if (1 == key.keyState('k') || 1 == key.keyState('K')){
+	else if (1 == key.keyState('K')){
 		help.toggleKoordsystem();	// Koordinatensystem on/off
 	}
-	else if (1 == key.keyState('ü') || 1 == key.keyState('Ü')){
+	else if (1 == key.keyState('W')){
 		globState.drawMode = (globState.drawMode == GL_FILL) ? GL_LINE : GL_FILL; // Wireframe on/off
 	}
-	else if (1 == key.keyState('l') || 1 == key.keyState('L')){
+	else if (1 == key.keyState('L')){
 		globState.lightMode = !globState.lightMode;	// Beleuchtung on/off
 	}
-	else if (1 == key.keyState('c') || 1 == key.keyState('C')){
+	else if (1 == key.keyState('C')){
 		globState.cullMode = !globState.cullMode; // Backfaceculling on/off
 	}
-	else if (1 == key.keyState('i') || 1 == key.keyState('I')){
+	else if (1 == key.keyState('I')){
 		globState.cameraHelper[0] = 0;	// Initialisierung der Kamera
 		globState.cameraHelper[1] = 0;
 	}

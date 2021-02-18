@@ -9,6 +9,7 @@
 #include "geometry.h"
 #include "input.h"
 
+
 struct OrientationDimension {
 	public:
 		float angle;
@@ -31,6 +32,7 @@ struct Axis {
 	OrientationDimension roll;
 	OrientationDimension tilt;
 
+	Axis() {}  // TODO: abort respective need
 	Axis(OrientationDimension& roll, OrientationDimension& tilt);
 	void update();
 };
@@ -44,15 +46,22 @@ public:
 	const void draw();
 
 private:
-	Axis lowerAxis = Axis(OrientationDimension('a', 'd', 360), OrientationDimension('s', 'w', 45));
-
 	const float PEDASTEL_CEILING_Z_COORDINATE = 2.;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.2;
+	const float LOWER_AXIS_HEIGHT = 3.;
+
+	Color BASE_COLOR = Color(230, 80, 21);
+
+	Axis lowerAxis;
+	Axis centralAxis;
+	Axis outerAxis;
 
 	const void drawPedestal();
 
 	const void drawArm();
 	const void drawLowerSteelCylinder();
+	
 	const void drawLowerAxis();
+	const void drawCentralAxis();
 };
 

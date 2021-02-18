@@ -6,7 +6,7 @@
 
 #include "utils.h"
 
-void drawCuboid(float length, float height, float depth, Color &color);
+void drawCuboid(float length, float height, float depth, Color& color);
 
 void drawQuadraticGrid(CoordinateExtrema& xExtrema, int tiles, Color& color);
 
