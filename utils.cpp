@@ -59,3 +59,11 @@ GLfloat const Axes::X[3] = { 1., 0., 0. };
 GLfloat const Axes::Y[3] = { 0., 0., 1. };
 GLfloat const Axes::Z[3] = { 0., 1., 0. };
 #pragma endregion
+
+# pragma region Measurements
+Measurements::Measurements(float height, float width, float depth):
+	height(height),
+	width(width),
+	depth(depth)
+{}
+#pragma endregion

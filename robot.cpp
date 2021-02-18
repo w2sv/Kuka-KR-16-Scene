@@ -28,28 +28,43 @@ void OrientationDimension::clipAngle() {
 #pragma endregion
 
 #pragma region Axis
-Axis::Axis(OrientationDimension& roll, OrientationDimension& tilt):
+Axis::Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements& measurements):
 	roll(roll),
-	tilt(tilt)
+	tilt(tilt),
+	height(measurements.height),
+	width(measurements.width),
+	depth(measurements.depth),
+	centerHeight(measurements.height / 2)
 {}
 
 void Axis::update() {
 	this->roll.update();
 	this->tilt.update();
 }
+
+const void Axis::adjustMatrixOrientationAccordingly() {
+	// rotate
+	glRotatep(this->roll.angle, Axes::Z);
+
+	// tilt
+	glTranslatef(0, -this->centerHeight, 0);
+	glRotatep(this->tilt.angle, Axes::X);
+	glTranslatef(0, this->centerHeight, 0);
+}
 #pragma endregion
 
 #pragma region Robot
 
 Robot::Robot() :
-	lowerAxis(Axis(OrientationDimension('a', 'd', 360), OrientationDimension('s', 'w', 45))),
-	centralAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 45))),
-	outerAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 45))) {
+	lowerAxis(Axis(OrientationDimension('a', 'd', 360), OrientationDimension('s', 'w', 45), Measurements(3, 0.5, 0.7))),
+	centralAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 45), Measurements(2.5, 0.3, 0.5))),
+	outerAxis(Axis(OrientationDimension('j', 'l', 360), OrientationDimension('k', 'i', 45), Measurements(2.5, 0.2, 0.3))) {
 
-	this->axisDrawFunction[&this->lowerAxis] = std::bind(&Robot::drawLowerAxis, this);
-	this->axisDrawFunction[&this->centralAxis] = std::bind(&Robot::drawCentralAxis, this);
-	this->axisDrawFunction[&this->outerAxis] = std::bind(&Robot::drawOuterAxis, this);
-
+	this->axisDrawFunction = {
+		{&this->lowerAxis, std::bind(&Robot::drawLowerAxis, this)},
+		{&this->centralAxis, std::bind(&Robot::drawCentralAxis, this)},
+		{&this->outerAxis, std::bind(&Robot::drawOuterAxis, this)}
+	};
 	this->axes = { &this->lowerAxis, &this->centralAxis, &this->outerAxis };
 }
 
@@ -57,13 +72,14 @@ const void Robot::draw() {
 	this->drawPedestal();
 	this->drawLowerSteelCylinder();
 	
-	for (auto const axisPointer: this->axes) {
-		this->axisDrawFunction[axisPointer]();
-	}
+	glPushMatrix();
+		for (Axis* const axisPointer: this->axes)
+			this->axisDrawFunction[axisPointer]();
+	glPopMatrix();
 }
 
 void Robot::update() {
-	for (auto const axisPointer : this->axes) {
+	for (Axis* const axisPointer : this->axes) {
 		axisPointer->update();
 	}
 }
@@ -87,34 +103,15 @@ const void Robot::drawLowerSteelCylinder() {
 }
 
 const void Robot::drawLowerAxis() {
-	glPushMatrix();
-		glTranslatef(0, this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_CEILING_Z_COORDINATE + this->LOWER_AXIS_HEIGHT / 2, 0);
-		
-		// rotate
-		glRotatep(this->lowerAxis.roll.angle, Axes::Z);
-
-		// tilt
-		glTranslatef(0, -this->LOWER_AXIS_HEIGHT / 2, 0);
-		glRotatep(this->lowerAxis.tilt.angle, Axes::X);
-		glTranslatef(0, this->LOWER_AXIS_HEIGHT / 2, 0);
-			drawCuboid(0.7, this->LOWER_AXIS_HEIGHT, 0.9, BASE_COLOR);
+	glTranslatef(0, this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_CEILING_Z_COORDINATE + this->LOWER_AXIS_HEIGHT / 2, 0);
+	this->lowerAxis.adjustMatrixOrientationAccordingly();
+		drawCuboid(this->lowerAxis.depth, this->lowerAxis.height, this->lowerAxis.width, BASE_COLOR);
 }
 
 const void Robot::drawCentralAxis() {
-	static float HEIGHT = 2.5;
-
-	glTranslatef(0, this->LOWER_AXIS_HEIGHT / 2 + HEIGHT / 2, 0);
-
-	// rotate
-	glRotatep(this->centralAxis.roll.angle, Axes::Z);
-
-	// tilt
-	glTranslatef(0, -HEIGHT / 2, 0);
-	glRotatep(this->centralAxis.tilt.angle, Axes::X);
-	glTranslatef(0, HEIGHT / 2, 0);
-	drawCuboid(0.5, HEIGHT, 0.3, BASE_COLOR);
-
-	glPopMatrix();
+	glTranslatef(0, this->LOWER_AXIS_HEIGHT / 2 + this->centralAxis.height / 2, 0);
+	this->centralAxis.adjustMatrixOrientationAccordingly();
+		drawCuboid(0.5, this->centralAxis.height, 0.3, BASE_COLOR);
 }
 
 const void Robot::drawOuterAxis(){}

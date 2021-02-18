@@ -40,3 +40,8 @@ namespace Axes {
 	extern GLfloat const Z[3];
 }
 
+struct Measurements {
+	float height, width, depth;
+
+	Measurements(float height, float width, float depth);
+};

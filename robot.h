@@ -33,12 +33,17 @@ struct OrientationDimension {
 };
 
 struct Axis {
-	OrientationDimension roll;
-	OrientationDimension tilt;
+public:
+	OrientationDimension roll, tilt;
+	float height, width, depth;
 
 	Axis() {}  // TODO: abort respective need
-	Axis(OrientationDimension& roll, OrientationDimension& tilt);
+	Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements& measurements);
 	void update();
+	const void adjustMatrixOrientationAccordingly();
+
+private:
+	float centerHeight;
 };
 
 class Robot
