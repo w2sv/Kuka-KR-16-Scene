@@ -18,7 +18,8 @@
 
 
 void drawScene(){
-	CoordinateExtrema groundMeasures = CoordinateExtrema(-10, 10);
+	static CoordinateExtrema groundMeasures = CoordinateExtrema(-10, 10);
+	static cg_key key;
 
 	drawPlane(groundMeasures, groundMeasures, Color(.3, .3, .3));
 	drawQuadraticGrid(groundMeasures, 20, Color(.3, .8, .8));
@@ -26,6 +27,9 @@ void drawScene(){
 	static Robot* robot = new Robot();
 	robot->draw();
 	robot->update();
+
+	if (key.keyState('R') == 1)
+		robot->reset();
 }
 
 /////////////////////////////////////////////////////////////////////////////////

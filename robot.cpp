@@ -61,13 +61,18 @@ const void Axis::adjustMatrixOrientationAccordingly() {
 	glRotatep(this->tilt.angle, Axes::X);
 	glTranslatef(0, this->centerHeight, 0);
 }
+
+void Axis::reset() {
+	this->roll.angle = 0;
+	this->tilt.angle = 0;
+}
 #pragma endregion
 
 #pragma region Robot
 
 Robot::Robot() :
 	lowerAxis(Axis(OrientationDimension('a', 'd', 360), OrientationDimension('s', 'w', 45), Measurements(3, 0.5, 0.7))),
-	centralAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 45), Measurements(2.5, 0.3, 0.5))),
+	centralAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 65), Measurements(2.5, 0.3, 0.5))),
 	outerAxis(Axis(OrientationDimension('j', 'l', 360), OrientationDimension('k', 'i', 45), Measurements(2.5, 0.2, 0.3))) {
 
 	this->axisDrawFunction = {
@@ -96,6 +101,13 @@ void Robot::update() {
 	}
 }
 
+void Robot::reset() {
+	for (Axis* const axisPointer : this->axes) {
+		axisPointer->reset();
+	}
+}
+
+#pragma region Drawing
 const void Robot::drawPedestal() {
 	glPushMatrix();
 		glColor3f(1.0f, .0f, 0.0f);
@@ -104,7 +116,6 @@ const void Robot::drawPedestal() {
 	glPopMatrix();
 }
 
-#pragma region Arm
 const void Robot::drawLowerSteelCylinder() {
 	glPushMatrix();
 		glColor3f(.4f, .4f, .4f);
@@ -114,6 +125,7 @@ const void Robot::drawLowerSteelCylinder() {
 	glPopMatrix();
 }
 
+#pragma region AxesDrawing
 const void Robot::drawLowerAxis() {
 	glTranslateZ(this->lowerAxis.centerHeight);
 	this->lowerAxis.adjustMatrixOrientationAccordingly();
@@ -128,7 +140,10 @@ const void Robot::drawCentralAxis() {
 	glTranslateZ(this->centralAxis.centerHeight);
 }
 
-const void Robot::drawOuterAxis(){}
+const void Robot::drawOuterAxis(){
+	
+}
+#pragma endregion
 
 #pragma endregion
 

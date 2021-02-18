@@ -43,6 +43,7 @@ public:
 	Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements& measurements);
 	void update();
 	const void adjustMatrixOrientationAccordingly();
+	void reset();
 };
 
 class Robot
@@ -53,6 +54,7 @@ public:
 	void moveArm(Vector3& position);
 	const void draw();
 	void update();
+	void reset();
 
 private:
 	const float PEDASTEL_HEIGHT = 2.;
