@@ -12,7 +12,7 @@ OrientationDimension::OrientationDimension(char incrementationKey, char decremen
 {}
 
 void OrientationDimension::update() {
-	float INCREMENT = 0.4;
+	float INCREMENT = 0.2;
 
 	bool modified = false;
 	if (this->key->keyState(this->decrementationKey) != 0) {
@@ -136,12 +136,15 @@ const void Robot::drawLowerAxis() {
 const void Robot::drawCentralAxis() {
 	glTranslateZ(this->centralAxis.centerHeight);
 	this->centralAxis.adjustMatrixOrientationAccordingly();
-		drawCuboid(0.5, this->centralAxis.height, 0.3, BASE_COLOR);
+		drawCuboid(this->centralAxis.depth, this->centralAxis.height, this->centralAxis.width, BASE_COLOR);
 	glTranslateZ(this->centralAxis.centerHeight);
 }
 
 const void Robot::drawOuterAxis(){
-	
+	/*glTranslatef(this->centralAxis.depth / 2, this->centralAxis.centerHeight, 0);
+	glRotatep(90, Axes::Y);
+	this->centralAxis.adjustMatrixOrientationAccordingly();
+		drawCuboid(this->outerAxis.depth, this->outerAxis.height, this->outerAxis.width, BASE_COLOR);*/
 }
 #pragma endregion
 
