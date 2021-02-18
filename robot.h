@@ -4,8 +4,8 @@
 #include <limits>
 #include <functional>
 #include <map>
-#include <iterator>
 #include <vector>
+#include <cmath>
 
 #include "Include/freeglut.h"
 
@@ -25,6 +25,7 @@ struct OrientationDimension {
 		static cg_key* key;
 
 		float angleLimit;
+		bool isFullRangeOfMotionDim;
 
 		char incrementationKey;
 		char decrementationKey;

@@ -7,23 +7,33 @@ OrientationDimension::OrientationDimension(char incrementationKey, char decremen
 	angle(0), 
 	incrementationKey(incrementationKey), 
 	decrementationKey(decrementationKey), 
-	angleLimit(angleLimit) 
+	angleLimit(angleLimit),
+	isFullRangeOfMotionDim(angleLimit == 360)
 {}
 
 void OrientationDimension::update() {
 	float INCREMENT = 0.4;
 
-	if (this->key->keyState(this->decrementationKey) != 0)
+	bool modified = false;
+	if (this->key->keyState(this->decrementationKey) != 0) {
 		this->angle += INCREMENT;
+		modified = true;
+	}
 
-	else if (this->key->keyState(this->incrementationKey) != 0)
+	else if (this->key->keyState(this->incrementationKey) != 0) {
 		this->angle -= INCREMENT;
+		modified = true;
+	}
 
-	this->clipAngle();
+	if (modified)
+		this->clipAngle();
 }
 
 void OrientationDimension::clipAngle() {
 	this->angle = std::min<float>(std::max<float>(this->angle, -this->angleLimit), this->angleLimit);
+
+	if (this->isFullRangeOfMotionDim && abs(this->angle) == this->angleLimit)
+		this->angle = this->angle == this->angleLimit ? -this->angleLimit : this->angleLimit;
 }
 #pragma endregion
 
