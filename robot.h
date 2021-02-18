@@ -36,14 +36,12 @@ struct Axis {
 public:
 	OrientationDimension roll, tilt;
 	float height, width, depth;
+	float centerHeight;
 
 	Axis() {}  // TODO: abort respective need
 	Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements& measurements);
 	void update();
 	const void adjustMatrixOrientationAccordingly();
-
-private:
-	float centerHeight;
 };
 
 class Robot
@@ -56,9 +54,8 @@ public:
 	void update();
 
 private:
-	const float PEDASTEL_CEILING_Z_COORDINATE = 2.;
+	const float PEDASTEL_HEIGHT = 2.;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.2;
-	const float LOWER_AXIS_HEIGHT = 3.;
 
 	Color BASE_COLOR = Color(230, 80, 21);
 

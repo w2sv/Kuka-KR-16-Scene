@@ -73,6 +73,8 @@ const void Robot::draw() {
 	this->drawLowerSteelCylinder();
 	
 	glPushMatrix();
+	glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
+
 		for (Axis* const axisPointer: this->axes)
 			this->axisDrawFunction[axisPointer]();
 	glPopMatrix();
@@ -87,8 +89,8 @@ void Robot::update() {
 const void Robot::drawPedestal() {
 	glPushMatrix();
 		glColor3f(1.0f, .0f, 0.0f);
-		glTranslatef(0, this->PEDASTEL_CEILING_Z_COORDINATE / 2, 0);
-			drawCuboid(3, this->PEDASTEL_CEILING_Z_COORDINATE, 4, Color(1.0, 0.0, 0.0, 0.2));
+		glTranslatef(0, this->PEDASTEL_HEIGHT / 2, 0);
+			drawCuboid(3, this->PEDASTEL_HEIGHT, 4, Color(1.0, 0.0, 0.0, 0.2));
 	glPopMatrix();
 }
 
@@ -96,22 +98,24 @@ const void Robot::drawPedestal() {
 const void Robot::drawLowerSteelCylinder() {
 	glPushMatrix();
 		glColor3f(.4f, .4f, .4f);
-		glTranslatef(0, this->PEDASTEL_CEILING_Z_COORDINATE, 0);
+		glTranslatef(0, this->PEDASTEL_HEIGHT, 0);
 		glRotatef(90, -1, 0, 0);
 			drawCylinder(1, 1, this->LOWER_STEEL_CYLINDER_HEIGHT);
 	glPopMatrix();
 }
 
 const void Robot::drawLowerAxis() {
-	glTranslatef(0, this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_CEILING_Z_COORDINATE + this->LOWER_AXIS_HEIGHT / 2, 0);
+	glTranslateZ(this->lowerAxis.centerHeight);
 	this->lowerAxis.adjustMatrixOrientationAccordingly();
 		drawCuboid(this->lowerAxis.depth, this->lowerAxis.height, this->lowerAxis.width, BASE_COLOR);
+	glTranslateZ(this->lowerAxis.centerHeight);
 }
 
 const void Robot::drawCentralAxis() {
-	glTranslatef(0, this->LOWER_AXIS_HEIGHT / 2 + this->centralAxis.height / 2, 0);
+	glTranslateZ(this->centralAxis.centerHeight);
 	this->centralAxis.adjustMatrixOrientationAccordingly();
 		drawCuboid(0.5, this->centralAxis.height, 0.3, BASE_COLOR);
+	glTranslateZ(this->centralAxis.centerHeight);
 }
 
 const void Robot::drawOuterAxis(){}

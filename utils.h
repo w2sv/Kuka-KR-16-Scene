@@ -45,3 +45,5 @@ struct Measurements {
 
 	Measurements(float height, float width, float depth);
 };
+
+void glTranslateZ(GLfloat value);

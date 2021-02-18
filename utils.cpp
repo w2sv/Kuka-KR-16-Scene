@@ -67,3 +67,7 @@ Measurements::Measurements(float height, float width, float depth):
 	depth(depth)
 {}
 #pragma endregion
+
+void glTranslateZ(GLfloat value) {
+	glTranslatef(0, value, 0);
+}
