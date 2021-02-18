@@ -40,17 +40,32 @@ void Axis::update() {
 #pragma endregion
 
 #pragma region Robot
-Robot::Robot():
+
+Robot::Robot() :
 	lowerAxis(Axis(OrientationDimension('a', 'd', 360), OrientationDimension('s', 'w', 45))),
-	centralAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 45)))
-{}
+	centralAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 45))),
+	outerAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 45))) {
+
+	this->axisDrawFunction[&this->lowerAxis] = std::bind(&Robot::drawLowerAxis, this);
+	this->axisDrawFunction[&this->centralAxis] = std::bind(&Robot::drawCentralAxis, this);
+	this->axisDrawFunction[&this->outerAxis] = std::bind(&Robot::drawOuterAxis, this);
+
+	this->axes = { &this->lowerAxis, &this->centralAxis, &this->outerAxis };
+}
 
 const void Robot::draw() {
 	this->drawPedestal();
+	this->drawLowerSteelCylinder();
+	
+	for (auto const axisPointer: this->axes) {
+		this->axisDrawFunction[axisPointer]();
+	}
+}
 
-	this->lowerAxis.update();
-	this->centralAxis.update();
-	this->drawArm();
+void Robot::update() {
+	for (auto const axisPointer : this->axes) {
+		axisPointer->update();
+	}
 }
 
 const void Robot::drawPedestal() {
@@ -62,12 +77,6 @@ const void Robot::drawPedestal() {
 }
 
 #pragma region Arm
-const void Robot::drawArm() {
-	this->drawLowerSteelCylinder();
-	this->drawLowerAxis();
-	this->drawCentralAxis();
-}
-
 const void Robot::drawLowerSteelCylinder() {
 	glPushMatrix();
 		glColor3f(.4f, .4f, .4f);
@@ -88,7 +97,7 @@ const void Robot::drawLowerAxis() {
 		glTranslatef(0, -this->LOWER_AXIS_HEIGHT / 2, 0);
 		glRotatep(this->lowerAxis.tilt.angle, Axes::X);
 		glTranslatef(0, this->LOWER_AXIS_HEIGHT / 2, 0);
-			drawCuboid(0.7, this->LOWER_AXIS_HEIGHT, 0.3, BASE_COLOR);
+			drawCuboid(0.7, this->LOWER_AXIS_HEIGHT, 0.9, BASE_COLOR);
 }
 
 const void Robot::drawCentralAxis() {
@@ -107,6 +116,9 @@ const void Robot::drawCentralAxis() {
 
 	glPopMatrix();
 }
+
+const void Robot::drawOuterAxis(){}
+
 #pragma endregion
 
 #pragma endregion

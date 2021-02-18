@@ -2,6 +2,10 @@
 
 #include <iostream>
 #include <limits>
+#include <functional>
+#include <map>
+#include <iterator>
+#include <vector>
 
 #include "Include/freeglut.h"
 
@@ -44,6 +48,7 @@ public:
 
 	void moveArm(Vector3& position);
 	const void draw();
+	void update();
 
 private:
 	const float PEDASTEL_CEILING_Z_COORDINATE = 2.;
@@ -56,12 +61,15 @@ private:
 	Axis centralAxis;
 	Axis outerAxis;
 
-	const void drawPedestal();
+	std::vector<Axis*> axes;
 
-	const void drawArm();
+	const void drawPedestal();
 	const void drawLowerSteelCylinder();
 	
 	const void drawLowerAxis();
 	const void drawCentralAxis();
+	const void drawOuterAxis();
+
+	std::map<Axis*, std::function<const void()>> axisDrawFunction;
 };
 
