@@ -48,3 +48,10 @@ const float CoordinateExtrema::spread() {
 	return abs(this->max - this->min);
 }
 #pragma endregion
+
+void glRotatep(float angle, const GLfloat* axis) {
+	glRotatef(angle, *(axis), *(axis + 1), *(axis + 2));
+}
+
+#pragma region Axes
+#pragma endregion

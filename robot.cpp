@@ -1,11 +1,19 @@
 #include "robot.h"
 
+#pragma region Axis
+cg_key* Axis::key = new cg_key;
+
+#pragma endregion
+
+#pragma region Robot
 Robot::Robot() {
 
 }
 
 const void Robot::draw() {
 	this->drawPedestal();
+
+	this->lowerAxis.update();
 	this->drawArm();
 }
 
@@ -20,7 +28,7 @@ const void Robot::drawPedestal() {
 #pragma region Arm
 const void Robot::drawArm() {
 	this->drawLowerSteelCylinder();
-	this->drawLowerJoint();
+	this->drawLowerAxis();
 }
 
 const void Robot::drawLowerSteelCylinder() {
@@ -32,10 +40,14 @@ const void Robot::drawLowerSteelCylinder() {
 	glPopMatrix();
 }
 
-const void Robot::drawLowerJoint() {
+const void Robot::drawLowerAxis() {
 	glPushMatrix();
 		glTranslatef(0, this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_CEILING_Z_COORDINATE + 1.5, 0);
+		glRotatep(this->lowerAxis.rotationAngle, Z_AXIS);
+		// glRotatef(this->lowerAxis.rotationAngle, 0, 1, 0);
 		drawCuboid(0.5, 3, 0.3, Color(230, 80, 21));
 	glPopMatrix();
 }
+#pragma endregion
+
 #pragma endregion

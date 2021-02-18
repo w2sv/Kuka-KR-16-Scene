@@ -23,7 +23,7 @@ void drawScene(){
 	drawPlane(groundMeasures, groundMeasures, Color(.3, .3, .3));
 	drawQuadraticGrid(groundMeasures, 20, Color(.3, .8, .8));
 
-	Robot* robot = new Robot();
+	static Robot* robot = new Robot();
 	robot->draw();
 }
 

@@ -31,3 +31,8 @@ public:
 
 	const float spread();
 };
+
+void glRotatep(float angle, const GLfloat* axis);
+
+const GLfloat X_AXIS[3] = { 1., 0., 0. };
+const GLfloat Z_AXIS[3] = { 0., 1., 0. };
