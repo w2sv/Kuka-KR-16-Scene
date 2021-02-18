@@ -10,7 +10,7 @@
 
 
 
-bool cg_help::showhelp = false, cg_help::showfps = true, cg_help::wireframe = false, cg_help::koordsystem = true;
+bool cg_help::showhelp = false, cg_help::showfps = true, cg_help::wireframe = false, cg_help::koordsystem = false;
 int cg_help::frames = 0;
 float cg_help::fps = 0.0f, cg_help::bg_size = bg_size = 0.8f, cg_help::shadow = 0.003f;
 const char * cg_help::title = "PrakCG Template V2.0,  TU-Chemnitz, 2018";

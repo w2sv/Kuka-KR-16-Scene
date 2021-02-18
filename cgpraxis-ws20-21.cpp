@@ -17,12 +17,31 @@
 #include "robot.h"
 
 
+void drawBackgroundWalls(CoordinateExtrema groundMeasures) {
+	static int tiles = 30;
+	static Color color = Color(.2, .2, .2);
+
+	glPushMatrix();
+		glRotatep(90, Axes::X);
+		glTranslatef(0, -groundMeasures.max, -groundMeasures.max);
+		drawQuadraticGrid(groundMeasures, tiles, color);
+	glPopMatrix();
+
+	glPushMatrix();
+		glRotatep(-90, Axes::Y);
+		glTranslatef(-groundMeasures.max, groundMeasures.max, 0);
+		drawQuadraticGrid(groundMeasures, tiles, color);
+	glPopMatrix();
+}
+
 void drawScene(){
 	static CoordinateExtrema groundMeasures = CoordinateExtrema(-10, 10);
 	static cg_key key;
 
-	drawPlane(groundMeasures, groundMeasures, Color(.3, .3, .3));
-	drawQuadraticGrid(groundMeasures, 20, Color(.3, .8, .8));
+	drawPlane(groundMeasures, groundMeasures, Color(.1, .1, .1));
+	drawQuadraticGrid(groundMeasures, 20, Color(.8, .0, .0));
+
+	drawBackgroundWalls(groundMeasures);
 
 	static Robot* robot = new Robot();
 	robot->draw();
