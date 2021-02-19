@@ -77,16 +77,12 @@ void init ( int argc, char **argv );
 /////////////////////////////////////////////////////////////////////////////////
 //	Globale Variablen
 /////////////////////////////////////////////////////////////////////////////////
-struct cg_globState
-{
+struct cg_globState{
 	static double screenSize[2];		// Zeichenmodus für Flächen {GL_LINE || GL_FILL}
 	static GLenum drawMode;			// Beleuchtung an / aus
 	static bool lightMode;			// Backface-Culling an / aus
 	static int normalMode;			// Hilfe-Instanz
 	static bool cullMode;			// Backface-Culling an / aus
-	static int cameraHelper[2];			// Mausposition, benoetigt für Kamera-Positionierung
 };
-
-
 
 #endif // WINDOW_H

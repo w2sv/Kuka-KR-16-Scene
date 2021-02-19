@@ -6,7 +6,6 @@ GLenum cg_globState::drawMode = GL_FILL;
 bool cg_globState::lightMode = false;
 int cg_globState::normalMode = 0;
 bool cg_globState::cullMode = false;
-int cg_globState::cameraHelper[] = { 0 };
 
 void init(int argc, char **argv)
 {
@@ -81,33 +80,25 @@ void reshapeFunc(int w, int h)
 /////////////////////////////////////////////////////////////////////////////////
 //	Menu CALLBACK Funktion
 /////////////////////////////////////////////////////////////////////////////////
-void menuFunc(int Item)
-{
-	switch (Item)
-	{
-	case ID_MENU_EXIT:
-		exit(0);
-		break;
-	case ID_MENU_WIREFRAME:
-		if (cg_globState::drawMode == GL_FILL)
-			cg_globState::drawMode = GL_LINE;
-		else
-			cg_globState::drawMode = GL_FILL;
-		break;
-	case ID_MENU_SHADE:
-		if (cg_globState::lightMode == GL_TRUE)
-			cg_globState::lightMode = GL_FALSE;
-		else
-			cg_globState::lightMode = GL_TRUE;
-		break;
-	case ID_MENU_NO_NORMALS:
-		cg_globState::normalMode = 0;
-		break;
-	case ID_MENU_PER_SURFACE_NORMALS:
-		cg_globState::normalMode = 1;
-		break;
-	case ID_MENU_PER_VERTEX_NORMALS:
-		cg_globState::normalMode = 2;
-		break;
+void menuFunc(int item){
+	switch (item){
+		case ID_MENU_EXIT:
+			exit(0);
+			break;
+		case ID_MENU_WIREFRAME:
+			cg_globState::drawMode = cg_globState::drawMode == GL_FILL ? GL_LINE : GL_FILL;
+			break;
+		case ID_MENU_SHADE:
+			cg_globState::lightMode = cg_globState::lightMode == GL_TRUE ? GL_FALSE : GL_TRUE;
+			break;
+		case ID_MENU_NO_NORMALS:
+			cg_globState::normalMode = 0;
+			break;
+		case ID_MENU_PER_SURFACE_NORMALS:
+			cg_globState::normalMode = 1;
+			break;
+		case ID_MENU_PER_VERTEX_NORMALS:
+			cg_globState::normalMode = 2;
+			break;
 	}
 }

@@ -1,8 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
 #include <iostream>
 
 #include "Include/freeglut.h"
@@ -15,23 +12,19 @@
 #include "geometry.h"
 #include "utils.h"
 #include "robot.h"
+#include "camera.h"
+#include "environment.h"
 
 
-void drawBackgroundWalls(CoordinateExtrema groundMeasures) {
-	static int tiles = 30;
-	static Color color = Color(.2, .2, .2);
+int main(int argc, char** argv) {
+	init(argc, argv);
 
-	glPushMatrix();
-		glRotatep(90, Axes::X);
-		glTranslatef(0, -groundMeasures.max, -groundMeasures.max);
-		drawQuadraticGrid(groundMeasures, tiles, color);
-	glPopMatrix();
+	// hier Objekte laden, erstellen etc.
+	// ...
 
-	glPushMatrix();
-		glRotatep(-90, Axes::Y);
-		glTranslatef(-groundMeasures.max, groundMeasures.max, 0);
-		drawQuadraticGrid(groundMeasures, tiles, color);
-	glPopMatrix();
+	// Die Hauptschleife starten
+	glutMainLoop();
+	return 0;
 }
 
 void drawScene(){
@@ -51,61 +44,12 @@ void drawScene(){
 		robot->reset();
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-//	Kamerafunktion
-/////////////////////////////////////////////////////////////////////////////////
-void setCamera()
-{
-	cg_mouse mouse;
-	// Ansichtstransformationen setzen,
-	// SetCamera() zum Beginn der Zeichenfunktion aufrufen
-	double x, y, z, The, Phi;
-	static double radius = 25;
-	// Maus abfragen
-	if (cg_mouse::buttonState(GLUT_LEFT_BUTTON))
-	{
-		cg_globState::cameraHelper[0] += mouse.moveX();
-		cg_globState::cameraHelper[1] += mouse.moveY();
-	}
-	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON))
-	{
-		radius += 0.1 * mouse.moveY();
-		if (radius < 1.0) radius = 1.0;
-	}
-	Phi = 0.2 * cg_globState::cameraHelper[0] / cg_globState::screenSize[0] * M_PI + M_PI * 0.5;
-	The = 0.2 * cg_globState::cameraHelper[1] / cg_globState::screenSize[1] * M_PI;
-	x = radius * cos(Phi) * cos(The);
-	y = radius * sin(The);
-	z = radius * sin(Phi) * cos(The);
-	int Oben = (The <= 0.5 * M_PI || The > 1.5 * M_PI) * 2 - 1;
-	gluLookAt(x, y, z, 0, 0, 0, 0, Oben, 0);
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-//	Anfang des OpenGL Programmes
-/////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char **argv)
-{
-	init(argc, argv);
-
-	// hier Objekte laden, erstellen etc.
-	// ...
-
-	// Die Hauptschleife starten
-	glutMainLoop();
-	return 0;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////
-//	komplettes Zeichnen eines Frames
-/////////////////////////////////////////////////////////////////////////////////
 void displayFunc()
 {
-	// Hilfe-Instanzen
-	cg_help help;
-	cg_globState globState;
-	cg_key key;
+	static cg_help help;
+	static cg_globState globState;
+	static cg_key key;
+	static Camera camera;
 
 	// Tastatur abfragen
 	// Achtung: einmaliges Betätigen funktioniert so nur mit glutIgnoreKeyRepeat(true) (siehe main())
@@ -130,10 +74,10 @@ void displayFunc()
 	else if (1 == key.keyState('C')){
 		globState.cullMode = !globState.cullMode; // Backfaceculling on/off
 	}
-	else if (1 == key.keyState('I')){
-		globState.cameraHelper[0] = 0;	// Initialisierung der Kamera
-		globState.cameraHelper[1] = 0;
-	}
+	//else if (1 == key.keyState('I')){
+	//	globState.cameraHelper[0] = 0;	// Initialisierung der Kamera
+	//	globState.cameraHelper[1] = 0;
+	//}
 
 	// Szene zeichnen: CLEAR, SETCAMERA, DRAW_SCENE
 
@@ -146,7 +90,7 @@ void displayFunc()
 	setDefaultLightAndMaterial(globState.lightMode);
 
 	// Kamera setzen (spherische Mausnavigation)
-	setCamera();
+	camera.set();
 
 	// Koordinatensystem zeichnen
 	help.drawKoordsystem(-10, 10, -10, 10, -10, 10);

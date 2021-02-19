@@ -112,6 +112,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="environment.cpp" />
     <ClCompile Include="geometry.cpp" />
     <ClCompile Include="help.cpp" />
     <ClCompile Include="input.cpp" />
@@ -122,6 +124,8 @@
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="environment.h" />
     <ClInclude Include="geometry.h" />
     <ClInclude Include="help.h" />
     <ClInclude Include="input.h" />
