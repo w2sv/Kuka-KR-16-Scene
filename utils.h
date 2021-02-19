@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 #include "Include/freeglut.h"
 
@@ -10,6 +11,7 @@ public:
 	GLfloat x, y, z;
 
 	Vector3(GLfloat x, GLfloat y, GLfloat z);
+	friend std::ostream& operator<<(std::ostream& os, const Vector3& vector);
 };
 
 struct Color {
@@ -47,3 +49,7 @@ struct Measurements {
 };
 
 void glTranslateZ(GLfloat value);
+
+GLdouble* getModelMatrix();
+GLdouble* getModelViewMatrix();
+Vector3 parseTranslationVector(GLdouble* modelMatrix);

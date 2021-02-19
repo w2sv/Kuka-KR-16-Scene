@@ -7,6 +7,11 @@ Vector3::Vector3(GLfloat x, GLfloat y, GLfloat z) {
 	this->y = y;
 	this->z = z;
 }
+std::ostream& operator<<(std::ostream& os, const Vector3& vec)
+{
+	os << vec.x << '/' << vec.y << '/' << vec.z << std::endl;
+	return os;
+}
 #pragma endregion
 
 #pragma region Color

@@ -49,6 +49,8 @@ public:
 class Robot
 {
 public:
+	static GLdouble* tcp_location_matrix;
+
 	Robot();
 
 	void moveArm(Vector3& position);

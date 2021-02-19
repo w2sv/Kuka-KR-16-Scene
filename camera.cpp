@@ -1,14 +1,24 @@
 #include "camera.h"
 
 
-Camera::Camera() {
-	this->screenPosX = 1956;  // TODO
-	this->screenPosY = 883;
+Camera::Camera():
+	mode(Mode::Observer)
+{
+		this->screenPosX = 1956;  // TODO
+		this->screenPosY = 883;
 }
 
+void Camera::setMode(Mode mode) { this->mode = mode; }
+
 const void Camera::set() {
-	static cg_mouse mouse;
-	
+	switch (this->mode) {
+		case Mode::Observer:
+			this->setObserverMode(); break;
+		case Mode::TCP:
+			this->setTCPMode(); break;
+	}
+}
+const void Camera::setObserverMode() {
 	double x, y, z, The, Phi;
 	static double radius = 60;
 
@@ -17,12 +27,9 @@ const void Camera::set() {
 		this->screenPosY += mouse.moveY();
 	}
 	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON)) {
-		radius += 0.1 * mouse.moveY();
-		if (radius < 1.0) 
+		radius = std::min<float>(radius + 0.1 * mouse.moveY(), 1.0);
 			radius = 1.0;
 	}
-
-	std::cout << cg_globState::screenSize[0] << " " << cg_globState::screenSize[1] << std::endl;
 
 	Phi = 0.2 * this->screenPosX / cg_globState::screenSize[0] * M_PI + M_PI * 0.5;
 	The = 0.2 * this->screenPosY / cg_globState::screenSize[1] * M_PI;
@@ -33,3 +40,5 @@ const void Camera::set() {
 
 	gluLookAt(x, y, z, 0, 0, 0, 0, Oben, 0);
 }
+
+const void Camera::setTCPMode() {}

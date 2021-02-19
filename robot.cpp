@@ -69,6 +69,7 @@ void Axis::reset() {
 #pragma endregion
 
 #pragma region Robot
+GLdouble* Robot::tcp_location_matrix = new GLdouble;
 
 Robot::Robot() :
 	lowerAxis(Axis(OrientationDimension('a', 'd', 360), OrientationDimension('s', 'w', 45), Measurements(3, 0.5, 0.7))),
@@ -88,10 +89,12 @@ const void Robot::draw() {
 	this->drawLowerSteelCylinder();
 	
 	glPushMatrix();
-	glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
+		glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
 
-		for (Axis* const axisPointer: this->axes)
-			this->axisDrawFunction[axisPointer]();
+			for (Axis* const axisPointer: this->axes)
+				this->axisDrawFunction[axisPointer]();
+
+			this->tcp_location_matrix = getModelMatrix();
 	glPopMatrix();
 }
 
