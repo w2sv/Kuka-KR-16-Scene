@@ -43,7 +43,7 @@ Axis::Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements&
 	tilt(tilt),
 	height(measurements.height),
 	width(measurements.width),
-	depth(measurements.depth),
+	length(measurements.depth),
 	centerHeight(measurements.height / 2)
 {}
 
@@ -52,7 +52,7 @@ void Axis::update() {
 	this->tilt.update();
 }
 
-const void Axis::adjustMatrixOrientationAccordingly() {
+const void Axis::adjustModelMatrixOrientationAccordingly() {
 	// rotate
 	glRotatep(this->roll.angle, Axes::Z);
 
@@ -69,8 +69,6 @@ void Axis::reset() {
 #pragma endregion
 
 #pragma region Robot
-GLdouble* Robot::tcp_location_matrix = new GLdouble;
-
 Robot::Robot() :
 	lowerAxis(Axis(OrientationDimension('a', 'd', 360), OrientationDimension('s', 'w', 45), Measurements(3, 0.5, 0.7))),
 	centralAxis(Axis(OrientationDimension('f', 'h', 360), OrientationDimension('t', 'g', 65), Measurements(2.5, 0.3, 0.5))),
@@ -82,20 +80,6 @@ Robot::Robot() :
 		{&this->outerAxis, std::bind(&Robot::drawOuterAxis, this)}
 	};
 	this->axes = { &this->lowerAxis, &this->centralAxis, &this->outerAxis };
-}
-
-const void Robot::draw() {
-	this->drawPedestal();
-	this->drawLowerSteelCylinder();
-	
-	glPushMatrix();
-		glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
-
-			for (Axis* const axisPointer: this->axes)
-				this->axisDrawFunction[axisPointer]();
-
-			this->tcp_location_matrix = getModelMatrix();
-	glPopMatrix();
 }
 
 void Robot::update() {
@@ -111,43 +95,78 @@ void Robot::reset() {
 }
 
 #pragma region Drawing
+const void Robot::draw() {
+	this->drawPedestal();
+	this->drawLowerSteelCylinder();
+
+	glPushMatrix();
+	glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
+	this->BASE_COLOR.renderMaterialized();
+	for (Axis* const axisPointer : this->axes)
+		this->axisDrawFunction[axisPointer]();
+	glPopMatrix();
+}
+
+const void drawScrewHead() {
+
+}
+
 const void Robot::drawPedestal() {
 	glPushMatrix();
-		glColor3f(1.0f, .0f, 0.0f);
+		setColor(1.0f, .0f, 0.0f);
 		glTranslatef(0, this->PEDASTEL_HEIGHT / 2, 0);
-			drawCuboid(3, this->PEDASTEL_HEIGHT, 4, Color(1.0, 0.0, 0.0, 0.2));
+		glScalef(4, this->PEDASTEL_HEIGHT, 3);
+			drawCube();
 	glPopMatrix();
 }
 
 const void Robot::drawLowerSteelCylinder() {
+	static float LOWER_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.2;
+	static float CENTRAL_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.7;
+	static float UPPER_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.1;
+
+	// lower segment
 	glPushMatrix();
-		glColor3f(.4f, .4f, .4f);
-		glTranslatef(0, this->PEDASTEL_HEIGHT, 0);
-		glRotatef(90, -1, 0, 0);
-			drawCylinder(1, 1, this->LOWER_STEEL_CYLINDER_HEIGHT);
+		this->BASE_COLOR.renderMaterialized();
+		glTranslateZ(this->PEDASTEL_HEIGHT);
+		glRotatep(270, Axes::X);
+		drawCylinder(1.2, 1, LOWER_SEGMENT_HEIGHT);
+	glPopMatrix();
+
+	// central segment
+	glPushMatrix();
+		setColor(0.2, 0.2, 0.2);
+		glTranslateZ(LOWER_SEGMENT_HEIGHT + this->PEDASTEL_HEIGHT);
+		glRotatep(270, Axes::X);
+		drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
+	glPopMatrix();
+
+	// upper segment
+	glPushMatrix();
+		this->BASE_COLOR.renderMaterialized();
+		glTranslateZ(this->PEDASTEL_HEIGHT + LOWER_SEGMENT_HEIGHT + CENTRAL_SEGMENT_HEIGHT);
+		glRotatep(270, Axes::X);
+		drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
 	glPopMatrix();
 }
 
 #pragma region AxesDrawing
 const void Robot::drawLowerAxis() {
 	glTranslateZ(this->lowerAxis.centerHeight);
-	this->lowerAxis.adjustMatrixOrientationAccordingly();
-		drawCuboid(this->lowerAxis.depth, this->lowerAxis.height, this->lowerAxis.width, BASE_COLOR);
+	this->lowerAxis.adjustModelMatrixOrientationAccordingly();
+		drawCuboid(this->lowerAxis.length, this->lowerAxis.height, this->lowerAxis.width);
 	glTranslateZ(this->lowerAxis.centerHeight);
 }
 
 const void Robot::drawCentralAxis() {
 	glTranslateZ(this->centralAxis.centerHeight);
-	this->centralAxis.adjustMatrixOrientationAccordingly();
-		drawCuboid(this->centralAxis.depth, this->centralAxis.height, this->centralAxis.width, BASE_COLOR);
+	this->centralAxis.adjustModelMatrixOrientationAccordingly();
+		drawCuboid(this->centralAxis.length, this->centralAxis.height, this->centralAxis.width);
 	glTranslateZ(this->centralAxis.centerHeight);
 }
 
 const void Robot::drawOuterAxis(){
-	/*glTranslatef(this->centralAxis.depth / 2, this->centralAxis.centerHeight, 0);
-	glRotatep(90, Axes::Y);
-	this->centralAxis.adjustMatrixOrientationAccordingly();
-		drawCuboid(this->outerAxis.depth, this->outerAxis.height, this->outerAxis.width, BASE_COLOR);*/
+	
 }
 #pragma endregion
 

@@ -5,8 +5,11 @@
 #include "Include/freeglut.h"
 
 #include "utils.h"
+#include "light.h"
 
-void drawCuboid(float length, float height, float depth, Color& color);
+void drawCube();
+
+void drawCuboid(float length, float height, float depth);
 
 void drawQuadraticGrid(CoordinateExtrema& xExtrema, int tiles, Color& color);
 

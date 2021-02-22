@@ -12,6 +12,7 @@
 #include "utils.h"
 #include "geometry.h"
 #include "input.h"
+#include "light.h"
 
 
 struct OrientationDimension {
@@ -36,21 +37,19 @@ struct OrientationDimension {
 struct Axis {
 public:
 	OrientationDimension roll, tilt;
-	float height, width, depth;
+	float height, width, length;
 	float centerHeight;
 
 	Axis() {}  // TODO: abort respective need
 	Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements& measurements);
 	void update();
-	const void adjustMatrixOrientationAccordingly();
+	const void adjustModelMatrixOrientationAccordingly();
 	void reset();
 };
 
 class Robot
 {
 public:
-	static GLdouble* tcp_location_matrix;
-
 	Robot();
 
 	void moveArm(Vector3& position);
@@ -59,16 +58,18 @@ public:
 	void reset();
 
 private:
-	const float PEDASTEL_HEIGHT = 2.;
+	const float PEDASTEL_HEIGHT = 3.;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.2;
 
 	Color BASE_COLOR = Color(230, 80, 21);
-
+	
 	Axis lowerAxis;
 	Axis centralAxis;
 	Axis outerAxis;
 
 	std::vector<Axis*> axes;
+
+	const void drawScrewHead();
 
 	const void drawPedestal();
 	const void drawLowerSteelCylinder();

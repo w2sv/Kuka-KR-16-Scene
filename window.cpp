@@ -3,12 +3,11 @@
 
 double cg_globState::screenSize[] = { 0 };
 GLenum cg_globState::drawMode = GL_FILL;
-bool cg_globState::lightMode = false;
+bool cg_globState::lightMode = true;
 int cg_globState::normalMode = 0;
 bool cg_globState::cullMode = false;
 
-void init(int argc, char **argv)
-{
+void init(int argc, char **argv){
 	int MainWin;		// Identifier vom Hauptfenster
 	int MainMenu;		// Identifier vom Hauptmenu
 
@@ -53,8 +52,7 @@ void init(int argc, char **argv)
 /////////////////////////////////////////////////////////////////////////////////
 //	CALLBACK Funktion fuer Idle: wird aufgerufen, Standard-Callback
 /////////////////////////////////////////////////////////////////////////////////
-void idleFunc()
-{
+void idleFunc(){
 	glutPostRedisplay();
 }
 
@@ -64,8 +62,7 @@ void idleFunc()
 //	Fenstergroesse aendert
 //		w,h: neue Breite und Hoehe des Fensters
 /////////////////////////////////////////////////////////////////////////////////
-void reshapeFunc(int w, int h)
-{
+void reshapeFunc(int w, int h){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45, (double)w / (double)h, 1, 2000);

@@ -27,8 +27,7 @@ const void Camera::setObserverMode() {
 		this->screenPosY += mouse.moveY();
 	}
 	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON)) {
-		radius = std::min<float>(radius + 0.1 * mouse.moveY(), 1.0);
-			radius = 1.0;
+		radius = std::max<float>(radius + 0.1 * mouse.moveY(), 1.0);
 	}
 
 	Phi = 0.2 * this->screenPosX / cg_globState::screenSize[0] * M_PI + M_PI * 0.5;

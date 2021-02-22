@@ -22,6 +22,7 @@ public:
 	explicit Color(int r, int g, int b, double o = 1.0);
 
 	const void render();
+	const void renderMaterialized();
 };
 
 struct CoordinateExtrema {

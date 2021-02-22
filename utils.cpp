@@ -32,7 +32,13 @@ Color::Color(int r, int g, int b, double o) {
 }
 
 const void Color::render() {
-	glColor4f(r, g, b, o);
+	glColor3f(r, g, b);
+}
+
+const void Color::renderMaterialized() {
+	this->render();
+	GLfloat amb_diff[4] = { r, g, b, 1};
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, amb_diff);
 }
 #pragma endregion
 

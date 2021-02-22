@@ -105,8 +105,7 @@ void displayFunc()
 	// Backface Culling on/off);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
-	if (globState.cullMode) glEnable(GL_CULL_FACE);
-	else glDisable(GL_CULL_FACE);
+	globState.cullMode ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 
 	// Modell zeichnen /////////////////!!!!!!!!!!!!!!!!!!!!!!!!///////////////////////
 	drawScene();

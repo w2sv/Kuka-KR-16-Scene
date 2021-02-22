@@ -1,5 +1,13 @@
 #include "light.h"
 
+// Farbe setzen fuer Farb- und Beleuchtungsmodus
+void setColor(GLfloat r, GLfloat g, GLfloat b) {
+	glColor3f(r, g, b);
+	GLfloat amb_diff[4] = { r,g,b,1 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, amb_diff);
+}
+
+
 void setMaterial(GLenum face, GLfloat amb[4], GLfloat diff[4], GLfloat spec[4], GLfloat shine, GLfloat emis[4])
 // Aktualisierung des OpenGL Materials
 {
@@ -25,7 +33,7 @@ void setLights()
 
 	// Paramaters fuer Lichtquelle 0
 	GLfloat l_pos[4] = { -1.0f, 1.0f, 1.0f, 0.0f };
-	GLfloat l_amb[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	GLfloat l_amb[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
 	GLfloat l_diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat l_spec[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat l_spotdir[3] = { 0.0f, 0.0f, 1.0f };
@@ -57,7 +65,7 @@ void setDefaultLightAndMaterial(GLboolean lightMode) {
 	if (lightMode == GL_TRUE) // Beleuchtung aktivieren
 	{
 		GLfloat m_amb[4] = { 0.2, 0.2, 0.2, 1.0 };
-		GLfloat *m_diff = color;
+		GLfloat* m_diff = color;
 		GLfloat m_spec[4] = { 0.8, 0.8, 0.8, 1.0 };
 		GLfloat m_shine = 32.0;
 		GLfloat m_emiss[4] = { 0.0, 0.0, 0.0, 1.0 };
@@ -66,6 +74,8 @@ void setDefaultLightAndMaterial(GLboolean lightMode) {
 
 		setLights();
 
+		glEnable(GL_NORMALIZE);
+
 		glEnable(GL_LIGHTING);
 	}
 	else   // Zeichnen im Farbmodus
@@ -73,6 +83,4 @@ void setDefaultLightAndMaterial(GLboolean lightMode) {
 		glDisable(GL_LIGHTING);
 		glColor4fv(color);
 	}
-
-
 };
