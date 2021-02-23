@@ -14,6 +14,13 @@ std::ostream& operator<<(std::ostream& os, const Vector3& vec)
 }
 #pragma endregion
 
+#pragma region Vector2
+Vector2::Vector2(GLfloat x, GLfloat y) {
+	this->x = x;
+	this->y = y;
+}
+#pragma endregion
+
 #pragma region Color
 Color::Color(double r, double g, double b, double o) {
 	this->r = r;
@@ -81,4 +88,18 @@ Measurements::Measurements(float height, float width, float depth):
 
 void glTranslateZ(GLfloat value) {
 	glTranslatef(0, value, 0);
+}
+
+std::vector<std::string> getStringSplits(std::string str, std::string delimiter) {
+	std::vector<std::string> splits;
+	unsigned int start = 0;
+	unsigned int end = 0;
+
+	while (end != std::string::npos) {
+		end = str.find(delimiter, start);
+		splits.push_back(str.substr(start, (end == std::string::npos ? str.length() : end) - start));
+		start = end + delimiter.length();
+	}
+
+	return splits;
 }

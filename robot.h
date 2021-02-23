@@ -13,6 +13,7 @@
 #include "geometry.h"
 #include "input.h"
 #include "light.h"
+#include "wavefront.h"
 
 
 struct OrientationDimension {

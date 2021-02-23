@@ -155,6 +155,14 @@ const void Robot::drawLowerAxis() {
 	glTranslateZ(this->lowerAxis.centerHeight);
 	this->lowerAxis.adjustModelMatrixOrientationAccordingly();
 		drawCuboid(this->lowerAxis.length, this->lowerAxis.height, this->lowerAxis.width);
+
+		glPushMatrix();
+			glTranslatef(3, 0, 0);
+			static cg_object3D hollowCylinder;
+			hollowCylinder.load("obj_files\\hollow_curved_cylinder.obj", false);
+			hollowCylinder.draw();
+		glPopMatrix();
+
 	glTranslateZ(this->lowerAxis.centerHeight);
 }
 

@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "Include/freeglut.h"
 
@@ -12,6 +14,13 @@ public:
 
 	Vector3(GLfloat x, GLfloat y, GLfloat z);
 	friend std::ostream& operator<<(std::ostream& os, const Vector3& vector);
+};
+
+struct Vector2 {
+public:
+	GLfloat x, y;
+
+	Vector2(GLfloat x, GLfloat y);
 };
 
 struct Color {
@@ -51,6 +60,4 @@ struct Measurements {
 
 void glTranslateZ(GLfloat value);
 
-GLdouble* getModelMatrix();
-GLdouble* getModelViewMatrix();
-Vector3 parseTranslationVector(GLdouble* modelMatrix);
+std::vector<std::string> getStringSplits(std::string str, std::string delimiter);
