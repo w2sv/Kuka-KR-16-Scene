@@ -80,21 +80,29 @@ void Axis::reset() {
 
 
 #pragma region Robot
-cg_object3D** Robot::objects = new cg_object3D*[1];
+const Color Robot::BASE_COLOR = Color(230, 80, 21);
 
-void loadObjects() {
+
+
+#pragma region Objects
+cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
+
+void Robot::loadObjects() {
 	const char* DIR_NAME = ".\\objects\\";
 	const char* FILE_NAMES[] = { "hollow_curved_cylinder.obj" };
 
-	for (size_t i = 0; i < 1; i++) {
-		cg_object3D* obj = new cg_object3D;
-		obj->load(concatenatedCharPtr(DIR_NAME, FILE_NAMES[i]), false);
-
-		Robot::objects[i] = std::move(obj);
-		std::cout << "1";
+	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
+		Robot::objects[i].load(concatenatedCharPtr(DIR_NAME, FILE_NAMES[i]), false);
 	}
-	std::cout << "2";
 }
+
+
+void Robot::setObjectMaterials() {
+	objects[Object::HollowCylinder].setMaterial(BASE_COLOR.r, BASE_COLOR.g, BASE_COLOR.b, BASE_COLOR.o, 0.5, 0.5, 0.8);
+}
+#pragma endregion
+
+
 
 Robot::Robot() :
 	lowerAxis(Axis(
@@ -113,11 +121,8 @@ Robot::Robot() :
 		{&this->lowerAxis, std::bind(&Robot::drawLowerAxis, this)},
 		{&this->centralAxis, std::bind(&Robot::drawCentralAxis, this)},
 		{&this->outerAxis, std::bind(&Robot::drawOuterAxis, this)}}),
-	axes({ &this->lowerAxis, &this->centralAxis, &this->outerAxis }){
-
-	// set object materials
-	(*objects)[Object::HollowCylinder]->setMaterial(BASE_COLOR.r, BASE_COLOR.g, BASE_COLOR.b, BASE_COLOR.o, 0.5, 0.5, 0.8);
-}
+	axes({ &this->lowerAxis, &this->centralAxis, &this->outerAxis })
+{}
 
 
 void Robot::update() {
@@ -202,9 +207,7 @@ void Robot::drawLowerAxis() const {
 
 		glPushMatrix();
 		glTranslatef(0, 3, 0);
-		std::cout << 6;
-		(objects + Object::HollowCylinder)->draw();
-		std::cout << 7;
+		objects[Object::HollowCylinder].draw();
 		glPopMatrix();
 
 	glTranslateZ(this->lowerAxis.centerHeight);

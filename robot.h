@@ -52,19 +52,11 @@ public:
 };
 
 
-enum Object {
-	HollowCylinder,
-};
-
-
-void loadObjects();
-
-
-
 class Robot
 {
 public:
-	static cg_object3D** objects;
+	static void loadObjects();
+	static void setObjectMaterials();
 
 	Robot();
 
@@ -74,8 +66,17 @@ public:
 	void reset();
 
 private:
-	const Color BASE_COLOR = Color(230, 80, 21);
+	const static Color BASE_COLOR;
 	void drawScrewHead() const;
+
+	// ------------OBJECTS-----------------
+
+	const static int N_OBJECTS = 1;
+	static cg_object3D objects[N_OBJECTS];
+
+	enum Object {
+		HollowCylinder,
+	};
 
 	// ------------PARTS-------------------
 
@@ -100,6 +101,4 @@ private:
 	void drawOuterAxis() const;
 	Axis outerAxis;
 };
-
-
 #endif
