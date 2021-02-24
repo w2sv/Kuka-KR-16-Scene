@@ -20,7 +20,6 @@ struct OrientationDimension {
 	public:
 		float angle;
 		
-		OrientationDimension() {}  // TODO: abort respective need
 		OrientationDimension(char incrementationKey, char decrementationKey, float angleLimit);
 		void update();
 	private:
@@ -41,8 +40,7 @@ public:
 	float height, width, length;
 	float centerHeight;
 
-	Axis() {}  // TODO: abort respective need
-	Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements& measurements);
+	Axis(OrientationDimension&& roll, OrientationDimension&& tilt, Measurements&& measurements);
 	void update();
 	void adjustModelMatrixOrientationAccordingly() const;
 	void reset();

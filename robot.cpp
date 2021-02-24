@@ -42,7 +42,7 @@ void OrientationDimension::clipAngle() {
 
 
 #pragma region Axis
-Axis::Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements& measurements):
+Axis::Axis(OrientationDimension&& roll, OrientationDimension&& tilt, Measurements&& measurements):
 	roll(roll),
 	tilt(tilt),
 	height(measurements.height),
