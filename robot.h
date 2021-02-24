@@ -44,41 +44,48 @@ public:
 	Axis() {}  // TODO: abort respective need
 	Axis(OrientationDimension& roll, OrientationDimension& tilt, Measurements& measurements);
 	void update();
-	const void adjustModelMatrixOrientationAccordingly();
+	void adjustModelMatrixOrientationAccordingly() const;
 	void reset();
 };
+
+static cg_object3D hollowCylinder;
+
 
 class Robot
 {
 public:
 	Robot();
 
+	void draw();  // TODO: make const again
 	void moveArm(Vector3& position);
-	const void draw();
 	void update();
 	void reset();
 
 private:
+	const Color BASE_COLOR = Color(230, 80, 21);
+	void drawScrewHead() const;
+
+	// ------------PARTS-------------------
+
+	void drawPedestal() const;
 	const float PEDASTEL_HEIGHT = 3.;
+
+	void drawLowerSteelCylinder() const;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.2;
 
-	Color BASE_COLOR = Color(230, 80, 21);
-	
-	Axis lowerAxis;
-	Axis centralAxis;
-	Axis outerAxis;
+		// --------------AXES------------------
 
 	std::vector<Axis*> axes;
+	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
 
-	const void drawScrewHead();
 
-	const void drawPedestal();
-	const void drawLowerSteelCylinder();
-	
-	const void drawLowerAxis();
-	const void drawCentralAxis();
-	const void drawOuterAxis();
+	void drawLowerAxis() const;
+	Axis lowerAxis;
 
-	std::map<Axis*, std::function<const void()>> axisDrawFunction;
+	void drawCentralAxis() const;
+	Axis centralAxis;
+
+	void drawOuterAxis() const;
+	Axis outerAxis;
 };
 

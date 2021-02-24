@@ -8,6 +8,7 @@
 
 #include "Include/freeglut.h"
 
+
 struct Vector3 {
 public:
 	GLfloat x, y, z;
@@ -16,12 +17,14 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const Vector3& vector);
 };
 
+
 struct Vector2 {
 public:
 	GLfloat x, y;
 
 	Vector2(GLfloat x, GLfloat y);
 };
+
 
 struct Color {
 public:
@@ -30,9 +33,10 @@ public:
 	Color(double r, double g, double b, double o = 1.0);
 	explicit Color(int r, int g, int b, double o = 1.0);
 
-	const void render();
-	const void renderMaterialized();
+	void render() const;
+	void renderMaterialized() const;
 };
+
 
 struct CoordinateExtrema {
 public:
@@ -41,10 +45,12 @@ public:
 	CoordinateExtrema(float min, float max);
 	CoordinateExtrema(float absValue);
 
-	const float spread();
+	float spread() const;
 };
 
+
 void glRotatep(float angle, const GLfloat* axis);
+
 
 namespace Axes {
 	extern GLfloat const X[3];
@@ -52,12 +58,12 @@ namespace Axes {
 	extern GLfloat const Z[3];
 }
 
+
 struct Measurements {
 	float height, width, depth;
 
 	Measurements(float height, float width, float depth);
 };
 
-void glTranslateZ(GLfloat value);
 
-std::vector<std::string> getStringSplits(std::string str, std::string delimiter);
+void glTranslateZ(GLfloat value);

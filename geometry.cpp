@@ -77,10 +77,3 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 
 	gluDeleteQuadric(q);
 };
-
-//void drawEllipsoid() {
-//	glPushMatrix();
-//		glScalef(1, 0.5, 0.5);
-//		glutSolidSphere(1, SLICES, STACKS);
-//	glPopMatrix();
-//}

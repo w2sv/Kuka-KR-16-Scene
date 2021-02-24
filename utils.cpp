@@ -38,11 +38,11 @@ Color::Color(int r, int g, int b, double o) {
 	this->o = o;
 }
 
-const void Color::render() {
+void Color::render() const {
 	glColor3f(r, g, b);
 }
 
-const void Color::renderMaterialized() {
+void Color::renderMaterialized() const {
 	this->render();
 	GLfloat amb_diff[4] = { r, g, b, 1};
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, amb_diff);
@@ -62,7 +62,7 @@ CoordinateExtrema::CoordinateExtrema(float absValue) {
 	this->max = absValue;
 }
 
-const float CoordinateExtrema::spread() {
+float CoordinateExtrema::spread() const {
 	return abs(this->max - this->min);
 }
 #pragma endregion
@@ -88,18 +88,4 @@ Measurements::Measurements(float height, float width, float depth):
 
 void glTranslateZ(GLfloat value) {
 	glTranslatef(0, value, 0);
-}
-
-std::vector<std::string> getStringSplits(std::string str, std::string delimiter) {
-	std::vector<std::string> splits;
-	unsigned int start = 0;
-	unsigned int end = 0;
-
-	while (end != std::string::npos) {
-		end = str.find(delimiter, start);
-		splits.push_back(str.substr(start, (end == std::string::npos ? str.length() : end) - start));
-		start = end + delimiter.length();
-	}
-
-	return splits;
 }
