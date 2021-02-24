@@ -28,7 +28,13 @@ inline void crossProduct(GLfloat* n, GLfloat* a, GLfloat* b)
 
 cg_object3D::cg_object3D()
 {
-	points = NULL;
+	points = nullptr;
+	normals = nullptr;
+	texcoords = nullptr;
+
+	f_normals = nullptr;
+	p_normals = nullptr;
+
 	setMaterial(0.6f, 0.6f, 0.6f, 1.0f, 0.0f, 128.0f, 0.0f);
 	setPosition(0.0f, 0.0f, 0.0f);
 	setNormalmode(2);

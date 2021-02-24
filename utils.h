@@ -67,3 +67,6 @@ struct Measurements {
 
 
 void glTranslateZ(GLfloat value);
+
+
+char* concatenatedCharPtr(const char* a, const char* b);

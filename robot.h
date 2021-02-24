@@ -1,11 +1,16 @@
 #pragma once
 
+#ifndef ROBOT_H
+#define ROBOT_H
+
 #include <iostream>
 #include <limits>
 #include <functional>
 #include <map>
 #include <vector>
 #include <cmath>
+#include <sstream>
+#include <string>
 
 #include "Include/freeglut.h"
 
@@ -46,12 +51,21 @@ public:
 	void reset();
 };
 
-static cg_object3D hollowCylinder;
+
+enum Object {
+	HollowCylinder,
+};
+
+
+void loadObjects();
+
 
 
 class Robot
 {
 public:
+	static cg_object3D** objects;
+
 	Robot();
 
 	void draw();  // TODO: make const again
@@ -87,3 +101,5 @@ private:
 	Axis outerAxis;
 };
 
+
+#endif

@@ -19,11 +19,13 @@
 int main(int argc, char** argv) {
 	init(argc, argv);
 
-	// hier Objekte laden, erstellen etc.
-	// ...
+	// load objects
+	loadObjects();
+	std::cout << 3;
 
-	// Die Hauptschleife starten
+	// start main loop
 	glutMainLoop();
+
 	return 0;
 }
 
@@ -37,7 +39,9 @@ void drawScene(){
 	drawBackgroundWalls(groundMeasures);
 
 	static Robot* robot = new Robot();
+	std::cout << 4;
 	robot->draw();
+	std::cout << 5;
 	robot->update();
 
 	if (key.keyState('R') == 1)

@@ -108,3 +108,14 @@ Measurements::Measurements(float height, float width, float depth):
 void glTranslateZ(GLfloat value) {
 	glTranslatef(0, value, 0);
 }
+
+
+char* concatenatedCharPtr(const char* a, const char* b) {
+	// Reference: https://stackoverflow.com/a/1995057
+
+	char* result = (char*)calloc(strlen(a) + strlen(b) + 1, sizeof(char));
+	strcpy(result, a);
+	strcat(result, b);
+
+	return result;
+}
