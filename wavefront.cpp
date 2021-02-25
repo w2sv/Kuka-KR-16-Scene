@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <math.h>
+#include <iostream>
 
 #include "Include/glew.h"
 #include "Include/freeglut.h"
@@ -148,9 +149,12 @@ bool cg_object3D::readClusterVertex(char** r_line, int* p, int* t, int* n)
 
 void cg_object3D::load(const char* filename, bool use_vbos)
 {
-	if (!filename) return;
 	FILE* f = fopen(filename, "r");
-	if (!f) return;
+	if (!f) {
+		std::cerr << filename << "does not exist" << std::endl;
+		std::getchar();
+		std::exit(1);
+	};
 
 	int npoints = 0, ntris = 0, nnormals = 0, ntexcoords = 0;
 

@@ -88,7 +88,7 @@ cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 
 void Robot::loadObjects() {
 	const char* DIR_NAME = ".\\objects\\";
-	const char* FILE_NAMES[] = { "hollow_curved_cylinder.obj" };
+	const char* FILE_NAMES[] = { "first_joint.obj" };
 
 	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
 		Robot::objects[i].load(concatenatedCharPtr(DIR_NAME, FILE_NAMES[i]), false);

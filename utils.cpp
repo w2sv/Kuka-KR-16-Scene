@@ -105,9 +105,7 @@ Measurements::Measurements(float height, float width, float depth):
 
 
 
-void glTranslateZ(GLfloat value) {
-	glTranslatef(0, value, 0);
-}
+void glTranslateZ(GLfloat value) { glTranslatef(0, value, 0); }
 
 
 char* concatenatedCharPtr(const char* a, const char* b) {
