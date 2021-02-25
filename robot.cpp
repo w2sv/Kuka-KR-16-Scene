@@ -97,7 +97,7 @@ void Robot::loadObjects() {
 
 
 void Robot::setObjectMaterials() {
-	objects[Object::HollowCylinder].setMaterial(BASE_COLOR.r, BASE_COLOR.g, BASE_COLOR.b, BASE_COLOR.o, 0.5, 0.5, 0.8);
+	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0.5, 0.5, 0.8);
 }
 #pragma endregion
 
@@ -145,7 +145,7 @@ void Robot::draw() {
 
 	glPushMatrix();
 		glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
-		this->BASE_COLOR.renderMaterialized();
+		this->BASE_COLOR.render();
 		for (Axis* const axisPointer : this->axes)
 			this->axis2DrawFunction[axisPointer]();
 	glPopMatrix();
@@ -174,7 +174,7 @@ void Robot::drawLowerSteelCylinder() const {
 
 	// lower segment
 	glPushMatrix();
-		this->BASE_COLOR.renderMaterialized();
+		this->BASE_COLOR.render();
 		glTranslateZ(this->PEDASTEL_HEIGHT);
 		glRotatep(270, Axes::X);
 		drawCylinder(1.2, 1, LOWER_SEGMENT_HEIGHT);
@@ -190,7 +190,7 @@ void Robot::drawLowerSteelCylinder() const {
 
 	// upper segment
 	glPushMatrix();
-		this->BASE_COLOR.renderMaterialized();
+		this->BASE_COLOR.render();
 		glTranslateZ(this->PEDASTEL_HEIGHT + LOWER_SEGMENT_HEIGHT + CENTRAL_SEGMENT_HEIGHT);
 		glRotatep(270, Axes::X);
 		drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);

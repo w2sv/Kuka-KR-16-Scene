@@ -6,8 +6,10 @@
 
 #include "Include/glew.h"
 #include "Include/freeglut.h"
+
 #define EXPORT_EXT
 #include "wavefront.h"
+#include "utils.h"
 
 /* wavefront */
 
@@ -75,6 +77,12 @@ void cg_object3D::setMaterial(GLfloat red, GLfloat green, GLfloat blue, GLfloat 
 	emis[2] = blue * emission;
 	emis[3] = alpha;
 }
+
+
+void cg_object3D::setMaterial(Color& color, GLfloat spec, GLfloat shine, GLfloat emis) {
+	setMaterial(color.r, color.g, color.b, color.a, spec, shine, emis);
+}
+
 
 void cg_object3D::setPosition(GLfloat x, GLfloat y, GLfloat z)
 {

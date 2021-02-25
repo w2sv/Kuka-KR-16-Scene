@@ -38,9 +38,7 @@ void drawScene(){
 	drawBackgroundWalls(groundMeasures);
 
 	static Robot* robot = new Robot();
-	std::cout << 4;
 	robot->draw();
-	std::cout << 5;
 	robot->update();
 
 	if (key.keyState('R') == 1)

@@ -25,15 +25,15 @@ void drawCuboid(float length, float height, float depth) {
 }
 
 void drawQuadraticGrid(CoordinateExtrema& extrema, int tiles, Color& color) {
-	color.renderMaterialized();
+	color.render();
 
 	glBegin(GL_LINES);
 		for (float v = extrema.min; v <= extrema.max; v+= extrema.spread() / tiles) {
-			v == extrema.min || v == extrema.max ? setColor(.6, .3, .3) : color.renderMaterialized();
+			v == extrema.min || v == extrema.max ? setColor(.6, .3, .3) : color.render();
 			glVertex3f(v, 0, extrema.min);
 			glVertex3f(v, 0, extrema.max);
 
-			v == extrema.min || v == extrema.max ? setColor(.3, .3, .6) : color.renderMaterialized();
+			v == extrema.min || v == extrema.max ? setColor(.3, .3, .6) : color.render();
 			glVertex3f(extrema.min, 0, v);
 			glVertex3f(extrema.max, 0, v);
 		};
@@ -44,7 +44,7 @@ void drawPlane(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& 
 	const float Z_COORDINATE = -0.01;
 	
 	glBegin(GL_QUADS);
-		// color.renderMaterialized();
+		// color.render();
 
 		glVertex3f(xExtrema.min, Z_COORDINATE, yExtrema.min);
 		glVertex3f(xExtrema.max, Z_COORDINATE, yExtrema.min);

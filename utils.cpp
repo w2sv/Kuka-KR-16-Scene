@@ -28,31 +28,27 @@ Vector2::Vector2(GLfloat x, GLfloat y) {
 
 
 #pragma region Color
-Color::Color(double r, double g, double b, double o) {
+Color::Color(double r, double g, double b, double a) {
 	this->r = r;
 	this->g = g;
 	this->b = b;
 
-	this->o = o;
+	this->a = a;
 }
 
 
-Color::Color(int r, int g, int b, double o) {
-	this->r = r / 255.;
-	this->g = g / 255.;
-	this->b = b / 255.;
+Color::Color(int r, int g, int b, int a) {
+	static float DIVISOR = 255.;
 
-	this->o = o;
+	this->r = r / DIVISOR;
+	this->g = g / DIVISOR;
+	this->b = b / DIVISOR;
+	this->a = a / DIVISOR;
 }
 
 
 void Color::render() const {
 	glColor3f(r, g, b);
-}
-
-
-void Color::renderMaterialized() const {
-	this->render();
 	GLfloat amb_diff[4] = { r, g, b, 1};
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, amb_diff);
 }

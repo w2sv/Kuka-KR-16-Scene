@@ -28,13 +28,14 @@ public:
 
 struct Color {
 public:
-	GLfloat r, g, b, o;
+	GLfloat r, g, b, a;
 
-	Color(double r, double g, double b, double o = 1.0);
-	explicit Color(int r, int g, int b, double o = 1.0);
+	Color(double r, double g, double b, double a = 1.0);
+
+	// Constructor for initialization by means of int color values ranging from 0 to 255
+	explicit Color(int r, int g, int b, int a = 255);
 
 	void render() const;
-	void renderMaterialized() const;
 };
 
 

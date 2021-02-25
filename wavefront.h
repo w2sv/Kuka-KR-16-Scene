@@ -5,6 +5,8 @@
 #ifndef WAVEFRONT_H
 #define WAVEFRONT_H
 
+#include "utils.h"
+
 inline GLfloat* normieren ( GLfloat v[3] );
 inline void crossProduct( GLfloat *n, GLfloat *a, GLfloat *b );
 
@@ -24,6 +26,7 @@ public:
 
 	// Objekt Material + Farben setzen
 	void setMaterial ( GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha, GLfloat spec, GLfloat shine, GLfloat emis );
+	void setMaterial(Color& color, GLfloat spec, GLfloat shine, GLfloat emis);
 
 	// Objekt Position setzen
 	void setPosition ( GLfloat x, GLfloat y, GLfloat z );
