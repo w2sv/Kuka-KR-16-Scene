@@ -89,7 +89,7 @@ void Robot::loadObjects() {
 
 
 void Robot::setObjectMaterials() {
-	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0.1, 0.8, 0.3);
+	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0, 0, 0);
 }
 #pragma endregion
 
@@ -118,14 +118,11 @@ void Robot::reset() {
 
 #pragma region Drawing
 void Robot::draw() {
-	drawOctagon(2, 0.5);
-
-	// this->drawPedestal();
-	// this->drawLowerSteelCylinder();
+	 this->drawPedestal();
+	 this->drawLowerSteelCylinder();
 
 	glPushMatrix();
 		glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
-		this->BASE_COLOR.render();
 		for (Axis* const axisPointer : this->axes)
 			this->axis2DrawFunction[axisPointer]();
 	glPopMatrix();
@@ -141,7 +138,7 @@ void Robot::drawPedestal() const {
 	glPushMatrix();
 		setColor(1.0f, .0f, 0.0f);
 		glTranslatef(0, this->PEDASTEL_HEIGHT / 2, 0);
-		glScalef(4, this->PEDASTEL_HEIGHT, 3);
+		glScalef(6, this->PEDASTEL_HEIGHT, 5);
 			drawCube();
 	glPopMatrix();
 }
@@ -182,9 +179,22 @@ void Robot::drawLowerSteelCylinder() const {
 void Robot::drawLowerAxis() const {
 	this->lowerAxis.adjustModelMatrixOrientationAccordingly();
 
+	// hollow cylinder with second axis mount
 	glPushMatrix();
+		glTranslatef(0, 0, 0.07);
 		glScalef(2, 2, 2);
 		objects[Object::HollowCylinder].draw();
+	glPopMatrix();
+
+	// draw black block
+	glPushMatrix();
+		Color(0, 0, 0).render();
+		glTranslateZ(0.7);
+
+		OctagonVertices octVertices = drawOctagon(1.5, 0.4);
+		
+		Color(1., 0., 0.).render();
+		drawOctagonCage(octVertices);
 	glPopMatrix();
 }
 

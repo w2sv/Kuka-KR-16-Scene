@@ -8,7 +8,7 @@
 #include "light.h"
 
 
-const Color EDGE_COLOR(1., 0.1, 0.1);
+const Color EDGE_COLOR(.1, .1, .1);
 
 
 void drawCube();
@@ -21,6 +21,11 @@ void drawPlane(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& 
 
 void drawCylinder(float startRadius, float endRadius, float height);
 
-void drawOctagon(float heigth, float edgeLength, bool emphasizeEdges = true);
 
-void _drawOctagonEdges(GLfloat octagonVertices[2][8][3]);
+#pragma region Octagon
+typedef GLfloat(*OctagonVertices)[2][8][3];
+
+OctagonVertices drawOctagon(float heigth, float edgeLength);
+
+void drawOctagonCage(OctagonVertices);
+#pragma endregion

@@ -11,7 +11,7 @@ void drawCube() {
 
 		// Draht-Würfel Zeichnen
 		glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
-			setColor(0.1, 0.1, 0.1);
+			EDGE_COLOR.render();
 			glDepthFunc(GL_LEQUAL);
 			glutWireCube(1);
 		glPopAttrib();
@@ -84,7 +84,7 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 };
 
 
-void drawOctagon(float heigth, float edgeLength, bool emphasizeEdges) {
+OctagonVertices drawOctagon(float heigth, float edgeLength) {
 	float z = heigth / 2;
 
 	GLfloat octagonVertices[2][8][3] = {
@@ -127,36 +127,34 @@ void drawOctagon(float heigth, float edgeLength, bool emphasizeEdges) {
 	}
 	
 	// connect vertices opposing each other across xz-plane
-	for (size_t faceIndex = 0; faceIndex < 7; faceIndex++) {
+	for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
 		glBegin(GL_POLYGON);
 			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
 				for (size_t i = 0; i < 2; i++) {
-					glVertex3fv(octagonVertices[zPolarityIndex][faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2]);
+					glVertex3fv(octagonVertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8]);
 				}
 			}
 		glEnd();
 	}
 
-	// draw octagon cage if desired
-	if (emphasizeEdges)
-		_drawOctagonEdges(octagonVertices);
+	return &octagonVertices;
 }
 
 
-void _drawOctagonEdges(GLfloat octagonVertices[2][8][3]) {
+void drawOctagonCage(OctagonVertices vertices) {
 	glPushMatrix();
-		EDGE_COLOR.render();
+		glDepthFunc(GL_LEQUAL);
 
 		glBegin(GL_LINES);
 			for (size_t i = 0; i < 8; i++) {
 				for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
 					// draw edge along xz-plane
-					glVertex3fv(octagonVertices[zPolarityIndex][i]);
-					glVertex3fv(octagonVertices[zPolarityIndex][(i + 1) % 8]);
+					glVertex3fv(*vertices[zPolarityIndex][i]);
+					glVertex3fv(*vertices[zPolarityIndex][(i + 1) % 8]);
 
 					// draw edge across xz-plane
-					glVertex3fv(octagonVertices[0][(i + zPolarityIndex) % 8]);
-					glVertex3fv(octagonVertices[1][(i + zPolarityIndex) % 8]);
+					glVertex3fv(*vertices[0][(i + zPolarityIndex) % 8]);
+					glVertex3fv(*vertices[1][(i + zPolarityIndex) % 8]);
 				}
 			}
 		glEnd();
