@@ -41,6 +41,7 @@ void OrientationDimension::clipAngle() {
 #pragma endregion
 
 
+
 #pragma region Axis
 Axis::Axis(OrientationDimension&& roll, OrientationDimension&& tilt, Measurements&& measurements):
 	roll(roll),
@@ -74,8 +75,6 @@ void Axis::reset() {
 	this->tilt.angle = 0;
 }
 #pragma endregion
-
-
 
 
 

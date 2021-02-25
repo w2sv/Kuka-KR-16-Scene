@@ -64,7 +64,7 @@ public:
 	void moveArm(Vector3& position);
 	void update();
 	void reset();
-
+	 
 private:
 	const static Color BASE_COLOR;
 	void drawScrewHead() const;
