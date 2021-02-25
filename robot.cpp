@@ -43,36 +43,26 @@ void OrientationDimension::clipAngle() {
 
 
 #pragma region Axis
-Axis::Axis(OrientationDimension&& roll, OrientationDimension&& tilt, Measurements&& measurements):
-	roll(roll),
-	tilt(tilt),
-	height(measurements.height),
-	width(measurements.width),
-	length(measurements.depth),
-	centerHeight(measurements.height / 2)
+Axis::Axis(OrientationDimension&& dim):
+	orientation(dim)
 {}
 
 
 void Axis::update() {
-	this->roll.update();
-	this->tilt.update();
+	this->orientation.update();
 }
 
 
-void Axis::adjustModelMatrixOrientationAccordingly() const {
-	// rotate
-	glRotatep(this->roll.angle, Axes::Z);
+void Axis::reset() { this->orientation.angle = 0; }
 
-	// tilt
-	glTranslatef(0, -this->centerHeight, 0);
+
+void RotationAxis::adjustModelMatrixOrientationAccordingly() const { glRotatep(this->orientation.angle, Axes::Z); }
+
+
+void TiltAxis::adjustModelMatrixOrientationAccordingly() const { 
+	/*glTranslatef(0, -this->centerHeight, 0);
 	glRotatep(this->tilt.angle, Axes::X);
-	glTranslatef(0, this->centerHeight, 0);
-}
-
-
-void Axis::reset() {
-	this->roll.angle = 0;
-	this->tilt.angle = 0;
+	glTranslatef(0, this->centerHeight, 0);*/
 }
 #pragma endregion
 
@@ -97,30 +87,16 @@ void Robot::loadObjects() {
 
 
 void Robot::setObjectMaterials() {
-	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0.5, 0.5, 0.8);
+	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0.1, 0.8, 0.3);
 }
 #pragma endregion
 
 
 
 Robot::Robot() :
-	lowerAxis(Axis(
-		OrientationDimension('a', 'd', 360), 
-		OrientationDimension('s', 'w', 45), 
-		Measurements(3, 0.5, 0.7))),
-	centralAxis(Axis(
-		OrientationDimension('f', 'h', 360), 
-		OrientationDimension('t', 'g', 65), 
-		Measurements(2.5, 0.3, 0.5))),
-	outerAxis(Axis(
-		OrientationDimension('j', 'l', 360), 
-		OrientationDimension('k', 'i', 45), 
-		Measurements(2.5, 0.2, 0.3))),
-	axis2DrawFunction({
-		{&this->lowerAxis, std::bind(&Robot::drawLowerAxis, this)},
-		{&this->centralAxis, std::bind(&Robot::drawCentralAxis, this)},
-		{&this->outerAxis, std::bind(&Robot::drawOuterAxis, this)}}),
-	axes({ &this->lowerAxis, &this->centralAxis, &this->outerAxis })
+	lowerAxis(RotationAxis(OrientationDimension('a', 'd', 360), 0)), 
+	axis2DrawFunction({{&this->lowerAxis, std::bind(&Robot::drawLowerAxis, this)} }),
+	axes({ &this->lowerAxis})
 {}
 
 
@@ -200,24 +176,17 @@ void Robot::drawLowerSteelCylinder() const {
 
 #pragma region AxesDrawing
 void Robot::drawLowerAxis() const {
-	glTranslateZ(this->lowerAxis.centerHeight);
 	this->lowerAxis.adjustModelMatrixOrientationAccordingly();
-		drawCuboid(this->lowerAxis.length, this->lowerAxis.height, this->lowerAxis.width);
 
-		glPushMatrix();
-		glTranslatef(0, 3, 0);
+	glPushMatrix();
+		glScalef(2, 2, 2);
 		objects[Object::HollowCylinder].draw();
-		glPopMatrix();
-
-	glTranslateZ(this->lowerAxis.centerHeight);
+	glPopMatrix();
 }
 
 
 void Robot::drawCentralAxis()const {
-	glTranslateZ(this->centralAxis.centerHeight);
-	this->centralAxis.adjustModelMatrixOrientationAccordingly();
-		drawCuboid(this->centralAxis.length, this->centralAxis.height, this->centralAxis.width);
-	glTranslateZ(this->centralAxis.centerHeight);
+	
 }
 
 

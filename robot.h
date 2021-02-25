@@ -39,17 +39,32 @@ struct OrientationDimension {
 		void clipAngle();
 };
 
-struct Axis {
-public:
-	OrientationDimension roll, tilt;
-	float height, width, length;
-	float centerHeight;
 
-	Axis(OrientationDimension&& roll, OrientationDimension&& tilt, Measurements&& measurements);
+#pragma region Axis
+struct Axis {
+	OrientationDimension orientation;
+
+	Axis(OrientationDimension&& orientation, float startAngle);
 	void update();
-	void adjustModelMatrixOrientationAccordingly() const;
+	virtual void adjustModelMatrixOrientationAccordingly() const = 0;
 	void reset();
 };
+
+
+struct RotationAxis : public Axis {
+	using Axis::Axis;
+
+	void adjustModelMatrixOrientationAccordingly() const;
+};
+
+
+struct TiltAxis : public Axis {
+	using Axis::Axis;
+
+	void adjustModelMatrixOrientationAccordingly() const;
+};
+#pragma endregion
+
 
 
 class Robot
@@ -84,7 +99,7 @@ private:
 	const float PEDASTEL_HEIGHT = 3.;
 
 	void drawLowerSteelCylinder() const;
-	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.2;
+	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.6;
 
 		// --------------AXES------------------
 
@@ -93,12 +108,12 @@ private:
 
 
 	void drawLowerAxis() const;
-	Axis lowerAxis;
+	RotationAxis lowerAxis;
 
 	void drawCentralAxis() const;
-	Axis centralAxis;
+	// TiltAxis centralAxis;
 
 	void drawOuterAxis() const;
-	Axis outerAxis;
+	// RotationAxis outerAxis;
 };
 #endif
