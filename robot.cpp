@@ -43,9 +43,11 @@ void OrientationDimension::clipAngle() {
 
 
 #pragma region Axis
-Axis::Axis(OrientationDimension&& dim):
-	orientation(dim)
-{}
+Axis::Axis(OrientationDimension&& orientation, float startAngle):
+	orientation(orientation) 
+{ 
+	this->orientation.angle = startAngle; 
+}
 
 
 void Axis::update() {
@@ -116,8 +118,10 @@ void Robot::reset() {
 
 #pragma region Drawing
 void Robot::draw() {
-	this->drawPedestal();
-	this->drawLowerSteelCylinder();
+	drawOctagon(2, 0.5);
+
+	// this->drawPedestal();
+	// this->drawLowerSteelCylinder();
 
 	glPushMatrix();
 		glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);

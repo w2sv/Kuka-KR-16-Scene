@@ -4,6 +4,7 @@
 #define STACKS 20
 #define LOOPS 1
 
+
 void drawCube() {
 	glPushMatrix();
 		glutSolidCube(1.0);
@@ -17,12 +18,14 @@ void drawCube() {
 	glPopMatrix();
 };
 
+
 void drawCuboid(float length, float height, float depth) {
 	glPushMatrix();
-	glScalef(length, height, depth);
-	drawCube();
+		glScalef(length, height, depth);
+		drawCube();
 	glPopMatrix();
 }
+
 
 void drawQuadraticGrid(CoordinateExtrema& extrema, int tiles, Color& color) {
 	color.render();
@@ -40,6 +43,7 @@ void drawQuadraticGrid(CoordinateExtrema& extrema, int tiles, Color& color) {
 	glEnd();
 }
 
+
 void drawPlane(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& color) {
 	const float Z_COORDINATE = -0.01;
 	
@@ -52,6 +56,7 @@ void drawPlane(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& 
 		glVertex3f(xExtrema.min, Z_COORDINATE, yExtrema.max);
 	glEnd();
 }
+
 
 void drawCylinder(float startRadius, float endRadius, float height) {
 
@@ -77,3 +82,83 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 
 	gluDeleteQuadric(q);
 };
+
+
+void drawOctagon(float heigth, float edgeLength, bool emphasizeEdges) {
+	float z = heigth / 2;
+
+	GLfloat octagonVertices[2][8][3] = {
+		{
+			// positive y's
+			{-edgeLength, z, -edgeLength / 2}, // left |
+			{-edgeLength / 2, z, -edgeLength}, // /
+			{edgeLength / 2, z, -edgeLength}, // upper -
+			{edgeLength, z, -edgeLength / 2}, // "\"
+
+			// negative y's
+			{edgeLength, z, edgeLength / 2}, // right |
+			{edgeLength / 2, z, edgeLength}, // lower -
+			{-edgeLength / 2, z, edgeLength}, // upside down "\"
+			{-edgeLength, z, edgeLength / 2}, // upside down /
+		},
+		
+		// negative z
+		{
+			// positive y's
+			{-edgeLength, -z, -edgeLength / 2}, // left |
+			{-edgeLength / 2, -z, -edgeLength}, // /
+			{edgeLength / 2, -z, -edgeLength}, // upper -
+			{edgeLength, -z, -edgeLength / 2}, // "\"
+
+			// negative y's
+			{edgeLength, -z, edgeLength / 2}, // right |
+			{edgeLength / 2, -z, edgeLength}, // lower -
+			{-edgeLength / 2, -z, edgeLength}, // upside down "\"
+			{-edgeLength, -z, edgeLength / 2}, // upside down /
+		}
+	};
+
+	// draw upper and lower plane
+	for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+		glBegin(GL_POLYGON);
+			for (size_t i = 0; i < 9; i++)
+				glVertex3fv(octagonVertices[zPolarityIndex][i % 8]);
+		glEnd();
+	}
+	
+	// connect vertices opposing each other across xz-plane
+	for (size_t faceIndex = 0; faceIndex < 7; faceIndex++) {
+		glBegin(GL_POLYGON);
+			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+				for (size_t i = 0; i < 2; i++) {
+					glVertex3fv(octagonVertices[zPolarityIndex][faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2]);
+				}
+			}
+		glEnd();
+	}
+
+	// draw octagon cage if desired
+	if (emphasizeEdges)
+		_drawOctagonEdges(octagonVertices);
+}
+
+
+void _drawOctagonEdges(GLfloat octagonVertices[2][8][3]) {
+	glPushMatrix();
+		EDGE_COLOR.render();
+
+		glBegin(GL_LINES);
+			for (size_t i = 0; i < 8; i++) {
+				for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+					// draw edge along xz-plane
+					glVertex3fv(octagonVertices[zPolarityIndex][i]);
+					glVertex3fv(octagonVertices[zPolarityIndex][(i + 1) % 8]);
+
+					// draw edge across xz-plane
+					glVertex3fv(octagonVertices[0][(i + zPolarityIndex) % 8]);
+					glVertex3fv(octagonVertices[1][(i + zPolarityIndex) % 8]);
+				}
+			}
+		glEnd();
+	glPopMatrix();
+}

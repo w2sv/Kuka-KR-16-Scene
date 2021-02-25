@@ -33,8 +33,8 @@ void drawScene(){
 	static CoordinateExtrema groundMeasures = CoordinateExtrema(-10, 10);
 	static cg_key key;
 
-	drawPlane(groundMeasures, groundMeasures, Color(.1, .1, .1));
-	drawQuadraticGrid(groundMeasures, 20, Color(.8, .0, .0));
+	/*drawPlane(groundMeasures, groundMeasures, Color(.1, .1, .1));
+	drawQuadraticGrid(groundMeasures, 20, Color(.8, .0, .0));*/
 
 	drawBackgroundWalls(groundMeasures);
 
