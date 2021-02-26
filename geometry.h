@@ -15,6 +15,9 @@ const Color EDGE_COLOR(.1, .1, .1);
 
 void drawCube();
 
+// dev function, to be removed after dev termination
+void indicateCurrentPosition();
+
 void drawCuboid(float length, float height, float depth);
 
 void drawQuadraticGrid(CoordinateExtrema& xExtrema, int tiles, Color& color);

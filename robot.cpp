@@ -80,7 +80,7 @@ cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 
 void Robot::loadObjects() {
 	const char* DIR_NAME = ".\\objects\\";
-	const char* FILE_NAMES[] = { "first_joint.obj", "screw_head.obj" };
+	const char* FILE_NAMES[] = { "first_joint.obj", "screw_head.obj", "lower_arm.obj" };
 
 	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
 		Robot::objects[i].load(concatenatedCharPtr(DIR_NAME, FILE_NAMES[i]), false);
@@ -91,6 +91,7 @@ void Robot::loadObjects() {
 void Robot::setObjectMaterials() {
 	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0, 0, 0);
 	objects[Object::ScrewHead].setMaterial(Color(BASE_COLOR), 0, 0, 0);
+	objects[Object::LowerArm].setMaterial(Color(BASE_COLOR), 0, 0, 0);
 }
 #pragma endregion
 
@@ -98,8 +99,13 @@ void Robot::setObjectMaterials() {
 
 Robot::Robot() :
 	lowerAxis(RotationAxis(OrientationDimension('a', 'd', 360), 0)), 
-	axis2DrawFunction({{&this->lowerAxis, std::bind(&Robot::drawLowerAxis, this)} }),
-	axes({ &this->lowerAxis})
+	centralAxis(TiltAxis(OrientationDimension('w', 's', 45), 0)),
+
+	axis2DrawFunction({
+		{&this->lowerAxis, std::bind(&Robot::drawLowerAxis, this)},
+		{&this->centralAxis, std::bind(&Robot::drawCentralAxis, this)} 
+	}),
+	axes({ &this->lowerAxis, &this->centralAxis})
 {}
 
 
@@ -119,22 +125,21 @@ void Robot::reset() {
 
 #pragma region Drawing
 void Robot::draw() {
-	drawScrewHead();
-
-	 /*this->drawPedestal();
+	 this->drawPedestal();
 	 this->drawLowerSteelCylinder();
 
 	glPushMatrix();
 		glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
 		for (Axis* const axisPointer : this->axes)
 			this->axis2DrawFunction[axisPointer]();
-	glPopMatrix();*/
+	glPopMatrix();
 }
 
 
 void Robot::drawAxisWeight() const {
-	static float PEDASTEL_HEIGHT = 0.1;
-	static float BLOCK_HEIGHT = 1;
+	const static float PEDASTEL_HEIGHT = 0.1;
+	const static float BLOCK_HEIGHT = 1;
+	const static float UPPER_CYLINDER_HEIGTH = 0.05;
 
 	glPushMatrix();
 		// draw lower octPrism pedastel
@@ -156,13 +161,8 @@ void Robot::drawAxisWeight() const {
 		// draw upper black cylinder
 			Colors::BLACK.render();
 		glTranslateZ(BLOCK_HEIGHT / 2);
-		drawCylinder(0.1, 0.1, 0.05);
+		drawCylinder(0.1, 0.1, UPPER_CYLINDER_HEIGTH);
 	glPopMatrix();
-}
-
-
-void Robot::drawScrewHead() const {
-	objects[ScrewHead].draw();
 }
 
 
@@ -215,13 +215,47 @@ void Robot::drawLowerAxis() const {
 		objects[HollowCylinder].draw();
 	glPopMatrix();
 
-	glTranslateZ(0.7);
-	drawAxisWeight();
+	// draw axis weigth
+	glPushMatrix();
+		glTranslateZ(0.35);  // height of cylinder bottom disk
+		drawAxisWeight();
+	glPopMatrix();
+
+	// draw second axis mount disk
+	glPushMatrix();
+			BASE_COLOR.render();
+		glTranslatef(1.65, 1.63, 0.2);
+		glRotatep(90, Axes::X);
+		drawCylinder(0.5, 0.5, 0.3);
+	glPopMatrix();
 }
 
 
 void Robot::drawCentralAxis()const {
-	
+	centralAxis.adjustModelMatrixOrientationAccordingly();
+
+	glPushMatrix();
+		// draw weight pedastel octPrism
+			BASE_COLOR.render();
+		glTranslatef(1.65, 1.63, -0.1);
+		glRotatep(-90, Axes::X);
+		OctagonalPrismVertices weightPedastelVertices = drawOctagonalPrism(0.15, 0.6, 0.1);
+
+		// draw weight
+		glPushMatrix();
+			glTranslateZ(0.075);
+			this->drawAxisWeight();
+		glPopMatrix();
+
+		// draw joint
+		glPushMatrix();
+			glTranslatef(0, -0.8, 2.2);
+			glScalef(1.7, 1.7, 1.7);
+			glRotatep(180, Axes::Y);
+			indicateCurrentPosition();
+			objects[LowerArm].draw();
+		glPopMatrix();
+	glPopMatrix();
 }
 
 

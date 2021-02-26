@@ -84,17 +84,18 @@ private:
 
 	/* ------------OBJECTS----------------- */
 
-	const static int N_OBJECTS = 2;
+	const static int N_OBJECTS = 3;
 	static cg_object3D objects[N_OBJECTS];
 
 	enum Object {
 		HollowCylinder,
 		ScrewHead,
+		LowerArm
 	};
 
 	/* -------------PARTS------------------ */
 
-	void drawScrewHead() const;
+	const float AXIS_WEIGHT_HEIGTH = 1.15;
 	void drawAxisWeight() const;  // TODO: rename
 
 	/* ------------COMPONENTS------------------- */
@@ -115,7 +116,7 @@ private:
 	RotationAxis lowerAxis;
 
 	void drawCentralAxis() const;
-	// TiltAxis centralAxis;
+	TiltAxis centralAxis;
 
 	void drawOuterAxis() const;
 	// RotationAxis outerAxis;

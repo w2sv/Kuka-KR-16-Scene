@@ -19,6 +19,15 @@ void drawCube() {
 };
 
 
+void indicateCurrentPosition() {
+	glPushMatrix();
+			Color(0., 1., 0.).render();
+		glScalef(0.1, 0.1, 0.1);
+		drawCube();
+	glPopMatrix();
+}
+
+
 void drawCuboid(float length, float height, float depth) {
 	glPushMatrix();
 		glScalef(length, height, depth);
@@ -147,6 +156,7 @@ OctagonalPrismVertices drawOctagonalPrism(float heigth, float straightEdgeLength
 void drawOctagonalPrismCage(OctagonalPrismVertices vertices) {
 	glPushMatrix();
 		glDepthFunc(GL_LEQUAL);
+		glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
 
 		glBegin(GL_LINES);
 			for (size_t i = 0; i < 8; i++) {
@@ -161,5 +171,6 @@ void drawOctagonalPrismCage(OctagonalPrismVertices vertices) {
 				}
 			}
 		glEnd();
+		glPopAttrib();
 	glPopMatrix();
 }

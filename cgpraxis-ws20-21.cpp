@@ -36,7 +36,7 @@ void drawScene(){
 	drawPlane(groundMeasures, groundMeasures, Color(.1, .1, .1));
 	drawQuadraticGrid(groundMeasures, 20, Color(.8, .0, .0));
 
-	drawBackgroundWalls(groundMeasures);
+	// drawBackgroundWalls(groundMeasures);
 
 	static Robot* robot = new Robot();
 	robot->draw();
