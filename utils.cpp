@@ -52,6 +52,13 @@ void Color::render() const {
 	GLfloat amb_diff[4] = { r, g, b, 1};
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, amb_diff);
 }
+
+
+namespace Colors {
+	const Color BLACK = { .1, .1, .1 };
+	const Color GREY = { .3, .3, .3 };
+	const Color WHITE = { 1., 1., 1. };
+}
 #pragma endregion
 
 

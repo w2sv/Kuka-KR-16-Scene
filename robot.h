@@ -76,7 +76,6 @@ public:
 	Robot();
 
 	void draw();  // TODO: make const again
-	void moveArm(Vector3& position);
 	void update();
 	void reset();
 	 
@@ -84,7 +83,7 @@ private:
 	const static Color BASE_COLOR;
 	void drawScrewHead() const;
 
-	// ------------OBJECTS-----------------
+	/* ------------OBJECTS-----------------*/
 
 	const static int N_OBJECTS = 1;
 	static cg_object3D objects[N_OBJECTS];
@@ -93,7 +92,7 @@ private:
 		HollowCylinder,
 	};
 
-	// ------------PARTS-------------------
+	/* ------------PARTS-------------------*/
 
 	void drawPedestal() const;
 	const float PEDASTEL_HEIGHT = 3.;
@@ -101,7 +100,9 @@ private:
 	void drawLowerSteelCylinder() const;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.6;
 
-		// --------------AXES------------------
+	void drawAxisWeight() const;
+
+		/* --------------AXES------------------*/
 
 	std::vector<Axis*> axes;
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;

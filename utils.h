@@ -26,6 +26,7 @@ public:
 };
 
 
+#pragma region Color
 struct Color {
 public:
 	GLfloat r, g, b, a;
@@ -37,6 +38,12 @@ public:
 
 	void render() const;
 };
+
+
+namespace Colors {
+	extern Color const BLACK, WHITE, GREY;
+}
+#pragma endregion
 
 
 struct CoordinateExtrema {
@@ -54,9 +61,7 @@ void glRotatep(float angle, const GLfloat* axis);
 
 
 namespace Axes {
-	extern GLfloat const X[3];
-	extern GLfloat const Y[3];
-	extern GLfloat const Z[3];
+	extern GLfloat const X[3], Y[3], Z[3];
 }
 
 

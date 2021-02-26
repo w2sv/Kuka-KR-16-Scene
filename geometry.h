@@ -24,10 +24,10 @@ void drawPlane(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& 
 void drawCylinder(float startRadius, float endRadius, float height);
 
 
-#pragma region Octagon
-typedef std::vector<std::vector<std::vector<GLfloat>>> OctagonVertices;  // of shape [2][8][3]  TODO: incorporate dimensionalities into type via std::array
+#pragma region OctagonalPrism
+typedef std::vector<std::vector<std::vector<GLfloat>>> OctagonalPrismVertices;  // of shape [2][8][3]  TODO: incorporate dimensionalities into type via std::array
 
-OctagonVertices drawOctagon(float heigth, float straightEdgeLength, float diagonalEdgeLength);
+OctagonalPrismVertices drawOctagonalPrism(float heigth, float straightEdgeLength, float diagonalEdgeLength);
 
-void drawOctagonCage(OctagonVertices);
+void drawOctagonalPrismCage(OctagonalPrismVertices);
 #pragma endregion

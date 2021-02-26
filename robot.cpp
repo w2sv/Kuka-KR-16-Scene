@@ -118,13 +118,44 @@ void Robot::reset() {
 
 #pragma region Drawing
 void Robot::draw() {
-	 this->drawPedestal();
+	drawAxisWeight();
+
+	 /*this->drawPedestal();
 	 this->drawLowerSteelCylinder();
 
 	glPushMatrix();
 		glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
 		for (Axis* const axisPointer : this->axes)
 			this->axis2DrawFunction[axisPointer]();
+	glPopMatrix();*/
+}
+
+
+void Robot::drawAxisWeight() const {
+	static float PEDASTEL_HEIGHT = 0.1;
+	static float BLOCK_HEIGHT = 1;
+
+	glPushMatrix();
+		// draw lower octPrism pedastel
+			Colors::BLACK.render();
+		glTranslateZ(PEDASTEL_HEIGHT / 2);
+		OctagonalPrismVertices pedastelVertices = drawOctagonalPrism(PEDASTEL_HEIGHT, 0.5, 0.2);
+
+			Colors::GREY.render();
+		drawOctagonalPrismCage(pedastelVertices);
+
+		// draw octPrism block
+			Colors::BLACK.render();
+		glTranslateZ(BLOCK_HEIGHT / 2);
+		OctagonalPrismVertices blockVertices = drawOctagonalPrism(BLOCK_HEIGHT, 0.3, 0.3);
+
+			Colors::GREY.render();
+		drawOctagonalPrismCage(blockVertices);
+
+		// draw upper black cylinder
+			Colors::BLACK.render();
+		glTranslateZ(BLOCK_HEIGHT / 2);
+		drawCylinder(0.1, 0.1, 0.05);
 	glPopMatrix();
 }
 
@@ -153,7 +184,6 @@ void Robot::drawLowerSteelCylinder() const {
 	glPushMatrix();
 		this->BASE_COLOR.render();
 		glTranslateZ(this->PEDASTEL_HEIGHT);
-		glRotatep(270, Axes::X);
 		drawCylinder(1.2, 1, LOWER_SEGMENT_HEIGHT);
 	glPopMatrix();
 
@@ -161,7 +191,6 @@ void Robot::drawLowerSteelCylinder() const {
 	glPushMatrix();
 		setColor(0.2, 0.2, 0.2);
 		glTranslateZ(LOWER_SEGMENT_HEIGHT + this->PEDASTEL_HEIGHT);
-		glRotatep(270, Axes::X);
 		drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
 	glPopMatrix();
 
@@ -169,7 +198,6 @@ void Robot::drawLowerSteelCylinder() const {
 	glPushMatrix();
 		this->BASE_COLOR.render();
 		glTranslateZ(this->PEDASTEL_HEIGHT + LOWER_SEGMENT_HEIGHT + CENTRAL_SEGMENT_HEIGHT);
-		glRotatep(270, Axes::X);
 		drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
 	glPopMatrix();
 }
@@ -186,17 +214,8 @@ void Robot::drawLowerAxis() const {
 		objects[Object::HollowCylinder].draw();
 	glPopMatrix();
 
-	// draw black block
-	glPushMatrix();
-		Color(0., 1., 0.).render();
-		glTranslateZ(0.7);
-
-		OctagonVertices octVertices = drawOctagon(1.5, 0.4, 0.4);
-
-		// draw cage
-		Color(1., 0., 0.).render();
-		drawOctagonCage(octVertices);
-	glPopMatrix();
+	glTranslateZ(0.7);
+	drawAxisWeight();
 }
 
 

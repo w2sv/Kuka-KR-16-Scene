@@ -60,13 +60,11 @@ void drawPlane(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& 
 
 void drawCylinder(float startRadius, float endRadius, float height) {
 
-	// Zeichnet einen Zylinder mit variablen Abmessungen ins WKS
-	// Unterteilung: RINGS, SLICES
-	// Lage: Basiskreis in X-Y-Ebene, Höhe entlang der +Z Achse
-
 	GLUquadricObj* q = gluNewQuadric();
 
 	glPushMatrix();
+		glRotatep(270, Axes::X);
+
 		// Mantelfläche
 		gluCylinder(q, startRadius, endRadius, height, SLICES, STACKS);
 
@@ -84,11 +82,11 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 };
 
 
-OctagonVertices drawOctagon(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
+OctagonalPrismVertices drawOctagonalPrism(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
 	const float z = heigth / 2;
 	const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
 
-	OctagonVertices octagonVertices = {
+	OctagonalPrismVertices octagonVertices = {
 		{
 			/* Subsequently denoted are the vertices in clockwise direction with respect
 			to the respectively annotated edge;
@@ -146,7 +144,7 @@ OctagonVertices drawOctagon(float heigth, float straightEdgeLength, float diagon
 }
 
 
-void drawOctagonCage(OctagonVertices vertices) {
+void drawOctagonalPrismCage(OctagonalPrismVertices vertices) {
 	glPushMatrix();
 		glDepthFunc(GL_LEQUAL);
 
