@@ -80,7 +80,7 @@ cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 
 void Robot::loadObjects() {
 	const char* DIR_NAME = ".\\objects\\";
-	const char* FILE_NAMES[] = { "first_joint.obj" };
+	const char* FILE_NAMES[] = { "first_joint.obj", "screw_head.obj" };
 
 	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
 		Robot::objects[i].load(concatenatedCharPtr(DIR_NAME, FILE_NAMES[i]), false);
@@ -90,6 +90,7 @@ void Robot::loadObjects() {
 
 void Robot::setObjectMaterials() {
 	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0, 0, 0);
+	objects[Object::ScrewHead].setMaterial(Color(BASE_COLOR), 0, 0, 0);
 }
 #pragma endregion
 
@@ -118,7 +119,7 @@ void Robot::reset() {
 
 #pragma region Drawing
 void Robot::draw() {
-	drawAxisWeight();
+	drawScrewHead();
 
 	 /*this->drawPedestal();
 	 this->drawLowerSteelCylinder();
@@ -161,7 +162,7 @@ void Robot::drawAxisWeight() const {
 
 
 void Robot::drawScrewHead() const {
-
+	objects[ScrewHead].draw();
 }
 
 
@@ -211,7 +212,7 @@ void Robot::drawLowerAxis() const {
 	glPushMatrix();
 		glTranslatef(0, 0, 0.07);
 		glScalef(2, 2, 2);
-		objects[Object::HollowCylinder].draw();
+		objects[HollowCylinder].draw();
 	glPopMatrix();
 
 	glTranslateZ(0.7);

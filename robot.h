@@ -81,18 +81,23 @@ public:
 	 
 private:
 	const static Color BASE_COLOR;
-	void drawScrewHead() const;
 
-	/* ------------OBJECTS-----------------*/
+	/* ------------OBJECTS----------------- */
 
-	const static int N_OBJECTS = 1;
+	const static int N_OBJECTS = 2;
 	static cg_object3D objects[N_OBJECTS];
 
 	enum Object {
 		HollowCylinder,
+		ScrewHead,
 	};
 
-	/* ------------PARTS-------------------*/
+	/* -------------PARTS------------------ */
+
+	void drawScrewHead() const;
+	void drawAxisWeight() const;  // TODO: rename
+
+	/* ------------COMPONENTS------------------- */
 
 	void drawPedestal() const;
 	const float PEDASTEL_HEIGHT = 3.;
@@ -100,9 +105,7 @@ private:
 	void drawLowerSteelCylinder() const;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.6;
 
-	void drawAxisWeight() const;
-
-		/* --------------AXES------------------*/
+		/* --------------AXES------------------ */
 
 	std::vector<Axis*> axes;
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
