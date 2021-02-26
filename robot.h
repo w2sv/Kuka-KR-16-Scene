@@ -3,6 +3,8 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <iostream>
 #include <limits>
 #include <functional>
@@ -48,6 +50,9 @@ struct Axis {
 	void update();
 	virtual void adjustModelMatrixOrientationAccordingly() const = 0;
 	void reset();
+
+private:
+	float startAngle;
 };
 
 
@@ -59,9 +64,10 @@ struct RotationAxis : public Axis {
 
 
 struct TiltAxis : public Axis {
-	using Axis::Axis;
+	TiltAxis(OrientationDimension&& orientation, float startAngle, float length);
 
 	void adjustModelMatrixOrientationAccordingly() const;
+	float halvedLength;
 };
 #pragma endregion
 
@@ -96,7 +102,10 @@ private:
 	/* -------------PARTS------------------ */
 
 	const float AXIS_WEIGHT_HEIGTH = 1.15;
-	void drawAxisWeight() const;  // TODO: rename
+	void drawAxisWeight() const;
+
+	static const std::vector<Vector2> SCREW_POSITIONS;
+	void drawScrewCircle() const;
 
 	/* ------------COMPONENTS------------------- */
 

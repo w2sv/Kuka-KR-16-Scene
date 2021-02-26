@@ -19,7 +19,7 @@ std::ostream& operator<<(std::ostream& os, const Vector3& vec)
 
 
 #pragma region Vector2
-Vector2::Vector2(GLfloat x, GLfloat y) {
+Vector2::Vector2(GLdouble x, GLdouble y) {
 	this->x = x;
 	this->y = y;
 }
@@ -119,4 +119,19 @@ char* concatenatedCharPtr(const char* a, const char* b) {
 	strcat(result, b);
 
 	return result;
+}
+
+
+float toRadian(float degrees) {
+	return M_PI / 180. * degrees;
+}
+
+
+std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
+	std::vector<Vector2> circlePoints;
+
+	for (double t = 0; t < 2 * M_PI; t += 2 * M_PI / nPoints)
+		circlePoints.push_back(Vector2(cos(t) * radius, sin(t) * radius));
+
+	return circlePoints;
 }

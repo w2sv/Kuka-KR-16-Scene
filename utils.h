@@ -1,5 +1,7 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <cmath>
 #include <cassert>
 #include <iostream>
@@ -20,9 +22,9 @@ public:
 
 struct Vector2 {
 public:
-	GLfloat x, y;
+	GLdouble x, y;
 
-	Vector2(GLfloat x, GLfloat y);
+	Vector2(GLdouble x, GLdouble y);
 };
 
 
@@ -76,3 +78,9 @@ void glTranslateZ(GLfloat value);
 
 
 char* concatenatedCharPtr(const char* a, const char* b);
+
+
+float toRadian(float degrees);
+
+
+std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints);

@@ -44,7 +44,8 @@ void OrientationDimension::clipAngle() {
 
 #pragma region Axis
 Axis::Axis(OrientationDimension&& orientation, float startAngle):
-	orientation(orientation) 
+	orientation(orientation),
+	startAngle(startAngle)
 { 
 	this->orientation.angle = startAngle; 
 }
@@ -55,16 +56,27 @@ void Axis::update() {
 }
 
 
-void Axis::reset() { this->orientation.angle = 0; }
+void Axis::reset() { this->orientation.angle = this->startAngle; }
 
 
 void RotationAxis::adjustModelMatrixOrientationAccordingly() const { glRotatep(this->orientation.angle, Axes::Z); }
 
 
-void TiltAxis::adjustModelMatrixOrientationAccordingly() const { 
-	/*glTranslatef(0, -this->centerHeight, 0);
-	glRotatep(this->tilt.angle, Axes::X);
-	glTranslatef(0, this->centerHeight, 0);*/
+TiltAxis::TiltAxis(OrientationDimension&& orientation, float startAngle, float length):
+	Axis(std::move(orientation), startAngle),
+	halvedLength(length / 2)
+{}
+	
+
+void TiltAxis::adjustModelMatrixOrientationAccordingly() const {
+	/*float orientationAngle_Radian = toRadian(this->orientation.angle);
+
+	float shiftVectorZ = sin(orientationAngle_Radian) * this->halvedLength;
+	float shiftVectorX = cos(orientationAngle_Radian) * this->halvedLength;*/
+
+	// glTranslatef(0, -shiftVectorZ, -shiftVectorX);
+	glRotatep(this->orientation.angle, Axes::Z);
+	// glTranslatef(0, shiftVectorZ, shiftVectorX);
 }
 #pragma endregion
 
@@ -72,7 +84,7 @@ void TiltAxis::adjustModelMatrixOrientationAccordingly() const {
 
 #pragma region Robot
 const Color Robot::BASE_COLOR = Color(230, 80, 21);
-
+const std::vector<Vector2> Robot::SCREW_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
 
 
 #pragma region Objects
@@ -90,16 +102,17 @@ void Robot::loadObjects() {
 
 void Robot::setObjectMaterials() {
 	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0, 0, 0);
-	objects[Object::ScrewHead].setMaterial(Color(BASE_COLOR), 0, 0, 0);
+	objects[Object::ScrewHead].setMaterial(Color(Colors::GREY), 0, 0, 0);
 	objects[Object::LowerArm].setMaterial(Color(BASE_COLOR), 0, 0, 0);
 }
 #pragma endregion
 
 
 
+#pragma region Publics
 Robot::Robot() :
 	lowerAxis(RotationAxis(OrientationDimension('a', 'd', 360), 0)), 
-	centralAxis(TiltAxis(OrientationDimension('w', 's', 45), 0)),
+	centralAxis(TiltAxis(OrientationDimension('w', 's', 45), 22.5, 2.2)),
 
 	axis2DrawFunction({
 		{&this->lowerAxis, std::bind(&Robot::drawLowerAxis, this)},
@@ -121,6 +134,7 @@ void Robot::reset() {
 		axisPointer->reset();
 	}
 }
+#pragma endregion
 
 
 #pragma region Drawing
@@ -136,6 +150,7 @@ void Robot::draw() {
 }
 
 
+#pragma region Parts
 void Robot::drawAxisWeight() const {
 	const static float PEDASTEL_HEIGHT = 0.1;
 	const static float BLOCK_HEIGHT = 1;
@@ -166,6 +181,20 @@ void Robot::drawAxisWeight() const {
 }
 
 
+void Robot::drawScrewCircle() const {
+	for (size_t i = 0; i < SCREW_POSITIONS.size(); i++) {
+		glPushMatrix();
+			glTranslatef(SCREW_POSITIONS[i].x, 0, SCREW_POSITIONS[i].y);
+			glScalef(0.2, 0.2, 0.2);
+			objects[ScrewHead].draw();
+		glPopMatrix();
+	}
+}
+#pragma endregion
+
+
+
+#pragma region Components
 void Robot::drawPedestal() const {
 	glPushMatrix();
 		setColor(1.0f, .0f, 0.0f);
@@ -202,10 +231,13 @@ void Robot::drawLowerSteelCylinder() const {
 		drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
 	glPopMatrix();
 }
+#pragma endregion
 
 
 #pragma region AxesDrawing
 void Robot::drawLowerAxis() const {
+	static const float AXIS_MOUNT_DISK_HEIGHT = 0.3;
+
 	this->lowerAxis.adjustModelMatrixOrientationAccordingly();
 
 	// hollow cylinder with second axis mount
@@ -222,12 +254,13 @@ void Robot::drawLowerAxis() const {
 	glPopMatrix();
 
 	// draw second axis mount disk
-	glPushMatrix();
-			BASE_COLOR.render();
-		glTranslatef(1.65, 1.63, 0.2);
-		glRotatep(90, Axes::X);
-		drawCylinder(0.5, 0.5, 0.3);
-	glPopMatrix();
+		BASE_COLOR.render();
+	glTranslatef(1.65, 1.63, 0.2);
+	glRotatep(90, Axes::X);
+	drawCylinder(0.5, 0.5, AXIS_MOUNT_DISK_HEIGHT);
+
+	// translate located both at the top and in the center of the second axis mount disk
+	glTranslateZ(AXIS_MOUNT_DISK_HEIGHT);
 }
 
 
@@ -235,26 +268,44 @@ void Robot::drawCentralAxis()const {
 	centralAxis.adjustModelMatrixOrientationAccordingly();
 
 	glPushMatrix();
+
+		// draw axis with objects residing upon it 
+		glPushMatrix();
+			glTranslatef(0, 0.15, 0);
+			
+			glPushMatrix();
+				glTranslatef(0, 0, -this->centralAxis.halvedLength * 2);
+				
+				// draw axis
+				glPushMatrix();
+					glScalef(1.7, 1.7, 1.7);
+					objects[LowerArm].draw();
+				glPopMatrix();
+
+				// draw upper screw circle
+				glPushMatrix();
+					glTranslatef(0, 0, -this->centralAxis.halvedLength * 2);
+					this->drawScrewCircle();
+				glPopMatrix();
+			glPopMatrix();
+
+			// draw lower screw circle
+			this->drawScrewCircle();
+
+		glPopMatrix();
+
 		// draw weight pedastel octPrism
 			BASE_COLOR.render();
-		glTranslatef(1.65, 1.63, -0.1);
-		glRotatep(-90, Axes::X);
+		glTranslatef(0, -0.5, 0);
+		glRotatep(180, Axes::X);
 		OctagonalPrismVertices weightPedastelVertices = drawOctagonalPrism(0.15, 0.6, 0.1);
 
-		// draw weight
-		glPushMatrix();
-			glTranslateZ(0.075);
-			this->drawAxisWeight();
-		glPopMatrix();
+			Colors::BLACK.render();
+		drawOctagonalPrismCage(weightPedastelVertices);
 
-		// draw joint
-		glPushMatrix();
-			glTranslatef(0, -0.8, 2.2);
-			glScalef(1.7, 1.7, 1.7);
-			glRotatep(180, Axes::Y);
-			indicateCurrentPosition();
-			objects[LowerArm].draw();
-		glPopMatrix();
+		// draw weight
+		glTranslateZ(-0.075);
+		this->drawAxisWeight();
 	glPopMatrix();
 }
 
