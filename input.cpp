@@ -1,11 +1,11 @@
 #include "input.h"
 #include "Include/freeglut.h"
 
-
+#include <iostream>
 
 char cg_key::keys[] = { 0 };
 char cg_key::specialKeys[] = { 0 };
-char cg_mouse::buttons[] = { 0 };
+int cg_mouse::buttons[] = { 0 };
 int cg_mouse::pos[] = { 0 };
 
 
@@ -66,10 +66,14 @@ void MouseFunc(int button, int state, int x, int y)
 	cg_mouse::pos[3] = cg_mouse::pos[1];
 	cg_mouse::pos[0] = x;
 	cg_mouse::pos[1] = y;
-	if (button > -1 && button < 3)
-	{
-		cg_mouse::buttons[button] = char(GLUT_DOWN == state);
-	}
+	
+	if (button >= GLUT_LEFT_BUTTON && button <= GLUT_RIGHT_BUTTON)
+		cg_mouse::buttons[button] = GLUT_DOWN == state;
+
+	// wheel event buttons finishing on GLUT_UP after being effectuated
+	else if (button >= GLUT_MOUSE_WHEEL_UP && button <= GLUT_MOUSE_WHEEL_DOWN)
+		cg_mouse::buttons[button] = GLUT_UP == state;
+
 	glutPostRedisplay();
 }
 
@@ -100,8 +104,7 @@ char cg_key::specialKeyState(int  k)
 {
 	if (k > 99) 
 		k -= 87;
-	if (1 == specialKeys[k])
-	{
+	if (1 == specialKeys[k]){
 		specialKeys[k] = 2;
 		return 1;
 	}
@@ -110,11 +113,15 @@ char cg_key::specialKeyState(int  k)
 
 
 
-char cg_mouse::buttonState(unsigned char b)
-{
-	if (1 == buttons[b])
-	{
+int cg_mouse::buttonState(unsigned int b){
+	if (b <= 2 && buttons[b] == 1){
 		buttons[b] = 2;
+		return 1;
+	}
+
+	// reset wheel event buttons on query whilst being set to true
+	else if (b >= 3 && buttons[b]) {
+		buttons[b] = 0;
 		return 1;
 	}
 	return buttons[b];

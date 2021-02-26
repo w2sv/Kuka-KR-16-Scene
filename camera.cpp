@@ -21,11 +21,21 @@ const void Camera::set() {
 const void Camera::setObserverMode() {
 	double x, y, z, The, Phi;
 	static double radius = 60;
+	static const float WHEEL_EVENT_RADIUS_INCREMENT = 1.5;
 
+	// position alteration
 	if (cg_mouse::buttonState(GLUT_LEFT_BUTTON)) {
 		this->screenPosX += mouse.moveX();
 		this->screenPosY += mouse.moveY();
 	}
+
+	// Zooming via scroll event
+	if (cg_mouse::buttonState(GLUT_MOUSE_WHEEL_UP))
+		radius -= WHEEL_EVENT_RADIUS_INCREMENT;
+	if (cg_mouse::buttonState(GLUT_MOUSE_WHEEL_DOWN))
+		radius += WHEEL_EVENT_RADIUS_INCREMENT;
+
+	// Zooming via mouse movement during pressing of mouse wheel
 	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON)) {
 		radius = std::max<float>(radius + 0.1 * mouse.moveY(), 1.0);
 	}

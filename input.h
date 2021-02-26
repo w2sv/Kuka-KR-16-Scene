@@ -2,6 +2,9 @@
 #define INPUT_H
 
 
+#define GLUT_MOUSE_WHEEL_UP 3
+#define GLUT_MOUSE_WHEEL_DOWN 4
+
 
 // von GLUT benoetigte Callback-Funktionen
 void KeyboardDownFunc(unsigned char key, int x, int y);	// Tastendruck
@@ -51,8 +54,8 @@ public:
 	// Aktuellen Status der Mausbuttons zurueck geben
 	// Parameter b ist eine der Konstanten: GLUT_LEFT_BUTTON, GLUT_MIDDLE_BUTTON, GLUT_RIGHT_BUTTON
 	// Rueckgabewerte: 0 = nicht gedueckt, 1 = gerade eben runtergedrueckt, 2 = gedrueckt gehalten
-	static char buttonState(unsigned char b);
-
+	static int buttonState(unsigned int b);
+	
 	// Aktuelle Bewegung der Maus auf der X-Achse zurueckgeben
 	static int moveX();
 	// Aktuelle Bewegung der Maus auf der Y-Achse zurueckgeben
@@ -67,7 +70,7 @@ private:
 	friend void MouseFunc(int button, int state, int x, int y);
 	friend void MouseMove(int x, int y);
 
-	static char buttons[3];	// 0 - links, 1 - mitte, 2 - rechts
+	static int buttons[5];	// 0 - links, 1 - mitte, 2 - rechts, 3 - mouse wheel up, 4 - mouse wheel down
 	static int pos[4];	// 0,1 - aktuelle Position, 2,3 - letzte Position
 };
 

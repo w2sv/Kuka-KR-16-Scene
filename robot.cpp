@@ -304,7 +304,7 @@ void Robot::drawCentralAxis()const {
 		drawOctagonalPrismCage(weightPedastelVertices);
 
 		// draw weight
-		glTranslateZ(0.15);
+		glTranslateZ(0.09);
 		this->drawAxisWeight();
 	glPopMatrix();
 }

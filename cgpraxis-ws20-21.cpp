@@ -19,9 +19,6 @@
 int main(int argc, char** argv) {
 	init(argc, argv);
 
-	for (auto el : discrete2DCircleRadiusPoints(3, 20))
-		std::cout << el.x << " " << el.y << std::endl;
-
 	// load objects
 	Robot::loadObjects();
 	Robot::setObjectMaterials();
