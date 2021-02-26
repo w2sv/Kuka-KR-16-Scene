@@ -294,7 +294,7 @@ void Robot::drawCentralAxis()const {
 
 		glPopMatrix();
 
-		// draw weight pedastel octPrism
+		// draw orange axesweight pedastel octPrism
 			BASE_COLOR.render();
 		glTranslatef(0, -0.5, 0);
 		glRotatep(180, Axes::X);
@@ -304,7 +304,7 @@ void Robot::drawCentralAxis()const {
 		drawOctagonalPrismCage(weightPedastelVertices);
 
 		// draw weight
-		glTranslateZ(-0.075);
+		glTranslateZ(0.15);
 		this->drawAxisWeight();
 	glPopMatrix();
 }
