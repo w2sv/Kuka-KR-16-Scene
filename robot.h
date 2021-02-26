@@ -90,13 +90,14 @@ private:
 
 	/* ------------OBJECTS----------------- */
 
-	const static int N_OBJECTS = 3;
+	const static int N_OBJECTS = 4;
 	static cg_object3D objects[N_OBJECTS];
 
 	enum Object {
-		HollowCylinder,
+		RotationAxis1,
 		ScrewHead,
-		LowerArm
+		TiltAxis1,
+		TiltAxis2
 	};
 
 	/* -------------PARTS------------------ */
@@ -121,13 +122,13 @@ private:
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
 
 
-	void drawLowerAxis() const;
-	RotationAxis lowerAxis;
+	void drawFirstAxis() const;
+	RotationAxis firstAxis;
 
-	void drawCentralAxis() const;
-	TiltAxis centralAxis;
+	void drawSecondAxis() const;
+	TiltAxis secondAxis;
 
-	void drawOuterAxis() const;
-	// RotationAxis outerAxis;
+	void drawThirdAxis() const;
+	TiltAxis thirdAxis;
 };
 #endif

@@ -92,7 +92,7 @@ cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 
 void Robot::loadObjects() {
 	const char* DIR_NAME = ".\\objects\\";
-	const char* FILE_NAMES[] = { "first_joint.obj", "screw_head.obj", "lower_arm.obj" };
+	const char* FILE_NAMES[] = { "rotation_axis_1.obj", "screw_head.obj", "tilt_axis_1.obj", "tilt_axis_2.obj" };
 
 	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
 		Robot::objects[i].load(concatenatedCharPtr(DIR_NAME, FILE_NAMES[i]), false);
@@ -101,9 +101,10 @@ void Robot::loadObjects() {
 
 
 void Robot::setObjectMaterials() {
-	objects[Object::HollowCylinder].setMaterial(Color(BASE_COLOR), 0, 0, 0);
+	objects[Object::RotationAxis1].setMaterial(Color(BASE_COLOR), 0, 0, 0);
 	objects[Object::ScrewHead].setMaterial(Color(Colors::GREY), 0, 0, 0);
-	objects[Object::LowerArm].setMaterial(Color(BASE_COLOR), 0, 0, 0);
+	objects[Object::TiltAxis1].setMaterial(Color(BASE_COLOR), 0, 0, 0);
+	objects[Object::TiltAxis2].setMaterial(Color(BASE_COLOR), 0, 0, 0);
 }
 #pragma endregion
 
@@ -111,14 +112,16 @@ void Robot::setObjectMaterials() {
 
 #pragma region Publics
 Robot::Robot() :
-	lowerAxis(RotationAxis(OrientationDimension('a', 'd', 360), 0)), 
-	centralAxis(TiltAxis(OrientationDimension('w', 's', 45), 22.5, 2.2)),
+	firstAxis(RotationAxis(OrientationDimension('a', 'd', 360), 0)), 
+	secondAxis(TiltAxis(OrientationDimension('w', 's', 45), 22.5, 2.2)),
+	thirdAxis(TiltAxis(OrientationDimension('t', 'g', 45), 0., 2.)),
 
 	axis2DrawFunction({
-		{&this->lowerAxis, std::bind(&Robot::drawLowerAxis, this)},
-		{&this->centralAxis, std::bind(&Robot::drawCentralAxis, this)} 
+		{&this->firstAxis, std::bind(&Robot::drawFirstAxis, this)},
+		{&this->secondAxis, std::bind(&Robot::drawSecondAxis, this)},
+		{&this->thirdAxis, std::bind(&Robot::drawThirdAxis, this)}
 	}),
-	axes({ &this->lowerAxis, &this->centralAxis})
+	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis})
 {}
 
 
@@ -235,16 +238,16 @@ void Robot::drawLowerSteelCylinder() const {
 
 
 #pragma region AxesDrawing
-void Robot::drawLowerAxis() const {
+void Robot::drawFirstAxis() const {
 	static const float AXIS_MOUNT_DISK_HEIGHT = 0.3;
 
-	this->lowerAxis.adjustModelMatrixOrientationAccordingly();
+	this->firstAxis.adjustModelMatrixOrientationAccordingly();
 
 	// hollow cylinder with second axis mount
 	glPushMatrix();
 		glTranslatef(0, 0, 0.07);
 		glScalef(2, 2, 2);
-		objects[HollowCylinder].draw();
+		objects[RotationAxis1].draw();
 	glPopMatrix();
 
 	// draw axis weigth
@@ -264,8 +267,8 @@ void Robot::drawLowerAxis() const {
 }
 
 
-void Robot::drawCentralAxis()const {
-	centralAxis.adjustModelMatrixOrientationAccordingly();
+void Robot::drawSecondAxis()const {
+	secondAxis.adjustModelMatrixOrientationAccordingly();
 
 	glPushMatrix();
 
@@ -274,17 +277,17 @@ void Robot::drawCentralAxis()const {
 			glTranslatef(0, 0.15, 0);
 			
 			glPushMatrix();
-				glTranslatef(0, 0, -this->centralAxis.halvedLength * 2);
+				glTranslatef(0, 0, -this->secondAxis.halvedLength * 2);
 				
 				// draw axis
 				glPushMatrix();
 					glScalef(1.7, 1.7, 1.7);
-					objects[LowerArm].draw();
+					objects[TiltAxis1].draw();
 				glPopMatrix();
 
 				// draw upper screw circle
 				glPushMatrix();
-					glTranslatef(0, 0, -this->centralAxis.halvedLength * 2);
+					glTranslatef(0, 0, -this->secondAxis.halvedLength * 2);
 					this->drawScrewCircle();
 				glPopMatrix();
 			glPopMatrix();
@@ -307,11 +310,21 @@ void Robot::drawCentralAxis()const {
 		glTranslateZ(0.09);
 		this->drawAxisWeight();
 	glPopMatrix();
+
+	glTranslatef(0, 0, -this->secondAxis.halvedLength * 4);
 }
 
 
-void Robot::drawOuterAxis() const {
-	
+void Robot::drawThirdAxis() const {
+	this->thirdAxis.adjustModelMatrixOrientationAccordingly();
+
+	glPushMatrix();
+		glTranslatef(-1.8, -0.25, -0.95);
+		glScaleUniformly(5);
+		glRotatep(90, Axes::Y);
+		glRotatep(65, Axes::X);
+		objects[Object::TiltAxis2].draw();
+	glPopMatrix();
 }
 #pragma endregion
 

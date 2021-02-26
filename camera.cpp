@@ -14,19 +14,19 @@ const void Camera::set() {
 	switch (this->mode) {
 		case Mode::Observer:
 			this->setObserverMode(); break;
-		case Mode::TCP:
-			this->setTCPMode(); break;
 	}
 }
-const void Camera::setObserverMode() {
+void Camera::setObserverMode() {
 	double x, y, z, The, Phi;
 	static double radius = 60;
+
 	static const float WHEEL_EVENT_RADIUS_INCREMENT = 1.5;
 
-	// position alteration
+
+	// Observer angle movement
 	if (cg_mouse::buttonState(GLUT_LEFT_BUTTON)) {
-		this->screenPosX += mouse.moveX();
-		this->screenPosY += mouse.moveY();
+		this->screenPosX += cg_mouse::moveX();
+		this->screenPosY += cg_mouse::moveY();
 	}
 
 	// Zooming via scroll event
@@ -37,8 +37,9 @@ const void Camera::setObserverMode() {
 
 	// Zooming via mouse movement during pressing of mouse wheel
 	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON)) {
-		radius = std::max<float>(radius + 0.1 * mouse.moveY(), 1.0);
+		radius = std::max<float>(radius + 0.1 * cg_mouse::moveY(), 1.0);
 	}
+
 
 	Phi = 0.2 * this->screenPosX / cg_globState::screenSize[0] * M_PI + M_PI * 0.5;
 	The = 0.2 * this->screenPosY / cg_globState::screenSize[1] * M_PI;
@@ -49,5 +50,3 @@ const void Camera::setObserverMode() {
 
 	gluLookAt(x, y, z, 0, 0, 0, 0, Oben, 0);
 }
-
-const void Camera::setTCPMode() {}

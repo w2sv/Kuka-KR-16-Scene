@@ -62,6 +62,9 @@ public:
 void glRotatep(float angle, const GLfloat* axis);
 
 
+void glScaleUniformly(float value);
+
+
 namespace Axes {
 	extern GLfloat const X[3], Y[3], Z[3];
 }

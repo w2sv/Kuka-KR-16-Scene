@@ -111,6 +111,10 @@ Measurements::Measurements(float height, float width, float depth):
 void glTranslateZ(GLfloat value) { glTranslatef(0, value, 0); }
 
 
+void glScaleUniformly(float value) { glScalef(value, value, value); }
+
+
+
 char* concatenatedCharPtr(const char* a, const char* b) {
 	// Reference: https://stackoverflow.com/a/1995057
 

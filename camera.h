@@ -24,13 +24,10 @@ public:
 	const void set();
 	void setMode(Mode mode);
 private:
-	static cg_mouse mouse;
-
 	int screenPosX;
 	int screenPosY;
 
 	Mode mode;
 
-	const void setObserverMode();
-	const void setTCPMode();
+	void setObserverMode();
 };
