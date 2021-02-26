@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cassert>
+#include <vector>
+#include <array>
 
 #include "Include/freeglut.h"
 
@@ -23,9 +25,9 @@ void drawCylinder(float startRadius, float endRadius, float height);
 
 
 #pragma region Octagon
-typedef GLfloat(*OctagonVertices)[2][8][3];
+typedef std::vector<std::vector<std::vector<GLfloat>>> OctagonVertices;  // of shape [2][8][3]  TODO: incorporate dimensionalities into type via std::array
 
-OctagonVertices drawOctagon(float heigth, float edgeLength);
+OctagonVertices drawOctagon(float heigth, float straightEdgeLength, float diagonalEdgeLength);
 
 void drawOctagonCage(OctagonVertices);
 #pragma endregion

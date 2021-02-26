@@ -84,37 +84,42 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 };
 
 
-OctagonVertices drawOctagon(float heigth, float edgeLength) {
-	float z = heigth / 2;
+OctagonVertices drawOctagon(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
+	const float z = heigth / 2;
+	const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
 
-	GLfloat octagonVertices[2][8][3] = {
+	OctagonVertices octagonVertices = {
 		{
+			/* Subsequently denoted are the vertices in clockwise direction with respect
+			to the respectively annotated edge;
+			i.e. "left |" defines the lower vertex of the left | etc. */
+
 			// positive y's
-			{-edgeLength, z, -edgeLength / 2}, // left |
-			{-edgeLength / 2, z, -edgeLength}, // /
-			{edgeLength / 2, z, -edgeLength}, // upper -
-			{edgeLength, z, -edgeLength / 2}, // "\"
+			{-lateralLength, z, -straightEdgeLength / 2}, //  left |
+			{-straightEdgeLength / 2, z, -lateralLength}, // lower left "\"
+			{straightEdgeLength / 2, z, -lateralLength}, // -
+			{lateralLength, z, -straightEdgeLength / 2}, // lower right /
 
 			// negative y's
-			{edgeLength, z, edgeLength / 2}, // right |
-			{edgeLength / 2, z, edgeLength}, // lower -
-			{-edgeLength / 2, z, edgeLength}, // upside down "\"
-			{-edgeLength, z, edgeLength / 2}, // upside down /
+			{lateralLength, z, straightEdgeLength / 2}, // right |
+			{straightEdgeLength / 2, z, lateralLength}, // upper right "\"
+			{-straightEdgeLength / 2, z, lateralLength}, // -
+			{-lateralLength, z, straightEdgeLength / 2}, // upper left /
 		},
 		
 		// negative z
 		{
 			// positive y's
-			{-edgeLength, -z, -edgeLength / 2}, // left |
-			{-edgeLength / 2, -z, -edgeLength}, // /
-			{edgeLength / 2, -z, -edgeLength}, // upper -
-			{edgeLength, -z, -edgeLength / 2}, // "\"
+			{-lateralLength, -z, -straightEdgeLength / 2}, //  left |
+			{-straightEdgeLength / 2, -z, -lateralLength}, // lower left "\"
+			{straightEdgeLength / 2, -z, -lateralLength}, // -
+			{lateralLength, -z, -straightEdgeLength / 2}, // lower right /
 
 			// negative y's
-			{edgeLength, -z, edgeLength / 2}, // right |
-			{edgeLength / 2, -z, edgeLength}, // lower -
-			{-edgeLength / 2, -z, edgeLength}, // upside down "\"
-			{-edgeLength, -z, edgeLength / 2}, // upside down /
+			{lateralLength, -z, straightEdgeLength / 2}, // right |
+			{straightEdgeLength / 2, -z, lateralLength}, // upper right "\"
+			{-straightEdgeLength / 2, -z, lateralLength}, // -
+			{-lateralLength, -z, straightEdgeLength / 2}, // upper left /
 		}
 	};
 
@@ -122,7 +127,7 @@ OctagonVertices drawOctagon(float heigth, float edgeLength) {
 	for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
 		glBegin(GL_POLYGON);
 			for (size_t i = 0; i < 9; i++)
-				glVertex3fv(octagonVertices[zPolarityIndex][i % 8]);
+				glVertex3fv(octagonVertices[zPolarityIndex][i % 8].data());
 		glEnd();
 	}
 	
@@ -131,13 +136,13 @@ OctagonVertices drawOctagon(float heigth, float edgeLength) {
 		glBegin(GL_POLYGON);
 			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
 				for (size_t i = 0; i < 2; i++) {
-					glVertex3fv(octagonVertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8]);
+					glVertex3fv(octagonVertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
 				}
 			}
 		glEnd();
 	}
 
-	return &octagonVertices;
+	return octagonVertices;
 }
 
 
@@ -149,12 +154,12 @@ void drawOctagonCage(OctagonVertices vertices) {
 			for (size_t i = 0; i < 8; i++) {
 				for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
 					// draw edge along xz-plane
-					glVertex3fv(*vertices[zPolarityIndex][i]);
-					glVertex3fv(*vertices[zPolarityIndex][(i + 1) % 8]);
+					glVertex3fv(vertices[zPolarityIndex][i].data());
+					glVertex3fv(vertices[zPolarityIndex][(i + 1) % 8].data());
 
 					// draw edge across xz-plane
-					glVertex3fv(*vertices[0][(i + zPolarityIndex) % 8]);
-					glVertex3fv(*vertices[1][(i + zPolarityIndex) % 8]);
+					glVertex3fv(vertices[0][(i + zPolarityIndex) % 8].data());
+					glVertex3fv(vertices[1][(i + zPolarityIndex) % 8].data());
 				}
 			}
 		glEnd();

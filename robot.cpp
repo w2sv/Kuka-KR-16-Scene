@@ -188,11 +188,12 @@ void Robot::drawLowerAxis() const {
 
 	// draw black block
 	glPushMatrix();
-		Color(0, 0, 0).render();
+		Color(0., 1., 0.).render();
 		glTranslateZ(0.7);
 
-		OctagonVertices octVertices = drawOctagon(1.5, 0.4);
-		
+		OctagonVertices octVertices = drawOctagon(1.5, 0.4, 0.4);
+
+		// draw cage
 		Color(1., 0., 0.).render();
 		drawOctagonCage(octVertices);
 	glPopMatrix();

@@ -1,0 +1,5 @@
+-2nd til 4th(5th) axis
+-texturize
+-improve lighting
+-enable camera modes
+-enhance background
