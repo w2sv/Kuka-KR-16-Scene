@@ -50,6 +50,17 @@ void OrientationDimension::reset() {
 float OrientationDimension::getAngle() const {
 	return this->angle;
 }
+
+
+void OrientationDimension::setArbitraryAngle() {
+	// Reference: https://stackoverflow.com/a/7560564
+
+	std::random_device rd; // obtain a random number from hardware
+	std::mt19937 gen(rd()); // seed the generator
+	std::uniform_int_distribution<> distr(angleLimits.min, angleLimits.max);
+
+	this->angle = distr(gen);
+}
 #pragma endregion
 
 
@@ -128,16 +139,20 @@ Robot::Robot() :
 
 
 void Robot::update() {
-	for (Axis* const axisPointer : this->axes) {
+	for (Axis* const axisPointer : this->axes)
 		axisPointer->orientation.update();
-	}
 }
 
 
 void Robot::reset() {
-	for (Axis* const axisPointer : this->axes) {
+	for (Axis* const axisPointer : this->axes)
 		axisPointer->orientation.reset();
-	}
+}
+
+
+void Robot::setArbitraryAxesConfiguration() {
+	for (Axis* const axisPointer : this->axes)
+		axisPointer->orientation.setArbitraryAngle();
 }
 #pragma endregion
 

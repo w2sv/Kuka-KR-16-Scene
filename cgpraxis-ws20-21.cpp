@@ -31,37 +31,11 @@ int main(int argc, char** argv) {
 }
 
 
-#define NUM_TEXTURES 1
-
-const char* filenames[NUM_TEXTURES] = {
-	"steelplate.bmp",
-};
-
-cg_image textures[NUM_TEXTURES];
-
-void initTextures() {
-	const char* FILE_PATH = ".\\textures\\";
-
-	for (size_t i = 0; i < NUM_TEXTURES; i++){
-		if (!textures[i].load(concatenatedCharPtr(FILE_PATH, filenames[i]), true)) {
-			std::cerr << "Couldn't open texture #" << i << std::endl;
-			std::exit(1);
-		}
-
-		textures[i].setMinFilter(GL_NEAREST);
-		textures[i].setMagFilter(GL_LINEAR);
-		textures[i].setWrapMode(GL_CLAMP);
-	}
-}
-
-
 void drawScene(){
 	static Extrema groundMeasures = Extrema(-15, 15);
 
 	drawPlane(groundMeasures, groundMeasures, Color(.1, .1, .1));
 	drawQuadraticGrid(groundMeasures, 20, Color(.8, .0, .0));
-
-	// drawBackgroundWalls(groundMeasures);
 
 	static Robot* robot = new Robot();
 	robot->draw();
@@ -69,6 +43,8 @@ void drawScene(){
 
 	if (cg_key::keyState('R') == 1)
 		robot->reset();
+	else if(cg_key::keyState('A') == 1)
+		robot->setArbitraryAxesConfiguration();
 }
 
 void displayFunc()

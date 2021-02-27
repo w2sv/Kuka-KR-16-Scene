@@ -10,6 +10,7 @@
 #include <functional>
 #include <map>
 #include <vector>
+#include <random>
 
 #include "Include/freeglut.h"
 
@@ -26,6 +27,7 @@ struct OrientationDimension {
 		void update();
 		void reset();
 		float getAngle() const;
+		void setArbitraryAngle();
 	private:
 		float angle;
 
@@ -77,6 +79,7 @@ public:
 	void draw();  // TODO: make const again
 	void update();
 	void reset();
+	void setArbitraryAxesConfiguration();
 	 
 private:
 	const static Color BASE_COLOR;
