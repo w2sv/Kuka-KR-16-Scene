@@ -20,9 +20,9 @@ void indicateCurrentPosition();
 
 void drawCuboid(float length, float height, float depth);
 
-void drawQuadraticGrid(CoordinateExtrema& xExtrema, int tiles, Color& color);
+void drawQuadraticGrid(Extrema& xExtrema, int tiles, Color& color);
 
-void drawPlane(CoordinateExtrema& xExtrema, CoordinateExtrema& yExtrema, Color& color);
+void drawPlane(Extrema& xExtrema, Extrema& yExtrema, Color& color);
 
 void drawCylinder(float startRadius, float endRadius, float height);
 

@@ -25,7 +25,7 @@
 
 struct OrientationDimension {
 	public:
-		OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, float angleLimit);
+		OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits);
 		void update();
 		void reset();
 		float getAngle() const;
@@ -33,7 +33,7 @@ struct OrientationDimension {
 		float angle;
 
 		const float startAngle;
-		const std::vector<float> angleLimits;  // TODO
+		const Extrema angleLimits;
 		const bool isFullRangeOfMotionDim;
 		const char incrementationKey, decrementationKey;
 

@@ -64,7 +64,7 @@ namespace Colors {
 
 
 #pragma region CoordinateExtrema
-CoordinateExtrema::CoordinateExtrema(float min, float max) {
+Extrema::Extrema(float min, float max) {
 	assert(min < max);
 
 	this->min = min;
@@ -72,13 +72,13 @@ CoordinateExtrema::CoordinateExtrema(float min, float max) {
 }
 
 
-CoordinateExtrema::CoordinateExtrema(float absValue) {
+Extrema::Extrema(float absValue) {
 	this->min = -absValue;
 	this->max = absValue;
 }
 
 
-float CoordinateExtrema::spread() const {
+float Extrema::spread() const {
 	return abs(this->max - this->min);
 }
 #pragma endregion

@@ -1,18 +1,18 @@
 #include "robot.h"
 
 #pragma region OrientationDimension
-OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, float angleLimit): 
+OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits): 
 	angle(startAngle),
 	startAngle(startAngle),
-	angleLimits({ startAngle - angleLimit, startAngle + angleLimit }),
+	angleLimits(angleLimits),
 	incrementationKey(incrementationKey), 
 	decrementationKey(decrementationKey), 
-	isFullRangeOfMotionDim(angleLimit == 360)
+	isFullRangeOfMotionDim(angleLimits.spread() == 360)
 {}
 
 
 void OrientationDimension::update() {
-	float INCREMENT = 0.2;
+	float INCREMENT = 0.4;
 
 	if (cg_key::keyState(this->decrementationKey) != 0)
 		this->angle += INCREMENT;
@@ -27,14 +27,20 @@ void OrientationDimension::update() {
 
 
 void OrientationDimension::clipAngle() {
-	this->angle = std::min<float>(std::max<float>(this->angle, this->angleLimits[0]), this->angleLimits[1]);
-
-	if (this->isFullRangeOfMotionDim && abs(this->angle) == this->angleLimits[1])
-		this->angle = this->angle == this->angleLimits[1] ? this->angleLimits[0] : this->angleLimits[1];
+	if (isFullRangeOfMotionDim) {
+		if (angle >= 360)
+			angle -= 360;
+		else if (angle <= 0)
+			angle += 360;
+	}
+	else
+		angle = std::min<float>(std::max<float>(angle, angleLimits.min), angleLimits.max);
 }
 
 
-void OrientationDimension::reset() { this->angle = this->startAngle; }
+void OrientationDimension::reset() { 
+	this->angle = this->startAngle; 
+}
 
 
 float OrientationDimension::getAngle() const {
@@ -105,9 +111,9 @@ void Robot::setObjectMaterials() {
 
 #pragma region Publics
 Robot::Robot() :
-	firstAxis(RotationAxis(OrientationDimension('a', 'd', 0, 360))), 
-	secondAxis(TiltAxis(OrientationDimension('w', 's', 22.5, 45), 2.2)),
-	thirdAxis(TiltAxis(OrientationDimension('t', 'g', 60, 45), 3.9)),
+	firstAxis(RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360)))), 
+	secondAxis(TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-22.5, 45)), 2.2)),
+	thirdAxis(TiltAxis(OrientationDimension('t', 'g', 60, Extrema(0, 80)), 3.9)),
 
 	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis }),
 	axis2DrawFunction({
@@ -239,7 +245,7 @@ void Robot::drawFirstAxis() const {
 	// hollow cylinder with second axis mount
 	glPushMatrix();
 		glTranslatef(0, 0, 0.07);
-		glScalef(2, 2, 2);
+		glScaleUniformly(2);
 		objects[RotationAxis1].draw();
 	glPopMatrix();
 
@@ -252,15 +258,19 @@ void Robot::drawFirstAxis() const {
 	// draw second axis mount disk
 		BASE_COLOR.render();
 	glTranslatef(1.65, 1.63, 0.2);
-	glRotatep(90, Axes::X);
-	drawCylinder(0.5, 0.5, AXIS_MOUNT_DISK_HEIGHT);
+
+	glPushMatrix();
+		glRotatep(90, Axes::X);
+		drawCylinder(0.5, 0.5, AXIS_MOUNT_DISK_HEIGHT);
+	glPopMatrix();
 
 	// translate located both at the top and in the center of the second axis mount disk
-	glTranslateZ(AXIS_MOUNT_DISK_HEIGHT);
+	glTranslatef(0, 0, AXIS_MOUNT_DISK_HEIGHT);
 }
 
 
 void Robot::drawSecondAxis()const {
+	glRotatep(90, Axes::X);
 	secondAxis.adjustModelMatrixOrientationAccordingly();
 
 	glPushMatrix();

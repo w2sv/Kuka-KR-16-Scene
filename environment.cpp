@@ -1,7 +1,7 @@
 #include "environment.h"
 
 
-void drawBackgroundWalls(CoordinateExtrema groundMeasures) {
+void drawBackgroundWalls(Extrema groundMeasures) {
 	static int tiles = 30;
 	static Color color = Color(.2, .2, .2);
 

@@ -48,12 +48,12 @@ namespace Colors {
 #pragma endregion
 
 
-struct CoordinateExtrema {
+struct Extrema {
 public:
 	float min, max;
 
-	CoordinateExtrema(float min, float max);
-	CoordinateExtrema(float absValue);
+	Extrema(float min, float max);
+	Extrema(float absValue);
 
 	float spread() const;
 };

@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 }
 
 void drawScene(){
-	static CoordinateExtrema groundMeasures = CoordinateExtrema(-10, 10);
+	static Extrema groundMeasures = Extrema(-10, 10);
 
 	drawPlane(groundMeasures, groundMeasures, Color(.1, .1, .1));
 	drawQuadraticGrid(groundMeasures, 20, Color(.8, .0, .0));

@@ -6,4 +6,4 @@
 #include "utils.h"
 
 
-void drawBackgroundWalls(CoordinateExtrema groundMeasures);
+void drawBackgroundWalls(Extrema groundMeasures);
