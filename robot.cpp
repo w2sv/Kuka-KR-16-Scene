@@ -254,6 +254,7 @@ void Robot::drawFirstAxis() const {
 	// draw axis weigth
 	glPushMatrix();
 		glTranslateZ(0.35);  // height of cylinder bottom disk
+		glScaleUniformly(1.3);
 		drawAxisWeight();
 	glPopMatrix();
 
@@ -302,7 +303,7 @@ void Robot::drawSecondAxis()const {
 
 		glPopMatrix();
 
-		// draw orange axesweight pedastel octPrism
+		// draw orange axes weight pedastel octPrism
 			BASE_COLOR.render();
 		glTranslatef(0, -0.5, 0);
 		glRotatep(180, Axes::X);
@@ -329,7 +330,7 @@ void Robot::drawThirdAxis() const {
 
 	// draw axis
 	glPushMatrix();
-		glTranslatef(LENGTH / 2.4, -WIDTH / 2, 0);  // translate slightly to the right, up, forward 
+		glTranslatef(LENGTH * 0.41, -WIDTH * 0.5, 0);  // translate slightly to the right, up, forward 
 		glScaleUniformly(5);
 		glRotatep(90, Axes::Y);
 		glRotatep(-90, Axes::X);
