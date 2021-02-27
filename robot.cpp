@@ -114,12 +114,14 @@ Robot::Robot() :
 	firstAxis(RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360)))), 
 	secondAxis(TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-22.5, 45)), 2.2)),
 	thirdAxis(TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 45)), 3.9)),
+	fourthAxis(RotationAxis(OrientationDimension('f', 'h', 0, Extrema(0, 360)))),
 
-	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis }),
+	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis, &this->fourthAxis }),
 	axis2DrawFunction({
 		{&this->firstAxis, std::bind(&Robot::drawFirstAxis, this)},
 		{&this->secondAxis, std::bind(&Robot::drawSecondAxis, this)},
-		{&this->thirdAxis, std::bind(&Robot::drawThirdAxis, this)}
+		{&this->thirdAxis, std::bind(&Robot::drawThirdAxis, this)},
+		{&this->fourthAxis, std::bind(&Robot::drawFourthAxis, this)},
 	})
 {}
 
@@ -334,7 +336,7 @@ void Robot::drawThirdAxis() const {
 		objects[Object::TiltAxis2].draw();
 	glPopMatrix();
 
-	// draw weight block at axis beginning
+	// draw weight block at axis beginning along respective x-axes
 	glPushMatrix();
 		glTranslatef(-0.6, -WIDTH / 2, 0);
 
@@ -350,6 +352,61 @@ void Robot::drawThirdAxis() const {
 				this->drawAxisWeight();
 			glPopMatrix();
 		}
+	glPopMatrix();
+
+	// draw singular weight along y-axis
+	glPushMatrix();
+		glTranslatef(0.17, -WIDTH, 0);
+		glScaleUniformly(0.8);
+		glRotatep(180, Axes::X);
+		glRotatep(45, Axes::Z);
+		this->drawAxisWeight();
+	glPopMatrix();
+
+	glTranslatef(LENGTH * 0.975, -WIDTH / 2, 0);
+	glRotatep(270, Axes::Y);
+}
+
+
+void Robot::drawFourthAxis() const {
+	this->fourthAxis.adjustModelMatrixOrientationAccordingly();
+	
+	glPushMatrix();
+		BASE_COLOR.render();
+
+		// partial cone
+		drawCylinder(0.2, 0.3, 0.15);
+
+		// short disk
+		glTranslatef(0, 0.15, 0);
+		drawCylinder(0.3, 0.3, 0.08);
+
+		// long disk
+		glTranslatef(0, 0.08, 0);
+		drawCylinder(0.27, 0.27, 0.3);
+
+		glTranslatef(0, 0.3, 0);
+
+		// screw circle
+		glPushMatrix();
+			static const float XY_SCALE_FACTOR = 0.86;
+			glScalef(XY_SCALE_FACTOR, 1, XY_SCALE_FACTOR);
+			this->drawScrewCircle();
+		glPopMatrix();
+
+		BASE_COLOR.render();
+		
+		// disk
+		drawCylinder(0.13, 0.13, 0.1);
+
+		// disk
+		glTranslatef(0, 0.1, 0);
+		drawCylinder(0.15, 0.15, 0.15);
+
+		// cone
+		glTranslatef(0, 0.15, 0);
+		drawCylinder(0.15, 0.1, 0.25);
+
 	glPopMatrix();
 }
 #pragma endregion

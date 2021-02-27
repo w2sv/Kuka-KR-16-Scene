@@ -124,5 +124,8 @@ private:
 
 	void drawThirdAxis() const;
 	TiltAxis thirdAxis;
+
+	void drawFourthAxis() const;
+	RotationAxis fourthAxis;
 };
 #endif
