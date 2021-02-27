@@ -117,17 +117,9 @@ private:
 	std::vector<Axis*> axes;
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
 
-
 	void drawFirstAxis() const;
-	RotationAxis firstAxis;
-
 	void drawSecondAxis() const;
-	TiltAxis secondAxis;
-
 	void drawThirdAxis() const;
-	TiltAxis thirdAxis;
-
 	void drawFourthAxis() const;
-	RotationAxis fourthAxis;
 };
 #endif

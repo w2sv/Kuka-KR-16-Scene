@@ -123,17 +123,17 @@ void Robot::setObjectMaterials() {
 
 #pragma region Publics
 Robot::Robot() :
-	firstAxis(RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360)))), 
-	secondAxis(TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-45, 80)))),
-	thirdAxis(TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 75)))),
-	fourthAxis(RotationAxis(OrientationDimension('f', 'h', 0, Extrema(0, 360)))),
+	axes({
+		new RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360))),
+		new TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-45, 80))),
+		new TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 75))),
+		new RotationAxis(OrientationDimension('f', 'h', 0, Extrema(0, 360))) }),
 
-	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis, &this->fourthAxis }),
 	axis2DrawFunction({
-		{&this->firstAxis, std::bind(&Robot::drawFirstAxis, this)},
-		{&this->secondAxis, std::bind(&Robot::drawSecondAxis, this)},
-		{&this->thirdAxis, std::bind(&Robot::drawThirdAxis, this)},
-		{&this->fourthAxis, std::bind(&Robot::drawFourthAxis, this)},
+		{axes[0], std::bind(&Robot::drawFirstAxis, this)},
+		{axes[1], std::bind(&Robot::drawSecondAxis, this)},
+		{axes[2], std::bind(&Robot::drawThirdAxis, this)},
+		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
 	})
 {}
 
@@ -258,7 +258,7 @@ void Robot::drawLowerSteelCylinder() const {
 void Robot::drawFirstAxis() const {
 	static const float AXIS_MOUNT_DISK_HEIGHT = 0.3;
 
-	this->firstAxis.adjustModelMatrixOrientationAccordingly();
+	axes[0]->adjustModelMatrixOrientationAccordingly();
 
 	// hollow cylinder with second axis mount
 	glPushMatrix();
@@ -292,7 +292,7 @@ void Robot::drawSecondAxis()const {
 	static const float LENGTH = 4.4;
 
 	X::rotate(90);
-	secondAxis.adjustModelMatrixOrientationAccordingly();
+	this->axes[1]->adjustModelMatrixOrientationAccordingly();
 
 	glPushMatrix();
 
@@ -344,7 +344,7 @@ void Robot::drawThirdAxis() const {
 	static const float WIDTH = 0.5;
 	static const float MOUNT_PART_HEIGHT = 1.7;
 
-	this->thirdAxis.adjustModelMatrixOrientationAccordingly();
+	this->axes[2]->adjustModelMatrixOrientationAccordingly();
 
 	// draw axis
 	glPushMatrix();
@@ -388,7 +388,7 @@ void Robot::drawThirdAxis() const {
 
 
 void Robot::drawFourthAxis() const {
-	this->fourthAxis.adjustModelMatrixOrientationAccordingly();
+	this->axes[3]->adjustModelMatrixOrientationAccordingly();
 	
 	glPushMatrix();
 		BASE_COLOR.render();
