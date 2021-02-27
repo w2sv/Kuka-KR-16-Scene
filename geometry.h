@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <vector>
-#include <array>
 
 #include "Include/freeglut.h"
 

@@ -14,6 +14,7 @@
 #include "robot.h"
 #include "camera.h"
 #include "environment.h"
+#include "image.h"
 
 
 int main(int argc, char** argv) {
@@ -29,8 +30,33 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
+
+#define NUM_TEXTURES 1
+
+const char* filenames[NUM_TEXTURES] = {
+	"steelplate.bmp",
+};
+
+cg_image textures[NUM_TEXTURES];
+
+void initTextures() {
+	const char* FILE_PATH = ".\\textures\\";
+
+	for (size_t i = 0; i < NUM_TEXTURES; i++){
+		if (!textures[i].load(concatenatedCharPtr(FILE_PATH, filenames[i]), true)) {
+			std::cerr << "Couldn't open texture #" << i << std::endl;
+			std::exit(1);
+		}
+
+		textures[i].setMinFilter(GL_NEAREST);
+		textures[i].setMagFilter(GL_LINEAR);
+		textures[i].setWrapMode(GL_CLAMP);
+	}
+}
+
+
 void drawScene(){
-	static Extrema groundMeasures = Extrema(-10, 10);
+	static Extrema groundMeasures = Extrema(-15, 15);
 
 	drawPlane(groundMeasures, groundMeasures, Color(.1, .1, .1));
 	drawQuadraticGrid(groundMeasures, 20, Color(.8, .0, .0));

@@ -116,6 +116,7 @@
     <ClCompile Include="environment.cpp" />
     <ClCompile Include="geometry.cpp" />
     <ClCompile Include="help.cpp" />
+    <ClCompile Include="image.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="cgpraxis-ws20-21.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="environment.h" />
     <ClInclude Include="geometry.h" />
     <ClInclude Include="help.h" />
+    <ClInclude Include="image.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="robot.h" />
