@@ -80,7 +80,7 @@ void cg_object3D::setMaterial(GLfloat red, GLfloat green, GLfloat blue, GLfloat 
 
 
 void cg_object3D::setMaterial(Color& color, GLfloat spec, GLfloat shine, GLfloat emis) {
-	setMaterial(color.r, color.g, color.b, color.a, spec, shine, emis);
+	setMaterial(color.r, color.g, color.b, 1., spec, shine, emis);
 }
 
 

@@ -5,22 +5,19 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <iostream>
+#include <iostream>  // !
 #include <limits>
 #include <functional>
 #include <map>
 #include <vector>
-#include <cmath>
-#include <sstream>
-#include <string>
 
 #include "Include/freeglut.h"
 
-#include "utils.h"
 #include "geometry.h"
 #include "input.h"
-#include "light.h"
 #include "wavefront.h"
+#include "glutils.h"
+#include "utils.h"
 
 
 struct OrientationDimension {
@@ -64,6 +61,9 @@ struct TiltAxis : public Axis {
 	float halvedLength;
 };
 #pragma endregion
+
+
+std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints);
 
 
 

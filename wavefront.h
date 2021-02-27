@@ -5,7 +5,8 @@
 #ifndef WAVEFRONT_H
 #define WAVEFRONT_H
 
-#include "utils.h"
+#include "glutils.h"
+
 
 inline GLfloat* normieren ( GLfloat v[3] );
 inline void crossProduct( GLfloat *n, GLfloat *a, GLfloat *b );

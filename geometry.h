@@ -5,12 +5,12 @@
 
 #include "Include/freeglut.h"
 
+#include "glutils.h"
 #include "utils.h"
 #include "light.h"
 
 
 const Color EDGE_COLOR(.1, .1, .1);
-
 
 void drawCube();
 

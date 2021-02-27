@@ -1,5 +1,6 @@
 #include "robot.h"
 
+
 #pragma region OrientationDimension
 OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits): 
 	angle(startAngle),
@@ -68,21 +69,14 @@ TiltAxis::TiltAxis(OrientationDimension&& orientation, float length):
 	
 
 void TiltAxis::adjustModelMatrixOrientationAccordingly() const {
-	/*float orientationAngle_Radian = toRadian(this->orientation.angle);
-
-	float shiftVectorZ = sin(orientationAngle_Radian) * this->halvedLength;
-	float shiftVectorX = cos(orientationAngle_Radian) * this->halvedLength;*/
-
-	// glTranslatef(0, -shiftVectorZ, -shiftVectorX);
 	glRotatep(this->orientation.getAngle(), Axes::Z);
-	// glTranslatef(0, shiftVectorZ, shiftVectorX);
 }
 #pragma endregion
 
 
 
 #pragma region Robot
-const Color Robot::BASE_COLOR = Color(230, 80, 21);
+const Color Robot::BASE_COLOR = Color(230./255., 80./255., 21./255.);
 const std::vector<Vector2> Robot::SCREW_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
 
 
@@ -107,6 +101,16 @@ void Robot::setObjectMaterials() {
 }
 #pragma endregion
 
+
+
+std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
+	std::vector<Vector2> circlePoints;
+
+	for (double t = 0; t < 2 * M_PI; t += 2 * M_PI / nPoints)
+		circlePoints.push_back(Vector2(cos(t) * radius, sin(t) * radius));
+
+	return circlePoints;
+}
 
 
 #pragma region Publics
