@@ -1,6 +1,9 @@
 #include "robot.h"
 
 
+using namespace Axes;
+
+
 #pragma region OrientationDimension
 OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits): 
 	angle(startAngle),
@@ -57,21 +60,26 @@ Axis::Axis(OrientationDimension&& orientation):
 {}
 
 
-void RotationAxis::adjustModelMatrixOrientationAccordingly() const { 
-	glRotatep(this->orientation.getAngle(), Axes::Z); 
+void RotationAxis::adjustModelMatrixOrientationAccordingly() const {
+	Z::rotate(this->orientation.getAngle()); 
 }
-
-
-TiltAxis::TiltAxis(OrientationDimension&& orientation, float length):
-	Axis(std::move(orientation)),
-	halvedLength(length / 2)
-{}
 	
 
 void TiltAxis::adjustModelMatrixOrientationAccordingly() const {
-	glRotatep(this->orientation.getAngle(), Axes::Z);
+	Z::rotate(this->orientation.getAngle());
 }
 #pragma endregion
+
+
+
+std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
+	std::vector<Vector2> circlePoints;
+
+	for (double t = 0; t < 2 * M_PI; t += 2 * M_PI / nPoints)
+		circlePoints.push_back(Vector2(cos(t) * radius, sin(t) * radius));
+
+	return circlePoints;
+}
 
 
 
@@ -102,22 +110,11 @@ void Robot::setObjectMaterials() {
 #pragma endregion
 
 
-
-std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
-	std::vector<Vector2> circlePoints;
-
-	for (double t = 0; t < 2 * M_PI; t += 2 * M_PI / nPoints)
-		circlePoints.push_back(Vector2(cos(t) * radius, sin(t) * radius));
-
-	return circlePoints;
-}
-
-
 #pragma region Publics
 Robot::Robot() :
 	firstAxis(RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360)))), 
-	secondAxis(TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-22.5, 45)), 2.2)),
-	thirdAxis(TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 45)), 3.9)),
+	secondAxis(TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-45, 80)))),
+	thirdAxis(TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 75)))),
 	fourthAxis(RotationAxis(OrientationDimension('f', 'h', 0, Extrema(0, 360)))),
 
 	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis, &this->fourthAxis }),
@@ -151,7 +148,7 @@ void Robot::draw() {
 	 this->drawLowerSteelCylinder();
 
 	glPushMatrix();
-		glTranslateZ(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
+		Z::translate(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
 		for (Axis* const axisPointer : this->axes)
 			this->axis2DrawFunction[axisPointer]();
 	glPopMatrix();
@@ -167,7 +164,7 @@ void Robot::drawAxisWeight() const {
 	glPushMatrix();
 		// draw lower octPrism pedastel
 			Colors::BLACK.render();
-		glTranslateZ(PEDASTEL_HEIGHT / 2);
+		Z::translate(PEDASTEL_HEIGHT / 2);
 		OctagonalPrismVertices pedastelVertices = drawOctagonalPrism(PEDASTEL_HEIGHT, 0.5, 0.2);
 
 			Colors::GREY.render();
@@ -175,7 +172,7 @@ void Robot::drawAxisWeight() const {
 
 		// draw octPrism block
 			Colors::BLACK.render();
-		glTranslateZ(BLOCK_HEIGHT / 2);
+			Z::translate(BLOCK_HEIGHT / 2);
 		OctagonalPrismVertices blockVertices = drawOctagonalPrism(BLOCK_HEIGHT, 0.3, 0.3);
 
 			Colors::GREY.render();
@@ -183,7 +180,7 @@ void Robot::drawAxisWeight() const {
 
 		// draw upper black cylinder
 			Colors::BLACK.render();
-		glTranslateZ(BLOCK_HEIGHT / 2);
+			Z::translate(BLOCK_HEIGHT / 2);
 		drawCylinder(0.1, 0.1, UPPER_CYLINDER_HEIGTH);
 	glPopMatrix();
 }
@@ -221,21 +218,21 @@ void Robot::drawLowerSteelCylinder() const {
 	// lower segment
 	glPushMatrix();
 		this->BASE_COLOR.render();
-		glTranslateZ(this->PEDASTEL_HEIGHT);
+		Z::translate(this->PEDASTEL_HEIGHT);
 		drawCylinder(1.2, 1, LOWER_SEGMENT_HEIGHT);
 	glPopMatrix();
 
 	// central segment
 	glPushMatrix();
 		setColor(0.2, 0.2, 0.2);
-		glTranslateZ(LOWER_SEGMENT_HEIGHT + this->PEDASTEL_HEIGHT);
+		Z::translate(LOWER_SEGMENT_HEIGHT + this->PEDASTEL_HEIGHT);
 		drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
 	glPopMatrix();
 
 	// upper segment
 	glPushMatrix();
 		this->BASE_COLOR.render();
-		glTranslateZ(this->PEDASTEL_HEIGHT + LOWER_SEGMENT_HEIGHT + CENTRAL_SEGMENT_HEIGHT);
+		Z::translate(this->PEDASTEL_HEIGHT + LOWER_SEGMENT_HEIGHT + CENTRAL_SEGMENT_HEIGHT);
 		drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
 	glPopMatrix();
 }
@@ -257,7 +254,7 @@ void Robot::drawFirstAxis() const {
 
 	// draw axis weigth
 	glPushMatrix();
-		glTranslateZ(0.35);  // height of cylinder bottom disk
+	Z::translate(0.35);  // height of cylinder bottom disk
 		glScaleUniformly(1.3);
 		drawAxisWeight();
 	glPopMatrix();
@@ -267,7 +264,7 @@ void Robot::drawFirstAxis() const {
 	glTranslatef(1.65, 1.63, 0.2);
 
 	glPushMatrix();
-		glRotatep(90, Axes::X);
+		X::rotate(90);
 		drawCylinder(0.5, 0.5, AXIS_MOUNT_DISK_HEIGHT);
 	glPopMatrix();
 
@@ -277,7 +274,9 @@ void Robot::drawFirstAxis() const {
 
 
 void Robot::drawSecondAxis()const {
-	glRotatep(90, Axes::X);
+	static const float LENGTH = 4.4;
+
+	X::rotate(90);
 	secondAxis.adjustModelMatrixOrientationAccordingly();
 
 	glPushMatrix();
@@ -287,7 +286,7 @@ void Robot::drawSecondAxis()const {
 			glTranslatef(0, 0.15, 0);
 			
 			glPushMatrix();
-				glTranslatef(0, 0, -this->secondAxis.halvedLength * 2);
+				glTranslatef(0, 0, -LENGTH / 2);
 				
 				// draw axis
 				glPushMatrix();
@@ -297,7 +296,7 @@ void Robot::drawSecondAxis()const {
 
 				// draw upper screw circle
 				glPushMatrix();
-					glTranslatef(0, 0, -this->secondAxis.halvedLength * 2);
+					glTranslatef(0, 0, -LENGTH / 2);
 					this->drawScrewCircle();
 				glPopMatrix();
 			glPopMatrix();
@@ -310,18 +309,18 @@ void Robot::drawSecondAxis()const {
 		// draw orange axes weight pedastel octPrism
 			BASE_COLOR.render();
 		glTranslatef(0, -0.5, 0);
-		glRotatep(180, Axes::X);
+		X::rotate(180);
 		OctagonalPrismVertices weightPedastelVertices = drawOctagonalPrism(0.15, 0.6, 0.1);
 
 			Colors::BLACK.render();
 		drawOctagonalPrismCage(weightPedastelVertices);
 
 		// draw weight
-		glTranslateZ(0.09);
+		Z::translate(0.09);
 		this->drawAxisWeight();
 	glPopMatrix();
 
-	glTranslatef(0, 0, -this->secondAxis.halvedLength * 4);
+	glTranslatef(0, 0, -LENGTH);
 }
 
 
@@ -336,8 +335,8 @@ void Robot::drawThirdAxis() const {
 	glPushMatrix();
 		glTranslatef(LENGTH * 0.41, -WIDTH * 0.5, 0);  // translate slightly to the right, up, forward 
 		glScaleUniformly(5);
-		glRotatep(90, Axes::Y);
-		glRotatep(-90, Axes::X);
+		Y::rotate(90);
+		X::rotate(-90);
 		objects[Object::TiltAxis2].draw();
 	glPopMatrix();
 
@@ -352,7 +351,7 @@ void Robot::drawThirdAxis() const {
 			glPushMatrix();
 				glTranslatef(0, 0, zTranslation);
 				glScalef(1, LATERAL_SCALING_FACTOR, LATERAL_SCALING_FACTOR);
-				glRotatep(90, Axes::Y);
+				Y::rotate(90);
 
 				this->drawAxisWeight();
 			glPopMatrix();
@@ -363,13 +362,13 @@ void Robot::drawThirdAxis() const {
 	glPushMatrix();
 		glTranslatef(0.17, -WIDTH, 0);
 		glScaleUniformly(0.8);
-		glRotatep(180, Axes::X);
-		glRotatep(45, Axes::Z);
+		X::rotate(180);
+		Z::rotate(45);
 		this->drawAxisWeight();
 	glPopMatrix();
 
 	glTranslatef(LENGTH * 0.975, -WIDTH / 2, 0);
-	glRotatep(270, Axes::Y);
+	Y::rotate(270);
 }
 
 

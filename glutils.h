@@ -28,7 +28,6 @@ struct Color {
 	GLfloat r, g, b;
 
 	Color(double r, double g, double b);
-
 	void render() const;
 };
 
@@ -39,18 +38,22 @@ namespace Colors {
 #pragma endregion
 
 
-void glRotatep(float angle, const GLfloat* axis);
-
-
-void glScaleUniformly(float value);
-
-
 namespace Axes {
-	extern GLfloat const X[3], Y[3], Z[3];
+	namespace X {
+		void rotate(float angle);
+		void translate(float distance);
+	}
+
+	namespace Y {
+		void rotate(float angle);
+		void translate(float distance);
+	}
+
+	namespace Z {
+		void rotate(float angle);
+		void translate(float distance);
+	}
 }
 
 
-
-
-
-void glTranslateZ(GLfloat value);
+void glScaleUniformly(float value);

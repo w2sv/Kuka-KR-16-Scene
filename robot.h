@@ -55,10 +55,9 @@ struct RotationAxis : public Axis {
 
 
 struct TiltAxis : public Axis {
-	TiltAxis(OrientationDimension&& orientation, float length);
+	using Axis::Axis;
 
 	void adjustModelMatrixOrientationAccordingly() const;
-	float halvedLength;
 };
 #pragma endregion
 

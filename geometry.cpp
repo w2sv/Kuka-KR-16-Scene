@@ -1,6 +1,9 @@
 #include "geometry.h"
 
 
+using namespace Axes;
+
+
 #define SLICES 20
 #define STACKS 20
 #define LOOPS 1
@@ -73,7 +76,7 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 	GLUquadricObj* q = gluNewQuadric();
 
 	glPushMatrix();
-		glRotatep(270, Axes::X);
+		X::rotate(270);
 
 		// Mantelfläche
 		gluCylinder(q, startRadius, endRadius, height, SLICES, STACKS);

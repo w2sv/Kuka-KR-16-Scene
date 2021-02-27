@@ -3,7 +3,7 @@
 #include "Include/freeglut.h"
 
 #include "geometry.h"
-#include "utils.h"
+#include "glutils.h"
 
 
 void drawBackgroundWalls(Extrema groundMeasures);

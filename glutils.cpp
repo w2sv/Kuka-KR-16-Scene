@@ -1,7 +1,7 @@
 #include "glutils.h"
 
 
-#pragma region Vector3
+#pragma region Vector
 Vector3::Vector3(GLfloat x, GLfloat y, GLfloat z) {
 	this->x = x;
 	this->y = y;
@@ -14,11 +14,9 @@ std::ostream& operator<<(std::ostream& os, const Vector3& vec)
 	os << vec.x << '/' << vec.y << '/' << vec.z << std::endl;
 	return os;
 }
-#pragma endregion
 
 
 
-#pragma region Vector2
 Vector2::Vector2(GLdouble x, GLdouble y) {
 	this->x = x;
 	this->y = y;
@@ -50,25 +48,38 @@ namespace Colors {
 #pragma endregion
 
 
+#pragma region Transformation
+namespace Axes {
+	namespace X {
+		void rotate(float angle) {
+			glRotatef(angle, 1, 0, 0);
+		}
+		void translate(float distance) {
+			glTranslatef(distance, 0, 0);
+		}
+	}
 
-#pragma region Rotation
+	namespace Y {
+		void rotate(float angle) {
+			glRotatef(angle, 0, 0, 1);
+		}
+		void translate(float distance) {
+			glTranslatef(0, 0, distance);
+		}
+	}
 
-void glRotatep(float angle, const GLfloat* axis) {
-	glRotatef(angle, *(axis), *(axis + 1), *(axis + 2));
+	namespace Z {
+		void rotate(float angle) {
+			glRotatef(angle, 0, 1, 0);
+		}
+		void translate(float distance) {
+			glTranslatef(0, distance, 0);
+		}
+	}
 }
 
-GLfloat const Axes::X[3] = { 1., 0., 0. };
-GLfloat const Axes::Y[3] = { 0., 0., 1. };
-GLfloat const Axes::Z[3] = { 0., 1., 0. };
+
+void glScaleUniformly(float value) { 
+	glScalef(value, value, value); 
+}
 #pragma endregion
-
-
-
-
-
-
-
-void glTranslateZ(GLfloat value) { glTranslatef(0, value, 0); }
-
-
-void glScaleUniformly(float value) { glScalef(value, value, value); }
