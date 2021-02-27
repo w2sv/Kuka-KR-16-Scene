@@ -19,6 +19,7 @@
 #include "wavefront.h"
 #include "glutils.h"
 #include "utils.h"
+#include "help.h"
 
 
 struct OrientationDimension {
@@ -75,13 +76,15 @@ public:
 	static void setObjectMaterials();
 
 	Robot();
+	~Robot();
 
 	void draw();  // TODO: make const again
 	void update();
 	void reset();
 	void setArbitraryAxesConfiguration();
-	 
+	void toggleDrawTCPCoordSystem();
 private:
+	bool drawTCPCoordSystem;
 	const static Color BASE_COLOR;
 
 	/* ------------OBJECTS----------------- */
@@ -98,7 +101,6 @@ private:
 
 	/* -------------PARTS------------------ */
 
-	const float AXIS_WEIGHT_HEIGTH = 1.15;
 	void drawAxisWeight() const;
 
 	static const std::vector<Vector2> SCREW_POSITIONS;

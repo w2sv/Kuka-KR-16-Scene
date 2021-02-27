@@ -83,6 +83,8 @@ struct cg_globState{
 	static bool lightMode;			// Backface-Culling an / aus
 	static int normalMode;			// Hilfe-Instanz
 	static bool cullMode;			// Backface-Culling an / aus
+
+	static bool drawCoordSystem;
 };
 
 #endif // WINDOW_H

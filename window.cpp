@@ -6,6 +6,7 @@ GLenum cg_globState::drawMode = GL_FILL;
 bool cg_globState::lightMode = true;
 int cg_globState::normalMode = 0;
 bool cg_globState::cullMode = false;
+bool cg_globState::drawCoordSystem = false;
 
 void init(int argc, char **argv){
 	int MainWin;		// Identifier vom Hauptfenster

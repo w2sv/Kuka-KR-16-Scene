@@ -31,26 +31,29 @@ int main(int argc, char** argv) {
 }
 
 
-void drawScene(){
-	static Extrema groundMeasures = Extrema(-15, 15);
+static Extrema groundMeasures = Extrema(-20, 20);
 
-	drawPlane(groundMeasures, groundMeasures, Color(.1, .1, .1));
-	drawQuadraticGrid(groundMeasures, 20, Color(.8, .0, .0));
+
+void drawScene(){
+	setColor(.1, .1, .1);
+	drawPlane(groundMeasures, groundMeasures);
+	drawQuadraticGrid(groundMeasures, 40, Color(.8, .0, .0));
 
 	static Robot* robot = new Robot();
 	robot->draw();
 	robot->update();
 
-	if (cg_key::keyState('R') == 1)
+	if (cg_key::specialKeyState(GLUT_KEY_F1) == 1)
 		robot->reset();
-	else if(cg_key::keyState('A') == 1)
+	else if (cg_key::specialKeyState(GLUT_KEY_F2) == 1)
 		robot->setArbitraryAxesConfiguration();
+	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1)
+		robot->toggleDrawTCPCoordSystem();
 }
 
 void displayFunc()
 {
 	static cg_help help;
-	static cg_globState globState;
 	static cg_key key;
 	static Camera camera;
 
@@ -62,29 +65,29 @@ void displayFunc()
 	else if (1 == key.keyState('F')) {
 		help.toggleFps();	// Framecounter on/off
 	}
-	else if (1 == key.keyState('H') || 1 == key.specialKeyState(GLUT_KEY_F1)) {
+	else if (1 == key.keyState('H')) {
 		help.toggle();	// Hilfetext on/off
 	}
 	else if (1 == key.keyState('K')) {
-		help.toggleKoordsystem();	// Koordinatensystem on/off
+		cg_globState::drawCoordSystem = toggleFlag(cg_globState::drawCoordSystem);	// Koordinatensystem on/off
 	}
 	else if (1 == key.keyState('W')) {
-		globState.drawMode = (globState.drawMode == GL_FILL) ? GL_LINE : GL_FILL; // Wireframe on/off
+		cg_globState::drawMode = (cg_globState::drawMode == GL_FILL) ? GL_LINE : GL_FILL; // Wireframe on/off
 	}
 	else if (1 == key.keyState('L')) {
-		globState.lightMode = !globState.lightMode;	// Beleuchtung on/off
+		cg_globState::lightMode = !cg_globState::lightMode;	// Beleuchtung on/off
 	}
 	else if (1 == key.keyState('C')) {
-		globState.cullMode = !globState.cullMode; // Backfaceculling on/off
+		cg_globState::cullMode = !cg_globState::cullMode; // Backfaceculling on/off
 	}
 	//else if (1 == key.keyState('I')){
 	//	globState.cameraHelper[0] = 0;	// Initialisierung der Kamera
 	//	globState.cameraHelper[1] = 0;
 	//}
-	else if (key.keyState('T'))
+	/*else if (key.keyState('T'))
 		camera.setMode(Camera::Mode::TCP);
 	else if (key.keyState('O'))
-		camera.setMode(Camera::Mode::Observer);
+		camera.setMode(Camera::Mode::Observer);*/
 
 	// Szene zeichnen: CLEAR, SETCAMERA, DRAW_SCENE
 
@@ -94,21 +97,22 @@ void displayFunc()
 	glLoadIdentity();
 
 	// Farbmodus oder Beleuchtungsmodus ?
-	setDefaultLightAndMaterial(globState.lightMode);
+	setDefaultLightAndMaterial(cg_globState::lightMode);
 
 	// Kamera setzen (spherische Mausnavigation)
 	camera.set();
 
 	// Koordinatensystem zeichnen
-	help.drawKoordsystem(-10, 10, -10, 10, -10, 10);
+	if (cg_globState::drawCoordSystem)
+		drawCoordSystem(groundMeasures, groundMeasures, groundMeasures);
 
 	// Zeichenmodus einstellen (Wireframe on/off)
-	glPolygonMode(GL_FRONT_AND_BACK, globState.drawMode);
+	glPolygonMode(GL_FRONT_AND_BACK, cg_globState::drawMode);
 
 	// Backface Culling on/off);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
-	globState.cullMode ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
+	cg_globState::cullMode ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 
 	// Modell zeichnen /////////////////!!!!!!!!!!!!!!!!!!!!!!!!///////////////////////
 	drawScene();

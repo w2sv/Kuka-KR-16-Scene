@@ -27,3 +27,6 @@ struct Measurements {
 
 	Measurements(float height, float width, float depth);
 };
+
+
+bool toggleFlag(bool flag);

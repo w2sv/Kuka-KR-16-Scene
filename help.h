@@ -1,6 +1,9 @@
 #ifndef HELP_H
 #define HELP_H
 
+#include "utils.h"
+#include "glutils.h"
+
 
 // *** Help-Module, PrakCG Template
 
@@ -47,6 +50,9 @@ const char *spalte2[] =
 #endif
 
 
+void drawCoordSystem(Extrema& x, Extrema& y, Extrema& z, float coneScale = 1);
+
+
 class cg_help
 {
 public:
@@ -59,7 +65,6 @@ public:
 	bool  isKoordsystem();
 	float getFps();
 	void  draw();
-	void  drawKoordsystem(GLfloat xmin, GLfloat xmax, GLfloat ymin, GLfloat ymax, GLfloat zmin, GLfloat zmax);
 
 private:
 	static bool  showhelp, showfps, wireframe, koordsystem;

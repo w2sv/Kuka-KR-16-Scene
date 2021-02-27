@@ -37,3 +37,8 @@ Measurements::Measurements(float height, float width, float depth) :
 	width(width),
 	depth(depth)
 {}
+
+
+bool toggleFlag(bool flag) {
+	return (bool)(-(int)flag + 1);
+}

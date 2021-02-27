@@ -134,8 +134,15 @@ Robot::Robot() :
 		{axes[1], std::bind(&Robot::drawSecondAxis, this)},
 		{axes[2], std::bind(&Robot::drawThirdAxis, this)},
 		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
-	})
+	}),
+	drawTCPCoordSystem(false)
 {}
+
+
+Robot::~Robot() {
+	for (size_t i = 0; i < this->axes.size(); i++)
+		delete this->axes[i];
+}
 
 
 void Robot::update() {
@@ -153,6 +160,11 @@ void Robot::reset() {
 void Robot::setArbitraryAxesConfiguration() {
 	for (Axis* const axisPointer : this->axes)
 		axisPointer->orientation.setArbitraryAngle();
+}
+
+
+void Robot::toggleDrawTCPCoordSystem() {
+	this->drawTCPCoordSystem = toggleFlag(this->drawTCPCoordSystem);
 }
 #pragma endregion
 
@@ -425,6 +437,13 @@ void Robot::drawFourthAxis() const {
 		// cone
 		glTranslatef(0, 0.15, 0);
 		drawCylinder(0.15, 0.1, 0.25);
+
+		if (this->drawTCPCoordSystem) {
+			static Extrema TCP_COORD_SYSTEM_EXTREMA = Extrema(-1, 1);
+
+			glTranslatef(0, 0.25, 0);
+			drawCoordSystem(TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, 0.3);
+		}
 
 	glPopMatrix();
 }

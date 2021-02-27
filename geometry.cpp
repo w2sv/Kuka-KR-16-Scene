@@ -57,12 +57,10 @@ void drawQuadraticGrid(Extrema& extrema, int tiles, Color& color) {
 }
 
 
-void drawPlane(Extrema& xExtrema, Extrema& yExtrema, Color& color) {
+void drawPlane(Extrema& xExtrema, Extrema& yExtrema) {
 	const float Z_COORDINATE = -0.01;
 	
 	glBegin(GL_QUADS);
-		// color.render();
-
 		glVertex3f(xExtrema.min, Z_COORDINATE, yExtrema.min);
 		glVertex3f(xExtrema.max, Z_COORDINATE, yExtrema.min);
 		glVertex3f(xExtrema.max, Z_COORDINATE, yExtrema.max);
