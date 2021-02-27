@@ -113,7 +113,7 @@ void Robot::setObjectMaterials() {
 Robot::Robot() :
 	firstAxis(RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360)))), 
 	secondAxis(TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-22.5, 45)), 2.2)),
-	thirdAxis(TiltAxis(OrientationDimension('t', 'g', 60, Extrema(0, 80)), 3.9)),
+	thirdAxis(TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 45)), 3.9)),
 
 	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis }),
 	axis2DrawFunction({
@@ -327,24 +327,29 @@ void Robot::drawThirdAxis() const {
 
 	// draw axis
 	glPushMatrix();
-		glTranslatef(-LENGTH / 2.4, -WIDTH / 2, -MOUNT_PART_HEIGHT / 2);  // translate slightly to the right, up, forward 
+		glTranslatef(LENGTH / 2.4, -WIDTH / 2, 0);  // translate slightly to the right, up, forward 
 		glScaleUniformly(5);
 		glRotatep(90, Axes::Y);
-		glRotatep(65, Axes::X);
+		glRotatep(-90, Axes::X);
 		objects[Object::TiltAxis2].draw();
 	glPopMatrix();
 
+	// draw weight block at axis beginning
 	glPushMatrix();
-		indicateCurrentPosition();
+		glTranslatef(-0.6, -WIDTH / 2, 0);
 
-		glTranslatef(0.6, -WIDTH / 2, -MOUNT_PART_HEIGHT / 6);
-		glRotatep(90, Axes::Y);
-		glRotatep(65, Axes::X);
-		glRotatep(90, Axes::X);
+		static const float LATERAL_SCALING_FACTOR = 0.5;
+		static const float Z_INCREMENT = 0.35;
 
-		this->drawAxisWeight();
+		for (float zTranslation = -Z_INCREMENT; zTranslation <= Z_INCREMENT; zTranslation += Z_INCREMENT) {
+			glPushMatrix();
+				glTranslatef(0, 0, zTranslation);
+				glScalef(1, LATERAL_SCALING_FACTOR, LATERAL_SCALING_FACTOR);
+				glRotatep(90, Axes::Y);
 
-		indicateCurrentPosition();
+				this->drawAxisWeight();
+			glPopMatrix();
+		}
 	glPopMatrix();
 }
 #pragma endregion
