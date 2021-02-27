@@ -1,14 +1,12 @@
 #include "robot.h"
 
 #pragma region OrientationDimension
-cg_key* OrientationDimension::key = new cg_key;
-
-
-OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float angleLimit): 
-	angle(0), 
+OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, float angleLimit): 
+	angle(startAngle),
+	startAngle(startAngle),
+	angleLimits({ startAngle - angleLimit, startAngle + angleLimit }),
 	incrementationKey(incrementationKey), 
 	decrementationKey(decrementationKey), 
-	angleLimit(angleLimit),
 	isFullRangeOfMotionDim(angleLimit == 360)
 {}
 
@@ -16,54 +14,49 @@ OrientationDimension::OrientationDimension(char incrementationKey, char decremen
 void OrientationDimension::update() {
 	float INCREMENT = 0.2;
 
-	bool modified = false;
-	if (this->key->keyState(this->decrementationKey) != 0) {
+	if (cg_key::keyState(this->decrementationKey) != 0)
 		this->angle += INCREMENT;
-		modified = true;
-	}
 
-	else if (this->key->keyState(this->incrementationKey) != 0) {
+	else if (cg_key::keyState(this->incrementationKey) != 0)
 		this->angle -= INCREMENT;
-		modified = true;
-	}
+	else
+		return;
 
-	if (modified)
-		this->clipAngle();
+	this->clipAngle();
 }
 
 
 void OrientationDimension::clipAngle() {
-	this->angle = std::min<float>(std::max<float>(this->angle, -this->angleLimit), this->angleLimit);
+	this->angle = std::min<float>(std::max<float>(this->angle, this->angleLimits[0]), this->angleLimits[1]);
 
-	if (this->isFullRangeOfMotionDim && abs(this->angle) == this->angleLimit)
-		this->angle = this->angle == this->angleLimit ? -this->angleLimit : this->angleLimit;
+	if (this->isFullRangeOfMotionDim && abs(this->angle) == this->angleLimits[1])
+		this->angle = this->angle == this->angleLimits[1] ? this->angleLimits[0] : this->angleLimits[1];
+}
+
+
+void OrientationDimension::reset() { this->angle = this->startAngle; }
+
+
+float OrientationDimension::getAngle() const {
+	return this->angle;
 }
 #pragma endregion
 
 
 
 #pragma region Axis
-Axis::Axis(OrientationDimension&& orientation, float startAngle):
-	orientation(orientation),
-	startAngle(startAngle)
-{ 
-	this->orientation.angle = startAngle; 
+Axis::Axis(OrientationDimension&& orientation):
+	orientation(orientation)
+{}
+
+
+void RotationAxis::adjustModelMatrixOrientationAccordingly() const { 
+	glRotatep(this->orientation.getAngle(), Axes::Z); 
 }
 
 
-void Axis::update() {
-	this->orientation.update();
-}
-
-
-void Axis::reset() { this->orientation.angle = this->startAngle; }
-
-
-void RotationAxis::adjustModelMatrixOrientationAccordingly() const { glRotatep(this->orientation.angle, Axes::Z); }
-
-
-TiltAxis::TiltAxis(OrientationDimension&& orientation, float startAngle, float length):
-	Axis(std::move(orientation), startAngle),
+TiltAxis::TiltAxis(OrientationDimension&& orientation, float length):
+	Axis(std::move(orientation)),
 	halvedLength(length / 2)
 {}
 	
@@ -75,7 +68,7 @@ void TiltAxis::adjustModelMatrixOrientationAccordingly() const {
 	float shiftVectorX = cos(orientationAngle_Radian) * this->halvedLength;*/
 
 	// glTranslatef(0, -shiftVectorZ, -shiftVectorX);
-	glRotatep(this->orientation.angle, Axes::Z);
+	glRotatep(this->orientation.getAngle(), Axes::Z);
 	// glTranslatef(0, shiftVectorZ, shiftVectorX);
 }
 #pragma endregion
@@ -112,29 +105,29 @@ void Robot::setObjectMaterials() {
 
 #pragma region Publics
 Robot::Robot() :
-	firstAxis(RotationAxis(OrientationDimension('a', 'd', 360), 0)), 
-	secondAxis(TiltAxis(OrientationDimension('w', 's', 45), 22.5, 2.2)),
-	thirdAxis(TiltAxis(OrientationDimension('t', 'g', 45), 0., 2.)),
+	firstAxis(RotationAxis(OrientationDimension('a', 'd', 0, 360))), 
+	secondAxis(TiltAxis(OrientationDimension('w', 's', 22.5, 45), 2.2)),
+	thirdAxis(TiltAxis(OrientationDimension('t', 'g', 60, 45), 3.9)),
 
+	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis }),
 	axis2DrawFunction({
 		{&this->firstAxis, std::bind(&Robot::drawFirstAxis, this)},
 		{&this->secondAxis, std::bind(&Robot::drawSecondAxis, this)},
 		{&this->thirdAxis, std::bind(&Robot::drawThirdAxis, this)}
-	}),
-	axes({ &this->firstAxis, &this->secondAxis, &this->thirdAxis})
+	})
 {}
 
 
 void Robot::update() {
 	for (Axis* const axisPointer : this->axes) {
-		axisPointer->update();
+		axisPointer->orientation.update();
 	}
 }
 
 
 void Robot::reset() {
 	for (Axis* const axisPointer : this->axes) {
-		axisPointer->reset();
+		axisPointer->orientation.reset();
 	}
 }
 #pragma endregion
@@ -188,7 +181,7 @@ void Robot::drawScrewCircle() const {
 	for (size_t i = 0; i < SCREW_POSITIONS.size(); i++) {
 		glPushMatrix();
 			glTranslatef(SCREW_POSITIONS[i].x, 0, SCREW_POSITIONS[i].y);
-			glScalef(0.2, 0.2, 0.2);
+			glScaleUniformly(0.2);
 			objects[ScrewHead].draw();
 		glPopMatrix();
 	}
@@ -281,7 +274,7 @@ void Robot::drawSecondAxis()const {
 				
 				// draw axis
 				glPushMatrix();
-					glScalef(1.7, 1.7, 1.7);
+				glScaleUniformly(1.7);
 					objects[TiltAxis1].draw();
 				glPopMatrix();
 
@@ -316,14 +309,32 @@ void Robot::drawSecondAxis()const {
 
 
 void Robot::drawThirdAxis() const {
+	static const float LENGTH = 3.9;
+	static const float WIDTH = 0.5;
+	static const float MOUNT_PART_HEIGHT = 1.7;
+
 	this->thirdAxis.adjustModelMatrixOrientationAccordingly();
 
+	// draw axis
 	glPushMatrix();
-		glTranslatef(-1.8, -0.25, -0.95);
+		glTranslatef(-LENGTH / 2.4, -WIDTH / 2, -MOUNT_PART_HEIGHT / 2);  // translate slightly to the right, up, forward 
 		glScaleUniformly(5);
 		glRotatep(90, Axes::Y);
 		glRotatep(65, Axes::X);
 		objects[Object::TiltAxis2].draw();
+	glPopMatrix();
+
+	glPushMatrix();
+		indicateCurrentPosition();
+
+		glTranslatef(0.6, -WIDTH / 2, -MOUNT_PART_HEIGHT / 6);
+		glRotatep(90, Axes::Y);
+		glRotatep(65, Axes::X);
+		glRotatep(90, Axes::X);
+
+		this->drawAxisWeight();
+
+		indicateCurrentPosition();
 	glPopMatrix();
 }
 #pragma endregion

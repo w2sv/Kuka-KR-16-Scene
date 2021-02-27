@@ -18,7 +18,7 @@ const void Camera::set() {
 }
 void Camera::setObserverMode() {
 	double x, y, z, The, Phi;
-	static double radius = 60;
+	static double radius = 40;
 
 	static const float WHEEL_EVENT_RADIUS_INCREMENT = 1.5;
 

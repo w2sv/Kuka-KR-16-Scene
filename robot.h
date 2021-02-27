@@ -25,18 +25,17 @@
 
 struct OrientationDimension {
 	public:
-		float angle;
-		
-		OrientationDimension(char incrementationKey, char decrementationKey, float angleLimit);
+		OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, float angleLimit);
 		void update();
+		void reset();
+		float getAngle() const;
 	private:
-		static cg_key* key;
+		float angle;
 
-		float angleLimit;
-		bool isFullRangeOfMotionDim;
-
-		char incrementationKey;
-		char decrementationKey;
+		const float startAngle;
+		const std::vector<float> angleLimits;  // TODO
+		const bool isFullRangeOfMotionDim;
+		const char incrementationKey, decrementationKey;
 
 		void clipAngle();
 };
@@ -46,13 +45,8 @@ struct OrientationDimension {
 struct Axis {
 	OrientationDimension orientation;
 
-	Axis(OrientationDimension&& orientation, float startAngle);
-	void update();
+	Axis(OrientationDimension&& orientation);
 	virtual void adjustModelMatrixOrientationAccordingly() const = 0;
-	void reset();
-
-private:
-	float startAngle;
 };
 
 
@@ -64,7 +58,7 @@ struct RotationAxis : public Axis {
 
 
 struct TiltAxis : public Axis {
-	TiltAxis(OrientationDimension&& orientation, float startAngle, float length);
+	TiltAxis(OrientationDimension&& orientation, float length);
 
 	void adjustModelMatrixOrientationAccordingly() const;
 	float halvedLength;
