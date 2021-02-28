@@ -17,6 +17,7 @@
 #include "image.h"
 
 
+
 int main(int argc, char** argv) {
 	init(argc, argv);
 
@@ -49,6 +50,8 @@ void drawScene(){
 		robot->setArbitraryAxesConfiguration();
 	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1)
 		robot->toggleDrawTCPCoordSystem();
+	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
+		robot->toggleDisplayAxesAngles();
 }
 
 void displayFunc()

@@ -3,14 +3,15 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include <iostream>  // !
 #include <limits>
 #include <functional>
 #include <map>
 #include <vector>
 #include <random>
+#include <sstream>
+#include <string>
+#include <math.h>
 
 #include "Include/freeglut.h"
 
@@ -25,12 +26,16 @@
 struct OrientationDimension {
 	public:
 		OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits);
+
 		void update();
 		void reset();
 		float getAngle() const;
+		bool angleLimitReached() const;
 		void setArbitraryAngle();
+
 	private:
 		float angle;
+		bool angleLimitReached_b;
 
 		const float startAngle;
 		const Extrema angleLimits;
@@ -82,10 +87,15 @@ public:
 	void update();
 	void reset();
 	void setArbitraryAxesConfiguration();
+
 	void toggleDrawTCPCoordSystem();
+	void toggleDisplayAxesAngles();
 private:
-	bool drawTCPCoordSystem;
 	const static Color BASE_COLOR;
+	bool drawTCPCoordSystem;
+	bool displayAxesAngles_b;
+
+	void displayAxesAngles() const;
 
 	/* ------------OBJECTS----------------- */
 

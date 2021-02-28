@@ -11,7 +11,8 @@ OrientationDimension::OrientationDimension(char incrementationKey, char decremen
 	angleLimits(angleLimits),
 	incrementationKey(incrementationKey), 
 	decrementationKey(decrementationKey), 
-	isFullRangeOfMotionDim(angleLimits.spread() == 360)
+	isFullRangeOfMotionDim(angleLimits.spread() == 360),
+	angleLimitReached_b(false)
 {}
 
 
@@ -27,6 +28,7 @@ void OrientationDimension::update() {
 		return;
 
 	this->clipAngle();
+	this->angleLimitReached_b = this->angle == this->angleLimits.min || this->angle == this->angleLimits.max;
 }
 
 
@@ -42,7 +44,7 @@ void OrientationDimension::clipAngle() {
 }
 
 
-void OrientationDimension::reset() { 
+void OrientationDimension::reset() {
 	this->angle = this->startAngle; 
 }
 
@@ -60,6 +62,11 @@ void OrientationDimension::setArbitraryAngle() {
 	std::uniform_int_distribution<> distr(angleLimits.min, angleLimits.max);
 
 	this->angle = distr(gen);
+}
+
+
+bool OrientationDimension::angleLimitReached() const {
+	return this->angleLimitReached_b;
 }
 #pragma endregion
 
@@ -125,7 +132,7 @@ void Robot::setObjectMaterials() {
 Robot::Robot() :
 	axes({
 		new RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360))),
-		new TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-45, 80))),
+		new TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-45, 60))),
 		new TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 75))),
 		new RotationAxis(OrientationDimension('f', 'h', 0, Extrema(0, 360))) }),
 
@@ -135,7 +142,8 @@ Robot::Robot() :
 		{axes[2], std::bind(&Robot::drawThirdAxis, this)},
 		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
 	}),
-	drawTCPCoordSystem(false)
+	drawTCPCoordSystem(false),
+	displayAxesAngles_b(true)
 {}
 
 
@@ -148,6 +156,18 @@ Robot::~Robot() {
 void Robot::update() {
 	for (Axis* const axisPointer : this->axes)
 		axisPointer->orientation.update();
+}
+
+
+void Robot::displayAxesAngles() const {
+	for (size_t i = 0; i < 4; i++) {
+		std::ostringstream oss;
+		oss << roundf(this->axes[i]->orientation.getAngle() * 100.) / 100.;
+		if (this->axes[i]->orientation.angleLimitReached())
+			oss << "!";
+
+		projectText(0.8, 0.8 - (i * 0.05), oss.str().c_str(), Color(0.8, 0, 0), GLUT_BITMAP_9_BY_15);
+	}
 }
 
 
@@ -166,6 +186,11 @@ void Robot::setArbitraryAxesConfiguration() {
 void Robot::toggleDrawTCPCoordSystem() {
 	this->drawTCPCoordSystem = toggleFlag(this->drawTCPCoordSystem);
 }
+
+
+void Robot::toggleDisplayAxesAngles() {
+	this->displayAxesAngles_b = toggleFlag(this->displayAxesAngles_b);
+}
 #pragma endregion
 
 
@@ -179,6 +204,9 @@ void Robot::draw() {
 		for (Axis* const axisPointer : this->axes)
 			this->axis2DrawFunction[axisPointer]();
 	glPopMatrix();
+
+	if (this->displayAxesAngles_b)
+		this->displayAxesAngles();
 }
 
 

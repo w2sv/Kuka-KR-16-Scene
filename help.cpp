@@ -4,15 +4,18 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include "Include/freeglut.h"
-#define __EXPORT_HELP
-#include "help.h"
 
+#include "Include/freeglut.h"
+
+#define __EXPORT_HELP
+
+
+#include "help.h"
 
 
 bool cg_help::showhelp = false, cg_help::showfps = true, cg_help::wireframe = false, cg_help::koordsystem = false;
 int cg_help::frames = 0;
-float cg_help::fps = 0.0f, cg_help::bg_size = bg_size = 0.8f, cg_help::shadow = 0.003f;
+float cg_help::fps = 0.0f, cg_help::bg_size = bg_size = 0.8f;
 const char * cg_help::title = "KUKA kr 16";
 
 
@@ -73,7 +76,7 @@ GLUT_BITMAP_HELVETICA_10
 GLUT_BITMAP_HELVETICA_12
 GLUT_BITMAP_HELVETICA_18
 */
-void cg_help::printText(float x, float y, const char *text, void *font)
+void printText(float x, float y, const char *text, void *font)
 {
 	glRasterPos2f(x, y);
 	unsigned int l = strlen(text);
@@ -81,17 +84,49 @@ void cg_help::printText(float x, float y, const char *text, void *font)
 		glutBitmapCharacter(font, text[i]);
 }
 
-void cg_help::printText(float x, float y, const char *text, float r, float g, float b, void *font)
+void printText(float x, float y, const char *text, float r, float g, float b, void *font)
 {
 	glColor3f(r, g, b);
 	printText(x, y, text, font);
 }
 
-void cg_help::printTextShadow(float x, float y, const char *text, float r, float g, float b, void *font)
+void printTextShadow(float x, float y, const char *text, float r, float g, float b, float shadow, void *font)
 {
 	printText(x + shadow, y - shadow, text, 0, 0, 0, font);
 	printText(x, y, text, r, g, b, font);
 }
+
+
+void projectText(float x, float y, const char* text, Color& color, void* font) {
+	GLfloat akt_color[4];
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	glGetFloatv(GL_CURRENT_COLOR, akt_color);
+
+	//orthogonale projektion setzen
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(-1.0f, 1.0f, -1.0f, 1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glDisable(GL_LIGHTING);
+
+	printText(x, y, text, color.r, color.g, color.b, font);
+
+	glEnable(GL_LIGHTING);
+
+	//reset matrices
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glColor4fv(akt_color);
+	glPopAttrib();
+}
+
 
 void cg_help::printFps(float x, float y, void *font)
 {
@@ -139,7 +174,7 @@ void cg_help::draw()
 		// hintergrund
 		drawBackground();
 		// title
-		printTextShadow(-0.6f, 0.7f, title, 1.0f, 1.0f, 0.0f, GLUT_BITMAP_TIMES_ROMAN_24);
+		printTextShadow(-0.6f, 0.7f, title, 1.0f, 1.0f, 0.0f, 0.003f, GLUT_BITMAP_TIMES_ROMAN_24);
 		// tasten
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		float posy = 0.5f;
