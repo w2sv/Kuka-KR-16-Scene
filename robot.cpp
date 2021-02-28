@@ -369,12 +369,16 @@ void Robot::drawFirstAxis() const {
 	glPopMatrix();
 
 	// draw second axis mount disk
-		BASE_COLOR.render();
 	glTranslatef(1.65, 1.63, 0.2);
+		BASE_COLOR.render();
 
 	glPushMatrix();
 		X::rotate(90);
-		drawCylinder(0.5, 0.5, AXIS_MOUNT_DISK_HEIGHT);
+		
+		textures[Texture::Steel].bind();
+		glEnable(GL_TEXTURE_2D);
+			drawCylinder(0.5, 0.5, AXIS_MOUNT_DISK_HEIGHT);
+		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
 	// translate located both at the top and in the center of the second axis mount disk
@@ -420,10 +424,12 @@ void Robot::drawSecondAxis()const {
 		glPopMatrix();
 
 		// draw orange axes weight pedastel octPrism
-			BASE_COLOR.render();
 		glTranslatef(0, -0.5, 0);
 		X::rotate(180);
-		OctagonalPrismVertices weightPedastelVertices = drawOctagonalPrism(0.15, 0.6, 0.1);
+			BASE_COLOR.render();
+	
+			OctagonalPrismVertices weightPedastelVertices = drawOctagonalPrism(0.15, 0.6, 0.1);
+			
 			Colors::BLACK.render();
 		drawOctagonalPrismCage(weightPedastelVertices);
 

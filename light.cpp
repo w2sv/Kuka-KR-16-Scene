@@ -21,7 +21,7 @@ void setMaterial(GLenum face, GLfloat amb[4], GLfloat diff[4], GLfloat spec[4], 
 void setLights()
 {
 	// Parameter eines globalen Lichts
-	GLint g_localviewer = GL_FALSE;
+	GLint g_localviewer = GL_TRUE;
 	GLfloat g_amb[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 	glEnable(GL_LIGHTING);
@@ -62,10 +62,11 @@ void setLights()
 // Standardeinstellung für Farbe und Beleuchtung
 void setDefaultLightAndMaterial(GLboolean lightMode) {
 	GLfloat color[4] = { 0.4, 0.4, 0.8, 1.0 };
+
 	if (lightMode == GL_TRUE){
 		GLfloat m_amb[4] = { 0.2, 0.2, 0.2, 1.0 };
 		GLfloat* m_diff = color;
-		GLfloat m_spec[4] = { 0.8, 0.8, 0.8, 1.0 };
+		GLfloat m_spec[4] = { 0.2, 0.2, 0.2, 1.0 };
 		GLfloat m_shine = 32.0;
 		GLfloat m_emiss[4] = { 0.0, 0.0, 0.0, 1.0 };
 
