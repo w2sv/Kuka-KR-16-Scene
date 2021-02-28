@@ -10,15 +10,19 @@ Camera::Camera():
 
 void Camera::setMode(Mode mode) { this->mode = mode; }
 
-const void Camera::set() {
+
+const void Camera::set(Robot* robot) {
 	switch (this->mode) {
 		case Mode::Observer:
-			this->setObserverMode(); break;
+			this->setObserverMode(robot); break;
 	}
 }
-void Camera::setObserverMode() {
+
+
+
+void Camera::setObserverMode(Robot* robot) {
 	double x, y, z, The, Phi;
-	static double radius = 40;
+	static double radius = 0;
 
 	static const float WHEEL_EVENT_RADIUS_INCREMENT = 1.5;
 
@@ -40,7 +44,6 @@ void Camera::setObserverMode() {
 		radius = std::max<float>(radius + 0.1 * cg_mouse::moveY(), 1.0);
 	}
 
-
 	Phi = 0.2 * this->screenPosX / cg_globState::screenSize[0] * M_PI + M_PI * 0.5;
 	The = 0.2 * this->screenPosY / cg_globState::screenSize[1] * M_PI;
 	x = radius * cos(Phi) * cos(The);
@@ -48,5 +51,9 @@ void Camera::setObserverMode() {
 	z = radius * sin(Phi) * cos(The);
 	int Oben = (The <= 0.5 * M_PI || The > 1.5 * M_PI) * 2 - 1;
 
-	gluLookAt(x, y, z, 0, 0, 0, 0, Oben, 0);
+	// glMatrixMode(GL_MODELVIEW);
+	// robot->assumeSpatialTCPConfiguration();
+	gluLookAt(0, 0, 0, 0, 1, 0, 0, 1, 0);
+
+	// gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 }

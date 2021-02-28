@@ -94,6 +94,7 @@ public:
 
 	void toggleDrawTCPCoordSystem();
 	void toggleDisplayAxesAngles();
+	void assumeSpatialTCPConfiguration() const;
 private:
 	const static Color BASE_COLOR;
 	bool drawTCPCoordSystem;

@@ -101,14 +101,14 @@ std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 
 
 
-#define NUM_TEXTURES 3
+#pragma region Textures
+#define NUM_TEXTURES 2
 cg_image textures[NUM_TEXTURES];
 
 
 enum Texture {
 	Knobs,
-	Steel,
-	RustyMetal
+	Steel
 };
 
 
@@ -116,8 +116,7 @@ void loadTextures() {
 	const char* FILE_PATH = ".\\textures\\";
 	const char* FILE_NAMES[NUM_TEXTURES] = {
 		"smoothed-square-textured-metal.bmp",
-		"warped-sheet-metal_roughness.bmp",
-		"rust-covered-metal.bmp",
+		"warped-sheet-metal_roughness.bmp"
 	};
 
 	for (size_t i = 0; i < NUM_TEXTURES; i++) {
@@ -129,6 +128,7 @@ void loadTextures() {
 		textures[i].setEnvMode(GL_MODULATE);
 	}
 }
+#pragma endregion
 
 
 
@@ -231,6 +231,26 @@ void Robot::toggleDrawTCPCoordSystem() {
 void Robot::toggleDisplayAxesAngles() {
 	this->displayAxesAngles_b = toggleFlag(this->displayAxesAngles_b);
 }
+
+
+void Robot::assumeSpatialTCPConfiguration() const {
+	Z::translate(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
+
+	this->axes[0]->adjustModelMatrixOrientationAccordingly();
+	glTranslatef(0, 0, 0.3);
+	glTranslatef(1.65, 1.63, 0.2);
+
+	X::rotate(90);
+	this->axes[1]->adjustModelMatrixOrientationAccordingly();
+	glTranslatef(0, 0, -4.4);
+
+	this->axes[2]->adjustModelMatrixOrientationAccordingly();
+	glTranslatef(3.9 * 0.965, -0.5 / 2, 0);
+	Y::rotate(270);
+
+	this->axes[3]->adjustModelMatrixOrientationAccordingly();
+	glTranslatef(0, 1.03, 0);
+}
 #pragma endregion
 
 
@@ -301,7 +321,7 @@ void Robot::drawScrewCircle() const {
 void Robot::drawPedestal() const {
 	glPushMatrix();
 		glTranslatef(0, this->PEDASTEL_HEIGHT / 2, 0);
-		glScalef(6, this->PEDASTEL_HEIGHT, 5);
+		glScalef(12, this->PEDASTEL_HEIGHT, 10);
 			
 		Color(.6, .6, .6).render();
 		textures[Texture::Knobs].bind();
@@ -363,7 +383,7 @@ void Robot::drawFirstAxis() const {
 
 	// draw axis weigth
 	glPushMatrix();
-	Z::translate(0.35);  // height of cylinder bottom disk
+		Z::translate(0.35);  // height of cylinder bottom disk
 		glScaleUniformly(1.3);
 		drawAxisWeight();
 	glPopMatrix();

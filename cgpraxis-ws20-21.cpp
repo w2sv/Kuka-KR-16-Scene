@@ -36,6 +36,8 @@ int main(int argc, char** argv) {
 
 
 static Extrema groundMeasures = Extrema(-20, 20);
+static Robot* robot = new Robot();
+
 
 
 void drawScene(){
@@ -43,7 +45,6 @@ void drawScene(){
 	drawPlane(groundMeasures, groundMeasures);
 	drawQuadraticGrid(groundMeasures, 40, Color(.8, .0, .0));
 
-	static Robot* robot = new Robot();
 	robot->draw();
 	robot->update();
 
@@ -106,7 +107,7 @@ void displayFunc()
 	setDefaultLightAndMaterial(cg_globState::lightMode);
 
 	// Kamera setzen (spherische Mausnavigation)
-	camera.set();
+	camera.set(robot);
 
 	// Koordinatensystem zeichnen
 	if (cg_globState::drawCoordSystem)

@@ -21,7 +21,7 @@ public:
 	};
 
 	Camera();
-	const void set();
+	const void set(Robot* robot);
 	void setMode(Mode mode);
 private:
 	int screenPosX;
@@ -29,5 +29,5 @@ private:
 
 	Mode mode;
 
-	void setObserverMode();
+	void setObserverMode(Robot* robot);
 };
