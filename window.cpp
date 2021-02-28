@@ -8,6 +8,7 @@ int cg_globState::normalMode = 0;
 bool cg_globState::cullMode = false;
 bool cg_globState::drawCoordSystem = false;
 
+
 void init(int argc, char **argv){
 	int MainWin;		// Identifier vom Hauptfenster
 	int MainMenu;		// Identifier vom Hauptmenu
@@ -20,7 +21,7 @@ void init(int argc, char **argv){
 	glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);
 	glutInitDisplayMode(USED_MODUS);
 	MainWin = glutCreateWindow(PROG_NAME);
-	// glutFullScreen();
+	glutFullScreen();
 
 	// OpenGL Initialisierung
 	glEnable(GL_DEPTH_TEST);	// Z-Buffer aktivieren

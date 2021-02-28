@@ -122,7 +122,6 @@
     <ClCompile Include="cgpraxis-ws20-21.cpp" />
     <ClCompile Include="robot.cpp" />
     <ClCompile Include="glutils.cpp" />
-    <ClCompile Include="textures.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="wavefront.cpp" />
     <ClCompile Include="window.cpp" />
@@ -137,7 +136,6 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="robot.h" />
     <ClInclude Include="glutils.h" />
-    <ClInclude Include="textures.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="wavefront.h" />
     <ClInclude Include="window.h" />

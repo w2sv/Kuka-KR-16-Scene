@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <iostream>
 
 #ifdef _WIN32
 	#include <io.h>
@@ -52,6 +53,12 @@ cg_image::~cg_image ()
 
 bool cg_image::load ( const char * fileName, bool generateMipmaps )
 {
+	if (!fopen(fileName, "r")) {
+		std::cerr << fileName << "does not exist" << std::endl;
+		std::getchar();
+		std::exit(1);
+	};
+
 	// Datei in Zwischenspeicher lesen
 	if ( !loadBMP ( fileName, false ) )
 		if ( !loadTGA ( fileName, false ) )

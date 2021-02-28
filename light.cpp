@@ -3,7 +3,7 @@
 // Farbe setzen fuer Farb- und Beleuchtungsmodus
 void setColor(GLfloat r, GLfloat g, GLfloat b) {
 	glColor3f(r, g, b);
-	GLfloat amb_diff[4] = { r,g,b,1 };
+	GLfloat amb_diff[4] = { r, g, b, 1 };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, amb_diff);
 }
 
@@ -62,8 +62,7 @@ void setLights()
 // Standardeinstellung für Farbe und Beleuchtung
 void setDefaultLightAndMaterial(GLboolean lightMode) {
 	GLfloat color[4] = { 0.4, 0.4, 0.8, 1.0 };
-	if (lightMode == GL_TRUE) // Beleuchtung aktivieren
-	{
+	if (lightMode == GL_TRUE){
 		GLfloat m_amb[4] = { 0.2, 0.2, 0.2, 1.0 };
 		GLfloat* m_diff = color;
 		GLfloat m_spec[4] = { 0.8, 0.8, 0.8, 1.0 };
@@ -75,11 +74,9 @@ void setDefaultLightAndMaterial(GLboolean lightMode) {
 		setLights();
 
 		glEnable(GL_NORMALIZE);
-
 		glEnable(GL_LIGHTING);
 	}
-	else   // Zeichnen im Farbmodus
-	{
+	else {
 		glDisable(GL_LIGHTING);
 		glColor4fv(color);
 	}

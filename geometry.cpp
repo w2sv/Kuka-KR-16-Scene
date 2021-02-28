@@ -9,19 +9,6 @@ using namespace Axes;
 #define LOOPS 1
 
 
-//void drawCube() {
-//	glPushMatrix();
-//		glutSolidCube(1.0);
-//
-//		// Draht-Würfel Zeichnen
-//		glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
-//			EDGE_COLOR.render();
-//			glDepthFunc(GL_LEQUAL);
-//			glutWireCube(1);
-//		glPopAttrib();
-//	glPopMatrix();
-//};
-
 
 void drawCube() {
 	static const float COORD = 0.5;
@@ -40,40 +27,62 @@ void drawCube() {
 		}
 	};
 
-	glPushMatrix();
+	static const GLfloat TEXTURE_COORDINATES[4][2] = {
+			{1., 0.},
+			{1., 1.},
+			{0., 1.},
+			{0., 0.}
+	};
+
 	glBegin(GL_QUADS);
 
 	// lower face
-	for (size_t i = 0; i < 4; i++)
+	glNormal3f(0, 0, 1);
+	for (size_t i = 0; i < 4; i++) {
+		glTexCoord2fv(TEXTURE_COORDINATES[i]);
 		glVertex3fv(VERTICES[0][i]);
+	}
 
 	// upper face
-	for (size_t i = 0; i < 4; i++)
+	glNormal3f(0, 0, -1);
+	for (size_t i = 0; i < 4; i++) {
+		glTexCoord2fv(TEXTURE_COORDINATES[i]);
 		glVertex3fv(VERTICES[1][i]);
+	}
 
 	// front face
+	glNormal3f(0, -1, 0);
 	for (size_t i = 0; i < 2; i++)
-		for (size_t j = 0; j < 2; j++)
+		for (size_t j = 0; j < 2; j++) {
+			glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
 			glVertex3fv(VERTICES[i][i != j]);
+		}
 
-	//// back face
+	// back face
+	glNormal3f(0, 1, 0);
 	for (size_t i = 0; i < 2; i++)
-		for (size_t j = 0; j < 2; j++)
+		for (size_t j = 0; j < 2; j++) {
+			glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
 			glVertex3fv(VERTICES[i][(i != j) + 2]);
+		}
 
 	// left face
+	glNormal3f(-1, 0, 0);
 	for (size_t i = 0; i < 2; i++)
-		for (size_t j = 0; j < 2; j++)
+		for (size_t j = 0; j < 2; j++) {
+			glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
 			glVertex3fv(VERTICES[i][(i != j) + 1]);
+		}
 
 	// right face
+	glNormal3f(1, 0, 0);
 	for (size_t i = 0; i < 2; i++)
-		for (size_t j = 0; j < 2; j++)
+		for (size_t j = 0; j < 2; j++) {
+			glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
 			glVertex3fv(VERTICES[i][(i != j) * 3]);
+		}
 
 	glEnd();
-
-	glPopMatrix();
 }
 
 
@@ -118,6 +127,9 @@ void drawPlane(Extrema& xExtrema, Extrema& yExtrema) {
 void drawCylinder(float startRadius, float endRadius, float height) {
 
 	GLUquadricObj* q = gluNewQuadric();
+
+	gluQuadricNormals(q, true);
+	gluQuadricTexture(q, true);
 
 	glPushMatrix();
 		X::rotate(270);

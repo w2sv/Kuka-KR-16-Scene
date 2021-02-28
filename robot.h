@@ -21,6 +21,10 @@
 #include "glutils.h"
 #include "utils.h"
 #include "help.h"
+#include "image.h"
+
+
+void loadTextures();
 
 
 struct OrientationDimension {
@@ -121,7 +125,7 @@ private:
 	void drawPedestal() const;
 	const float PEDASTEL_HEIGHT = 3.;
 
-	void drawLowerSteelCylinder() const;
+	void drawBase() const;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.6;
 
 		/* --------------AXES------------------ */

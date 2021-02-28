@@ -101,6 +101,37 @@ std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 
 
 
+#define NUM_TEXTURES 3
+cg_image textures[NUM_TEXTURES];
+
+
+enum Texture {
+	Knobs,
+	Steel,
+	RustyMetal
+};
+
+
+void loadTextures() {
+	const char* FILE_PATH = ".\\textures\\";
+	const char* FILE_NAMES[NUM_TEXTURES] = {
+		"smoothed-square-textured-metal.bmp",
+		"warped-sheet-metal_roughness.bmp",
+		"rust-covered-metal.bmp",
+	};
+
+	for (size_t i = 0; i < NUM_TEXTURES; i++) {
+		textures[i].load(concatenatedCharPtr(FILE_PATH, FILE_NAMES[i]), true);
+
+		textures[i].setMinFilter(GL_NEAREST);
+		textures[i].setMagFilter(GL_LINEAR);
+		textures[i].setWrapMode(GL_CLAMP);
+		textures[i].setEnvMode(GL_MODULATE);
+	}
+}
+
+
+
 #pragma region Robot
 const Color Robot::BASE_COLOR = Color(230./255., 80./255., 21./255.);
 const std::vector<Vector2> Robot::SCREW_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
@@ -110,20 +141,29 @@ const std::vector<Vector2> Robot::SCREW_POSITIONS = discrete2DCircleRadiusPoints
 cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 
 void Robot::loadObjects() {
-	const char* DIR_NAME = ".\\objects\\";
-	const char* FILE_NAMES[] = { "rotation_axis_1.obj", "screw_head.obj", "tilt_axis_1.obj", "tilt_axis_2.obj" };
+	const char* FILE_PATH = ".\\objects\\";
+	const char* FILE_NAMES[Robot::N_OBJECTS] = { 
+		"rotation_axis_1.obj", 
+		"screw_head.obj", 
+		"tilt_axis_1.obj", 
+		"tilt_axis_2.obj" 
+	};
 
 	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
-		Robot::objects[i].load(concatenatedCharPtr(DIR_NAME, FILE_NAMES[i]), false);
+		Robot::objects[i].load(concatenatedCharPtr(FILE_PATH, FILE_NAMES[i]), false);
 	}
 }
 
 
 void Robot::setObjectMaterials() {
-	objects[Object::RotationAxis1].setMaterial(Color(BASE_COLOR), 0, 0, 0);
-	objects[Object::ScrewHead].setMaterial(Color(Colors::GREY), 0, 0, 0);
-	objects[Object::TiltAxis1].setMaterial(Color(BASE_COLOR), 0, 0, 0);
-	objects[Object::TiltAxis2].setMaterial(Color(BASE_COLOR), 0, 0, 0);
+	GLfloat spec = 200;  // 0 -> saturated color
+	GLfloat shine = 30;
+	GLfloat emis = 1; // 0 -> matt, 1->bright
+
+	objects[Object::RotationAxis1].setMaterial(Color(BASE_COLOR), spec, shine, emis);
+	objects[Object::ScrewHead].setMaterial(Color(Colors::GREY), 0.2, 0.5, 0);
+	objects[Object::TiltAxis1].setMaterial(Color(BASE_COLOR), spec, shine, emis);
+	objects[Object::TiltAxis2].setMaterial(Color(BASE_COLOR), spec, shine, emis);
 }
 #pragma endregion
 
@@ -196,13 +236,13 @@ void Robot::toggleDisplayAxesAngles() {
 
 #pragma region Drawing
 void Robot::draw() {
-	 this->drawPedestal();
-	 this->drawLowerSteelCylinder();
+	this->drawPedestal();
+	this->drawBase();
 
 	glPushMatrix();
-		Z::translate(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
-		for (Axis* const axisPointer : this->axes)
-			this->axis2DrawFunction[axisPointer]();
+	Z::translate(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
+	for (Axis* const axisPointer : this->axes)
+		this->axis2DrawFunction[axisPointer]();
 	glPopMatrix();
 
 	if (this->displayAxesAngles_b)
@@ -217,6 +257,8 @@ void Robot::drawAxisWeight() const {
 	const static float UPPER_CYLINDER_HEIGTH = 0.05;
 
 	glPushMatrix();
+		setDefaultLightAndMaterial(true);
+
 		// draw lower octPrism pedastel
 			Colors::BLACK.render();
 		Z::translate(PEDASTEL_HEIGHT / 2);
@@ -242,6 +284,7 @@ void Robot::drawAxisWeight() const {
 
 
 void Robot::drawScrewCircle() const {
+
 	for (size_t i = 0; i < SCREW_POSITIONS.size(); i++) {
 		glPushMatrix();
 			glTranslatef(SCREW_POSITIONS[i].x, 0, SCREW_POSITIONS[i].y);
@@ -257,40 +300,46 @@ void Robot::drawScrewCircle() const {
 #pragma region Components
 void Robot::drawPedestal() const {
 	glPushMatrix();
-		setColor(1.0f, .0f, 0.0f);
 		glTranslatef(0, this->PEDASTEL_HEIGHT / 2, 0);
 		glScalef(6, this->PEDASTEL_HEIGHT, 5);
+			
+		Color(.6, .6, .6).render();
+		textures[Texture::Knobs].bind();
+		
+		glEnable(GL_TEXTURE_2D);
 			drawCube();
+		glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }
 
 
-void Robot::drawLowerSteelCylinder() const {
+void Robot::drawBase() const {
 	static float LOWER_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.2;
 	static float CENTRAL_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.7;
 	static float UPPER_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.1;
+	
+	textures[Texture::Steel].bind();
+	glEnable(GL_TEXTURE_2D);
 
-	// lower segment
-	glPushMatrix();
-		this->BASE_COLOR.render();
-		Z::translate(this->PEDASTEL_HEIGHT);
-		drawCylinder(1.2, 1, LOWER_SEGMENT_HEIGHT);
-	glPopMatrix();
+		// lower segment
+		glPushMatrix();
+			Z::translate(this->PEDASTEL_HEIGHT);
+				this->BASE_COLOR.render();
+				drawCylinder(1.4, 1, LOWER_SEGMENT_HEIGHT);
 
-	// central segment
-	glPushMatrix();
-		setColor(0.2, 0.2, 0.2);
-		Z::translate(LOWER_SEGMENT_HEIGHT + this->PEDASTEL_HEIGHT);
-		drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
-	glPopMatrix();
+			// central segment
+			Z::translate(LOWER_SEGMENT_HEIGHT);
+				setColor(.4, .4, .4);
+				drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
 
-	// upper segment
-	glPushMatrix();
-		this->BASE_COLOR.render();
-		Z::translate(this->PEDASTEL_HEIGHT + LOWER_SEGMENT_HEIGHT + CENTRAL_SEGMENT_HEIGHT);
-		drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
-	glPopMatrix();
+			// upper segment
+			Z::translate(CENTRAL_SEGMENT_HEIGHT);
+				this->BASE_COLOR.render();
+				drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
+		glPopMatrix();
+
+	glDisable(GL_TEXTURE_2D);
 }
 #pragma endregion
 
@@ -305,7 +354,11 @@ void Robot::drawFirstAxis() const {
 	glPushMatrix();
 		glTranslatef(0, 0, 0.07);
 		glScaleUniformly(2);
-		objects[RotationAxis1].draw();
+			
+		textures[Texture::Steel].bind();
+		glEnable(GL_TEXTURE_2D);
+			objects[RotationAxis1].draw();
+		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
 	// draw axis weigth
@@ -346,8 +399,12 @@ void Robot::drawSecondAxis()const {
 				
 				// draw axis
 				glPushMatrix();
-				glScaleUniformly(1.7);
-					objects[TiltAxis1].draw();
+					glScaleUniformly(1.7);
+				
+					textures[Texture::Steel].bind();
+					glEnable(GL_TEXTURE_2D);
+						objects[TiltAxis1].draw();
+					glDisable(GL_TEXTURE_2D);
 				glPopMatrix();
 
 				// draw upper screw circle
@@ -367,7 +424,6 @@ void Robot::drawSecondAxis()const {
 		glTranslatef(0, -0.5, 0);
 		X::rotate(180);
 		OctagonalPrismVertices weightPedastelVertices = drawOctagonalPrism(0.15, 0.6, 0.1);
-
 			Colors::BLACK.render();
 		drawOctagonalPrismCage(weightPedastelVertices);
 
@@ -393,7 +449,10 @@ void Robot::drawThirdAxis() const {
 		glScaleUniformly(5);
 		Y::rotate(90);
 		X::rotate(-90);
-		objects[Object::TiltAxis2].draw();
+			textures[Texture::Steel].bind();
+		glEnable(GL_TEXTURE_2D);
+			objects[TiltAxis2].draw();
+		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
 	// draw weight block at axis beginning along respective x-axes
@@ -423,7 +482,7 @@ void Robot::drawThirdAxis() const {
 		this->drawAxisWeight();
 	glPopMatrix();
 
-	glTranslatef(LENGTH * 0.975, -WIDTH / 2, 0);
+	glTranslatef(LENGTH * 0.965, -WIDTH / 2, 0);
 	Y::rotate(270);
 }
 
@@ -432,8 +491,6 @@ void Robot::drawFourthAxis() const {
 	this->axes[3]->adjustModelMatrixOrientationAccordingly();
 	
 	glPushMatrix();
-		BASE_COLOR.render();
-
 		// partial cone
 		drawCylinder(0.2, 0.3, 0.15);
 

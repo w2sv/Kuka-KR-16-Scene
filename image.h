@@ -21,6 +21,8 @@ typedef unsigned int UINT;
 	typedef unsigned long DWORD;
 #endif
 
+#include <string>
+
 struct rawImageRec;
 
 /////////////////////////////////////////////////////////////////////////////
