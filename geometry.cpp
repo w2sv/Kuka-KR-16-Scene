@@ -9,32 +9,78 @@ using namespace Axes;
 #define LOOPS 1
 
 
-void drawCube() {
-	glPushMatrix();
-		glutSolidCube(1.0);
+//void drawCube() {
+//	glPushMatrix();
+//		glutSolidCube(1.0);
+//
+//		// Draht-Würfel Zeichnen
+//		glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
+//			EDGE_COLOR.render();
+//			glDepthFunc(GL_LEQUAL);
+//			glutWireCube(1);
+//		glPopAttrib();
+//	glPopMatrix();
+//};
 
-		// Draht-Würfel Zeichnen
-		glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
-			EDGE_COLOR.render();
-			glDepthFunc(GL_LEQUAL);
-			glutWireCube(1);
-		glPopAttrib();
+
+void drawCube() {
+	static const float COORD = 0.5;
+	static const GLfloat VERTICES[2][4][3] = {
+		{
+			{COORD, COORD, COORD},
+			{COORD, COORD, -COORD},
+			{-COORD, COORD, -COORD},
+			{-COORD, COORD, COORD}
+		},
+		{
+			{COORD, -COORD, COORD},
+			{ COORD, -COORD, -COORD },
+			{ -COORD, -COORD, -COORD },
+			{ -COORD, -COORD, COORD }
+		}
+	};
+
+	glPushMatrix();
+	glBegin(GL_QUADS);
+
+	// lower face
+	for (size_t i = 0; i < 4; i++)
+		glVertex3fv(VERTICES[0][i]);
+
+	// upper face
+	for (size_t i = 0; i < 4; i++)
+		glVertex3fv(VERTICES[1][i]);
+
+	// front face
+	for (size_t i = 0; i < 2; i++)
+		for (size_t j = 0; j < 2; j++)
+			glVertex3fv(VERTICES[i][i != j]);
+
+	//// back face
+	for (size_t i = 0; i < 2; i++)
+		for (size_t j = 0; j < 2; j++)
+			glVertex3fv(VERTICES[i][(i != j) + 2]);
+
+	// left face
+	for (size_t i = 0; i < 2; i++)
+		for (size_t j = 0; j < 2; j++)
+			glVertex3fv(VERTICES[i][(i != j) + 1]);
+
+	// right face
+	for (size_t i = 0; i < 2; i++)
+		for (size_t j = 0; j < 2; j++)
+			glVertex3fv(VERTICES[i][(i != j) * 3]);
+
+	glEnd();
+
 	glPopMatrix();
-};
+}
 
 
 void indicateCurrentPosition() {
 	glPushMatrix();
 			Color(0., 1., 0.).render();
 		glScalef(0.1, 0.1, 0.1);
-		drawCube();
-	glPopMatrix();
-}
-
-
-void drawCuboid(float length, float height, float depth) {
-	glPushMatrix();
-		glScalef(length, height, depth);
 		drawCube();
 	glPopMatrix();
 }

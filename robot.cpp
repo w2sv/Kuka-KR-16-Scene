@@ -261,6 +261,7 @@ void Robot::drawPedestal() const {
 		glTranslatef(0, this->PEDASTEL_HEIGHT / 2, 0);
 		glScalef(6, this->PEDASTEL_HEIGHT, 5);
 			drawCube();
+
 	glPopMatrix();
 }
 

@@ -17,8 +17,6 @@ void drawCube();
 // dev function, to be removed after dev termination
 void indicateCurrentPosition();
 
-void drawCuboid(float length, float height, float depth);
-
 void drawQuadraticGrid(Extrema& xExtrema, int tiles, Color& color);
 
 void drawPlane(Extrema& xExtrema, Extrema& yExtrema);
