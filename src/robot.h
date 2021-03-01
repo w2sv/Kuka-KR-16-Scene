@@ -30,22 +30,31 @@ void loadTextures();
 
 struct OrientationDimension {
 	public:
-		OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits);
+		OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits, char velocityAlterationKey);
 
-		void update();
 		void reset();
 		float getAngle() const;
 		bool angleLimitReached() const;
 		void setArbitraryAngle();
 
+		void update();
 	private:
-		float angle;
-		bool angleLimitReached_b;
+		const float maxVelocity = 3;
 
+		float angle;
+		float velocity;
+
+		bool angleLimitReached_b;
+		bool velocityLimitReached_b;
+
+		const char velocityAlterationKey;
 		const float startAngle;
 		const Extrema angleLimits;
 		const bool isFullRangeOfMotionDim;
 		const char incrementationKey, decrementationKey;
+
+		void updatePosition();
+		void updateVelocity();
 
 		void clipAngle();
 };

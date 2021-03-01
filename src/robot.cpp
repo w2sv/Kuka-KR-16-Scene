@@ -5,25 +5,49 @@ using namespace Axes;
 
 
 #pragma region OrientationDimension
-OrientationDimension::OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits): 
-	angle(startAngle),
-	startAngle(startAngle),
-	angleLimits(angleLimits),
-	incrementationKey(incrementationKey), 
-	decrementationKey(decrementationKey), 
-	isFullRangeOfMotionDim(angleLimits.spread() == 360),
-	angleLimitReached_b(false)
+OrientationDimension::OrientationDimension(
+	char incrementationKey, 
+	char decrementationKey, 
+	float startAngle, 
+	Extrema&& angleLimits, 
+	char velocityAlterationKey):
+		angle(startAngle),
+		startAngle(startAngle),
+		angleLimits(angleLimits),
+		incrementationKey(incrementationKey), 
+		decrementationKey(decrementationKey), 
+		isFullRangeOfMotionDim(angleLimits.spread() == 360),
+		angleLimitReached_b(false),
+		velocity(0.4),
+		velocityLimitReached_b(false),
+		velocityAlterationKey(velocityAlterationKey)
 {}
 
 
 void OrientationDimension::update() {
-	float INCREMENT = 0.4;
+	updateVelocity();
+	updatePosition();
+}
 
+
+void OrientationDimension::updateVelocity() {
+	static const float INCREMENT = 0.1;
+
+	if (cg_key::keyState(velocityAlterationKey) == 2) {
+		if (cg_key::keyState('+') == 1)
+			velocity += INCREMENT;
+		else if (cg_key::keyState('-') == 1)
+			velocity -= INCREMENT;
+	}
+}
+
+
+void OrientationDimension::updatePosition() {
 	if (cg_key::keyState(this->decrementationKey) != 0)
-		this->angle += INCREMENT;
+		this->angle += velocity;
 
 	else if (cg_key::keyState(this->incrementationKey) != 0)
-		this->angle -= INCREMENT;
+		this->angle -= velocity;
 	else
 		return;
 
@@ -171,10 +195,10 @@ void Robot::setObjectMaterials() {
 #pragma region Publics
 Robot::Robot() :
 	axes({
-		new RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360))),
-		new TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-45, 60))),
-		new TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 75))),
-		new RotationAxis(OrientationDimension('f', 'h', 0, Extrema(0, 360))) }),
+		new RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360), '1')),
+		new TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-45, 60), '2')),
+		new TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 75), '3')),
+		new RotationAxis(OrientationDimension('f', 'h', 0, Extrema(0, 360), '4')) }),
 
 	axis2DrawFunction({
 		{axes[0], std::bind(&Robot::drawFirstAxis, this)},
