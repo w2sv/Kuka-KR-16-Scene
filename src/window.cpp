@@ -26,6 +26,8 @@ void init(int argc, char **argv){
 	// OpenGL Initialisierung
 	glEnable(GL_DEPTH_TEST);	// Z-Buffer aktivieren
 
+	glClearColor(0.5, 0, 1, 1);
+
 	// Menue erzeugen
 	MainMenu = glutCreateMenu(menuFunc);
 	glutAddMenuEntry(MENU_TEXT_WIREFRAME, ID_MENU_WIREFRAME);

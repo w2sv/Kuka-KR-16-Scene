@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "help.h"
 #include "image.h"
+#include "window.h"
 
 
 void loadTextures();
@@ -55,21 +56,18 @@ struct Axis {
 	OrientationDimension orientation;
 
 	Axis(OrientationDimension&& orientation);
-	virtual void adjustModelMatrixOrientationAccordingly() const = 0;
+	void adjustModelMatrixOrientationAccordingly() const;
+	void adjustModelMatrixOrientationInversely() const;
 };
 
 
 struct RotationAxis : public Axis {
 	using Axis::Axis;
-
-	void adjustModelMatrixOrientationAccordingly() const;
 };
 
 
 struct TiltAxis : public Axis {
 	using Axis::Axis;
-
-	void adjustModelMatrixOrientationAccordingly() const;
 };
 #pragma endregion
 

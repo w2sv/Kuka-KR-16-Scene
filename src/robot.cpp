@@ -78,13 +78,13 @@ Axis::Axis(OrientationDimension&& orientation):
 {}
 
 
-void RotationAxis::adjustModelMatrixOrientationAccordingly() const {
+void Axis::adjustModelMatrixOrientationAccordingly() const {
 	Z::rotate(this->orientation.getAngle()); 
 }
-	
 
-void TiltAxis::adjustModelMatrixOrientationAccordingly() const {
-	Z::rotate(this->orientation.getAngle());
+
+void Axis::adjustModelMatrixOrientationInversely() const {
+	Z::rotate(-this->orientation.getAngle());
 }
 #pragma endregion
 
@@ -234,22 +234,22 @@ void Robot::toggleDisplayAxesAngles() {
 
 
 void Robot::assumeSpatialTCPConfiguration() const {
-	Z::translate(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
+	Z::translate(-this->LOWER_STEEL_CYLINDER_HEIGHT - this->PEDASTEL_HEIGHT);
 
-	this->axes[0]->adjustModelMatrixOrientationAccordingly();
-	glTranslatef(0, 0, 0.3);
-	glTranslatef(1.65, 1.63, 0.2);
+	this->axes[0]->adjustModelMatrixOrientationInversely();
+	glTranslatef(0, 0, -0.3);
+	glTranslatef(-1.65, -1.63, -0.2);
 
-	X::rotate(90);
-	this->axes[1]->adjustModelMatrixOrientationAccordingly();
-	glTranslatef(0, 0, -4.4);
+	X::rotate(-90);
+	this->axes[1]->adjustModelMatrixOrientationInversely();
+	glTranslatef(0, 0, 4.4);
 
-	this->axes[2]->adjustModelMatrixOrientationAccordingly();
-	glTranslatef(3.9 * 0.965, -0.5 / 2, 0);
-	Y::rotate(270);
+	this->axes[2]->adjustModelMatrixOrientationInversely();
+	glTranslatef(-(3.9 * 0.965), 0.5 / 2, 0);
+	Y::rotate(-270);
 
-	this->axes[3]->adjustModelMatrixOrientationAccordingly();
-	glTranslatef(0, 1.03, 0);
+	this->axes[3]->adjustModelMatrixOrientationInversely();
+	glTranslatef(0, -1.03, 0);
 }
 #pragma endregion
 
@@ -277,7 +277,7 @@ void Robot::drawAxisWeight() const {
 	const static float UPPER_CYLINDER_HEIGTH = 0.05;
 
 	glPushMatrix();
-		setDefaultLightAndMaterial(true);
+		setDefaultLightAndMaterial(cg_globState::lightMode);
 
 		// draw lower octPrism pedastel
 			Colors::BLACK.render();
