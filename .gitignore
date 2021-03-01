@@ -2,6 +2,9 @@
 
 Debug/*
 !Debug/freeglut.dll
+!Debug/glew32.dll
 
 Release
 
+# textures
+texture_depot
