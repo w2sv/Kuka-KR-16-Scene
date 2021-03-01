@@ -4,8 +4,8 @@
 #include <math.h>
 #include <iostream>
 
-#include "Include/glew.h"
-#include "Include/freeglut.h"
+#include "../dependencies/glew.h"
+#include "../dependencies/freeglut.h"
 
 #define EXPORT_EXT
 #include "wavefront.h"

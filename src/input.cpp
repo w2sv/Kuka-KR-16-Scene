@@ -1,5 +1,5 @@
 #include "input.h"
-#include "Include/freeglut.h"
+#include "../dependencies/freeglut.h"
 
 #include <iostream>
 

@@ -13,7 +13,7 @@
 #include <string>
 #include <math.h>
 
-#include "Include/freeglut.h"
+#include "../dependencies/freeglut.h"
 
 #include "geometry.h"
 #include "input.h"

@@ -3,7 +3,7 @@
 #include <cassert>
 #include <vector>
 
-#include "Include/freeglut.h"
+#include "../dependencies/freeglut.h"
 
 #include "glutils.h"
 #include "utils.h"

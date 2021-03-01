@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-#include "Include/freeglut.h"
-#include "Include/glext.h"
+#include "../dependencies/freeglut.h"
+#include "../dependencies/glext.h"
 
 #include "help.h"
 #include "window.h"

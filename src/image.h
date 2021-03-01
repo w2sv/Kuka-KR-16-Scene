@@ -2,7 +2,7 @@
 #define IMAGE_H
 
 #ifdef _WIN32
-	#include "Include/freeglut.h"
+	#include "../dependencies/freeglut.h"
 #else
 	#include <GL/freeglut.h>
 #endif

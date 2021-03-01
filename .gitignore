@@ -1,5 +1,6 @@
 .vs
 
+# build
 Debug/*
 !Debug/freeglut.dll
 !Debug/glew32.dll
@@ -7,4 +8,4 @@ Debug/*
 Release
 
 # textures
-texture_depot
+resources/textures/depot

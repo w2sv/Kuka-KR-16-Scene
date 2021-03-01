@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Include/freeglut.h"
+#include "../dependencies/freeglut.h"
 
 #include "geometry.h"
 #include "glutils.h"

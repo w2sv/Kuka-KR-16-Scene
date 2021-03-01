@@ -113,7 +113,7 @@ enum Texture {
 
 
 void loadTextures() {
-	const char* FILE_PATH = ".\\textures\\";
+	const char* FILE_PATH = "resources\\textures\\";
 	const char* FILE_NAMES[NUM_TEXTURES] = {
 		"smoothed-square-textured-metal.bmp",
 		"warped-sheet-metal_roughness.bmp"
@@ -141,7 +141,7 @@ const std::vector<Vector2> Robot::SCREW_POSITIONS = discrete2DCircleRadiusPoints
 cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 
 void Robot::loadObjects() {
-	const char* FILE_PATH = ".\\objects\\";
+	const char* FILE_PATH = "resources\\objects\\";
 	const char* FILE_NAMES[Robot::N_OBJECTS] = { 
 		"rotation_axis_1.obj", 
 		"screw_head.obj", 

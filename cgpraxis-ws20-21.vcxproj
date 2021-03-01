@@ -10,6 +10,35 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\cgpraxis-ws20-21.cpp" />
+    <ClCompile Include="src\environment.cpp" />
+    <ClCompile Include="src\geometry.cpp" />
+    <ClCompile Include="src\glutils.cpp" />
+    <ClCompile Include="src\help.cpp" />
+    <ClCompile Include="src\image.cpp" />
+    <ClCompile Include="src\input.cpp" />
+    <ClCompile Include="src\light.cpp" />
+    <ClCompile Include="src\robot.cpp" />
+    <ClCompile Include="src\utils.cpp" />
+    <ClCompile Include="src\wavefront.cpp" />
+    <ClCompile Include="src\window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\environment.h" />
+    <ClInclude Include="src\geometry.h" />
+    <ClInclude Include="src\glutils.h" />
+    <ClInclude Include="src\help.h" />
+    <ClInclude Include="src\image.h" />
+    <ClInclude Include="src\input.h" />
+    <ClInclude Include="src\light.h" />
+    <ClInclude Include="src\robot.h" />
+    <ClInclude Include="src\utils.h" />
+    <ClInclude Include="src\wavefront.h" />
+    <ClInclude Include="src\window.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{61D04787-7374-46FC-A4EB-86CFE79181F9}</ProjectGuid>
     <RootNamespace>cgpraxis-ws20-21</RootNamespace>
@@ -94,7 +123,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Include\freeglut.lib;Include\glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;dependencies\freeglut.lib;dependencies\glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,37 +138,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>C:\Users\User\Documents\%24RagazzoInfernale%24\Studium\WS 20-21\Praxisorientierte Einführung in die Comptergrafik\cgpraxis-ws20-21\dependencies;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="environment.cpp" />
-    <ClCompile Include="geometry.cpp" />
-    <ClCompile Include="help.cpp" />
-    <ClCompile Include="image.cpp" />
-    <ClCompile Include="input.cpp" />
-    <ClCompile Include="light.cpp" />
-    <ClCompile Include="cgpraxis-ws20-21.cpp" />
-    <ClCompile Include="robot.cpp" />
-    <ClCompile Include="glutils.cpp" />
-    <ClCompile Include="utils.cpp" />
-    <ClCompile Include="wavefront.cpp" />
-    <ClCompile Include="window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="environment.h" />
-    <ClInclude Include="geometry.h" />
-    <ClInclude Include="help.h" />
-    <ClInclude Include="image.h" />
-    <ClInclude Include="input.h" />
-    <ClInclude Include="light.h" />
-    <ClInclude Include="robot.h" />
-    <ClInclude Include="glutils.h" />
-    <ClInclude Include="utils.h" />
-    <ClInclude Include="wavefront.h" />
-    <ClInclude Include="window.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

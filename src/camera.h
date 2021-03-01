@@ -5,7 +5,7 @@
 #include <math.h>
 #include <limits>
 
-#include "Include/freeglut.h"
+#include "../dependencies/freeglut.h"
 
 #include "input.h"
 #include "window.h"

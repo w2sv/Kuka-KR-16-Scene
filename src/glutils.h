@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Include/freeglut.h"
+#include "../dependencies/freeglut.h"
 
 
 struct Vector3 {

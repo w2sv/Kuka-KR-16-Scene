@@ -5,7 +5,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "Include/freeglut.h"
+#include "../dependencies/freeglut.h"
 
 #define __EXPORT_HELP
 
