@@ -22,7 +22,7 @@ const void Camera::set(Robot* robot) {
 
 void Camera::setObserverMode(Robot* robot) {
 	double x, y, z, The, Phi;
-	static double radius = 0;
+	static double radius = 40;
 
 	static const float WHEEL_EVENT_RADIUS_INCREMENT = 1.5;
 
@@ -51,9 +51,5 @@ void Camera::setObserverMode(Robot* robot) {
 	z = radius * sin(Phi) * cos(The);
 	int Oben = (The <= 0.5 * M_PI || The > 1.5 * M_PI) * 2 - 1;
 
-	// glMatrixMode(GL_MODELVIEW);
-	// robot->assumeSpatialTCPConfiguration();
-	gluLookAt(0, 0, 0, 0, 1, 0, 0, 1, 0);
-
-	// gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
+	gluLookAt(x, y, z, 0, 0, 0, 0, Oben, 0);
 }

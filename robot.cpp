@@ -321,7 +321,7 @@ void Robot::drawScrewCircle() const {
 void Robot::drawPedestal() const {
 	glPushMatrix();
 		glTranslatef(0, this->PEDASTEL_HEIGHT / 2, 0);
-		glScalef(12, this->PEDASTEL_HEIGHT, 10);
+		glScalef(8, this->PEDASTEL_HEIGHT, 8);
 			
 		Color(.6, .6, .6).render();
 		textures[Texture::Knobs].bind();
