@@ -56,6 +56,8 @@ void drawScene(){
 		robot->toggleDrawTCPCoordSystem();
 	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
 		robot->toggleDisplayAxesAngles();
+	else if (cg_key::specialKeyState(GLUT_KEY_F5) == 1)
+		robot->initializeArbitraryAxisConfigurationAssumption();
 }
 
 void displayFunc()

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cassert>
+#include <random>
 
 
 #ifndef	M_PI				// Pi
@@ -42,3 +43,6 @@ struct Measurements {
 
 
 bool toggleFlag(bool flag);
+
+
+int randInt(const Extrema& bounds);

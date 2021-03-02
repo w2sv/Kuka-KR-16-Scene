@@ -8,7 +8,6 @@
 #include <functional>
 #include <map>
 #include <vector>
-#include <random>
 #include <sstream>
 #include <string>
 #include <math.h>
@@ -54,13 +53,22 @@ protected:
 
 struct AngleState : public AxisParameterState {
 	const char incrementationKey, decrementationKey;
-
 	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey);
 	void setArbitrarily();
+
+	// ------------TargetAngleApproaching------------------
+
+	void setTargetAngleAssumptionParameters(float approachVelocity);
+	void approachTargetAngle();
+	bool targetAngleReached() const;
+private:
+	int targetAngle;
+	std::function<float(float, float)> targetAngleApproachFunction;
+	float targetAngleApproachVelocity;
+	bool targetAngleReached_b;
 };
 struct VelocityState: public AxisParameterState {
 	const char identificationKey;
-
 	VelocityState(float max, char identificationKey);
 };
 #pragma endregion
@@ -137,12 +145,16 @@ public:
 	void reset();
 	void setArbitraryAxesConfiguration();
 
+	void initializeArbitraryAxisConfigurationAssumption();
+
 	void toggleDrawTCPCoordSystem();
 	void toggleDisplayAxesAngles();
 	void assumeSpatialTCPConfiguration() const;
 private:
 	const static Color BASE_COLOR;
 	const int N_AXES = 4;
+
+	bool assumeArbitraryAxisConfiguration_b;
 
 	bool drawTCPCoordSystem_b;
 	bool displayAxesAngles_b;

@@ -47,21 +47,44 @@ VelocityState::VelocityState(float max, char identificationKey):
 	AxisParameterState::AxisParameterState(0.4, Extrema(0.1, max)),
 	identificationKey(identificationKey)
 {}
+
+
+#define UNINITIALIZED -1
+
 AngleState::AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey) :
 	AxisParameterState::AxisParameterState(startValue, std::move(limits)),
 	incrementationKey(incrementationKey),
-	decrementationKey(decrementationKey)
+	decrementationKey(decrementationKey),
+	targetAngle(UNINITIALIZED),
+	targetAngleApproachFunction(nullptr),
+	targetAngleReached_b(true),
+	targetAngleApproachVelocity(UNINITIALIZED)
 {}
 void AngleState::setArbitrarily() {
-	// Reference: https://stackoverflow.com/a/7560564
-
-	std::random_device rd; // obtain a random number from hardware
-	std::mt19937 gen(rd()); // seed the generator
-	std::uniform_int_distribution<> distr(limits.min, limits.max);
-
-	value = distr(gen);
+	value = randInt(limits);
 }
 
+
+void AngleState::setTargetAngleAssumptionParameters(float approachVelocity) {
+	targetAngleApproachVelocity = approachVelocity;
+	targetAngle = randInt(limits);
+
+	if (abs(int(targetAngle - value) % 360) < abs(int(targetAngle + value) % 360))
+		targetAngleApproachFunction = std::plus<float>();
+	else
+		targetAngleApproachFunction = std::minus<float>();
+
+	targetAngleReached_b = false;
+}
+bool AngleState::targetAngleReached() const {
+	return targetAngleReached_b;
+}
+void AngleState::approachTargetAngle() {
+	float step = std::min<float>(targetAngleApproachVelocity, abs(targetAngle - value));
+	value = targetAngleApproachFunction(value, step);
+	
+	targetAngleReached_b = value == targetAngleReached_b;
+}
 
 
 #pragma region OrientationDimension
@@ -91,7 +114,12 @@ void OrientationDimension::updateVelocity() {
 	}
 }
 void OrientationDimension::updatePosition() {
-	if (cg_key::keyState(angle.decrementationKey) != 0)
+	if (!angle.targetAngleReached()) {
+		angle.approachTargetAngle();
+		return;
+	}
+
+	else if (cg_key::keyState(angle.decrementationKey) != 0)
 		angle += velocity.getValue();
 	else if (cg_key::keyState(angle.incrementationKey) != 0)
 		angle -= velocity.getValue();
@@ -239,7 +267,8 @@ Robot::Robot():
 		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
 	}),
 	drawTCPCoordSystem_b(false),
-	displayAxesAngles_b(true)
+	displayAxesAngles_b(true),
+	assumeArbitraryAxisConfiguration_b(false)
 {}
 Robot::~Robot() {
 	for (size_t i = 0; i < N_AXES; i++)
@@ -250,6 +279,15 @@ Robot::~Robot() {
 void Robot::update() {
 	for (Axis* axisPointer : axes)
 		axisPointer->orientation->update();
+
+	// check whether all axes have reached target angles
+	if (assumeArbitraryAxisConfiguration_b) {
+		for (Axis* axisPointer : axes) {
+			if (axisPointer->orientation->angle.targetAngleReached() == false)
+				return;
+		}
+		assumeArbitraryAxisConfiguration_b = false;
+	}
 }
 void Robot::reset() {
 	for (Axis* axisPointer : axes)
@@ -270,7 +308,7 @@ void Robot::toggleDisplayAxesAngles() {
 
 
 void Robot::displayAxesStates() const {
-	const int MAX_ANGLE_STATE_DIGITS = 6;
+	const int MAX_ANGLE_STATE_DIGITS = 7;
 
 	for (size_t i = 0; i < N_AXES; i++) {
 		std::ostringstream oss;
@@ -281,7 +319,7 @@ void Robot::displayAxesStates() const {
 			oss << "!";
 
 		// pad to uniform length
-		oss << std::string(MAX_ANGLE_STATE_DIGITS - oss.str().length(), ' ');
+		// oss << std::string(MAX_ANGLE_STATE_DIGITS - oss.str().length(), ' ');
 
 		// add delimiter
 		oss << " ";
@@ -313,6 +351,14 @@ void Robot::assumeSpatialTCPConfiguration() const {
 
 	this->axes[3]->adjustModelMatrixOrientationInversely();
 	glTranslatef(0, -1.03, 0);
+}
+
+
+void Robot::initializeArbitraryAxisConfigurationAssumption() {
+	assumeArbitraryAxisConfiguration_b = true;
+
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->angle.setTargetAngleAssumptionParameters(axisPointer->orientation->velocity.getValue());
 }
 #pragma endregion
 
