@@ -29,7 +29,7 @@ private:
 		Gyrate
 	};
 
-	const Vector2 START_POSITION = Vector2(0, cg_globState::screenSize[1] / 0.75);
+	const Vector2 START_POSITION = Vector2(0, cg_globState::screenSize[1] * 0.5);
 	const float START_RADIUS = 40;
 
 	Robot* robot;
