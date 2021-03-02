@@ -1,26 +1,73 @@
-#include "robot.h"
+﻿#include "robot.h"
 
 
 using namespace Axes;
 
 
+
+AxisParameterState::AxisParameterState(float startValue, Extrema&& limits):
+	startValue(startValue),
+	value(startValue),
+	limits(limits),
+	limitReached_b(false)
+{}
+
+
+void AxisParameterState::reset() {
+	value = startValue;
+}
+bool AxisParameterState::limitReached() const {
+	return limitReached_b;
+}
+void AxisParameterState::updateLimitReached() {
+	limitReached_b = value == limits.min || value == limits.max;
+}
+void AxisParameterState::clipValue() {
+	value = std::min<float>(std::max<float>(value, limits.min), limits.max);
+}
+float AxisParameterState::getValue() const {
+	return value;
+}
+
+void AxisParameterState::operator+=(float increment) {
+	value += increment;
+}
+void AxisParameterState::operator-=(float decrement) {
+	value -= decrement;
+}
+bool AxisParameterState::operator<=(float value) {
+	return this->value <= value;
+}
+bool AxisParameterState::operator>=(float value) {
+	return this->value >= value;
+}
+
+
+VelocityState::VelocityState(float max, char identificationKey):
+	AxisParameterState::AxisParameterState(0.4, Extrema(0.1, max)),
+	identificationKey(identificationKey)
+{}
+AngleState::AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey) :
+	AxisParameterState::AxisParameterState(startValue, std::move(limits)),
+	incrementationKey(incrementationKey),
+	decrementationKey(decrementationKey)
+{}
+void AngleState::setArbitrarily() {
+	// Reference: https://stackoverflow.com/a/7560564
+
+	std::random_device rd; // obtain a random number from hardware
+	std::mt19937 gen(rd()); // seed the generator
+	std::uniform_int_distribution<> distr(limits.min, limits.max);
+
+	value = distr(gen);
+}
+
+
+
 #pragma region OrientationDimension
-OrientationDimension::OrientationDimension(
-	char incrementationKey, 
-	char decrementationKey, 
-	float startAngle, 
-	Extrema&& angleLimits, 
-	char velocityAlterationKey):
-		angle(startAngle),
-		startAngle(startAngle),
-		angleLimits(angleLimits),
-		incrementationKey(incrementationKey), 
-		decrementationKey(decrementationKey), 
-		isFullRangeOfMotionDim(angleLimits.spread() == 360),
-		angleLimitReached_b(false),
-		velocity(0.4),
-		velocityLimitReached_b(false),
-		velocityAlterationKey(velocityAlterationKey)
+OrientationDimension::OrientationDimension(AngleState&& angle, VelocityState&& velocity):
+	angle(std::move(angle)),
+	velocity(std::move(velocity))
 {}
 
 
@@ -28,88 +75,73 @@ void OrientationDimension::update() {
 	updateVelocity();
 	updatePosition();
 }
-
-
 void OrientationDimension::updateVelocity() {
-	static const float INCREMENT = 0.1;
+	static const float INCREMENT = 0.01;
 
-	if (cg_key::keyState(velocityAlterationKey) == 2) {
-		if (cg_key::keyState('+') == 1)
+	if (cg_key::keyState(velocity.identificationKey) == 2) {
+		if (cg_key::keyState('+') != 0)
 			velocity += INCREMENT;
-		else if (cg_key::keyState('-') == 1)
+		else if (cg_key::keyState('-') != 0)
 			velocity -= INCREMENT;
+		else
+			return;
+
+		velocity.clipValue();
+		velocity.updateLimitReached();
 	}
 }
-
-
 void OrientationDimension::updatePosition() {
-	if (cg_key::keyState(this->decrementationKey) != 0)
-		this->angle += velocity;
-
-	else if (cg_key::keyState(this->incrementationKey) != 0)
-		this->angle -= velocity;
+	if (cg_key::keyState(angle.decrementationKey) != 0)
+		angle += velocity.getValue();
+	else if (cg_key::keyState(angle.incrementationKey) != 0)
+		angle -= velocity.getValue();
 	else
 		return;
 
-	this->clipAngle();
-	this->angleLimitReached_b = this->angle == this->angleLimits.min || this->angle == this->angleLimits.max;
+	adjustAngle();
+	angle.updateLimitReached();
 }
-
-
-void OrientationDimension::clipAngle() {
-	if (isFullRangeOfMotionDim) {
-		if (angle >= 360)
-			angle -= 360;
-		else if (angle <= 0)
-			angle += 360;
-	}
-	else
-		angle = std::min<float>(std::max<float>(angle, angleLimits.min), angleLimits.max);
+void UnlimitedMotionOrientationDimension::adjustAngle() {
+	if (angle >= 360)
+		angle -= 360;
+	else if (angle <= 0)
+		angle += 360;
+}
+void LimitedMotionOrientationDimension::adjustAngle() {
+	angle.clipValue();
 }
 
 
 void OrientationDimension::reset() {
-	this->angle = this->startAngle; 
-}
-
-
-float OrientationDimension::getAngle() const {
-	return this->angle;
-}
-
-
-void OrientationDimension::setArbitraryAngle() {
-	// Reference: https://stackoverflow.com/a/7560564
-
-	std::random_device rd; // obtain a random number from hardware
-	std::mt19937 gen(rd()); // seed the generator
-	std::uniform_int_distribution<> distr(angleLimits.min, angleLimits.max);
-
-	this->angle = distr(gen);
-}
-
-
-bool OrientationDimension::angleLimitReached() const {
-	return this->angleLimitReached_b;
+	angle.reset();
+	velocity.reset();
 }
 #pragma endregion
 
 
 
 #pragma region Axis
-Axis::Axis(OrientationDimension&& orientation):
+Axis::Axis(OrientationDimension* orientation):
 	orientation(orientation)
 {}
-
+Axis::~Axis() {
+	delete orientation;
+}
 
 void Axis::adjustModelMatrixOrientationAccordingly() const {
-	Z::rotate(this->orientation.getAngle()); 
+	Z::rotate(orientation->angle.getValue()); 
 }
-
-
 void Axis::adjustModelMatrixOrientationInversely() const {
-	Z::rotate(-this->orientation.getAngle());
+	Z::rotate(-orientation->angle.getValue());
 }
+
+
+RotationAxis::RotationAxis(AngleState&& angle, VelocityState&& velocity):
+	Axis::Axis(new UnlimitedMotionOrientationDimension(std::move(angle), std::move(velocity)))
+{}
+TiltAxis::TiltAxis(AngleState&& angle, VelocityState&& velocity) :
+	Axis::Axis(new LimitedMotionOrientationDimension(std::move(angle), std::move(velocity)))
+{}
 #pragma endregion
 
 
@@ -158,7 +190,7 @@ void loadTextures() {
 
 #pragma region Robot
 const Color Robot::BASE_COLOR = Color(230./255., 80./255., 21./255.);
-const std::vector<Vector2> Robot::SCREW_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
+const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
 
 
 #pragma region Objects
@@ -193,13 +225,13 @@ void Robot::setObjectMaterials() {
 
 
 #pragma region Publics
-Robot::Robot() :
+Robot::Robot():
 	axes({
-		new RotationAxis(OrientationDimension('a', 'd', 0, Extrema(0, 360), '1')),
-		new TiltAxis(OrientationDimension('w', 's', 22.5, Extrema(-45, 60), '2')),
-		new TiltAxis(OrientationDimension('t', 'g', -20, Extrema(-45, 75), '3')),
-		new RotationAxis(OrientationDimension('f', 'h', 0, Extrema(0, 360), '4')) }),
-
+		new RotationAxis(AngleState(0, Extrema(0, 360), 'a', 'd'), VelocityState(4, '1')),
+		new TiltAxis(AngleState(22.5, Extrema(-45, 60), 'w', 's'), VelocityState(2, '2')),
+		new TiltAxis(AngleState(-20, Extrema(-45, 75), 't', 'g'), VelocityState(2, '3')),
+		new RotationAxis(AngleState(0, Extrema(0, 360), 'f', 'h'), VelocityState(4, '4'))
+	}),
 	axis2DrawFunction({
 		{axes[0], std::bind(&Robot::drawFirstAxis, this)},
 		{axes[1], std::bind(&Robot::drawSecondAxis, this)},
@@ -212,38 +244,53 @@ Robot::Robot() :
 
 
 Robot::~Robot() {
-	for (size_t i = 0; i < this->axes.size(); i++)
-		delete this->axes[i];
+	for (size_t i = 0; i < N_AXES; i++)
+		delete axes[i];
 }
 
 
-void Robot::update() {
-	for (Axis* const axisPointer : this->axes)
-		axisPointer->orientation.update();
-}
+void Robot::displayAxesStates() const {
+	const int MAX_ANGLE_STATE_DIGITS = 6;
 
-
-void Robot::displayAxesAngles() const {
-	for (size_t i = 0; i < 4; i++) {
+	for (size_t i = 0; i < N_AXES; i++) {
 		std::ostringstream oss;
-		oss << roundf(this->axes[i]->orientation.getAngle() * 100.) / 100.;
-		if (this->axes[i]->orientation.angleLimitReached())
+
+		// add angle state
+		oss << roundf(axes[i]->orientation->angle.getValue() * 100.) / 100. << 'o';  // '°' not renderable by bitmap font
+		if (axes[i]->orientation->angle.limitReached())
 			oss << "!";
 
-		projectText(0.8, 0.8 - (i * 0.05), oss.str().c_str(), Color(0.8, 0, 0), GLUT_BITMAP_9_BY_15);
+		// pad to uniform length
+		oss << std::string(MAX_ANGLE_STATE_DIGITS - oss.str().length(), ' ');
+
+		// add delimiter
+		oss << " ";
+		
+		// add velocity
+		oss << axes[i]->orientation->velocity.getValue() << "m/s";
+		if (axes[i]->orientation->velocity.limitReached())
+			oss << "!";
+
+		projectText(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
 	}
 }
 
 
+void Robot::update() {
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->update();
+}
+
+
 void Robot::reset() {
-	for (Axis* const axisPointer : this->axes)
-		axisPointer->orientation.reset();
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->reset();
 }
 
 
 void Robot::setArbitraryAxesConfiguration() {
-	for (Axis* const axisPointer : this->axes)
-		axisPointer->orientation.setArbitraryAngle();
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->angle.setArbitrarily();
 }
 
 
@@ -290,7 +337,7 @@ void Robot::draw() {
 	glPopMatrix();
 
 	if (this->displayAxesAngles_b)
-		this->displayAxesAngles();
+		this->displayAxesStates();
 }
 
 
@@ -329,9 +376,9 @@ void Robot::drawAxisWeight() const {
 
 void Robot::drawScrewCircle() const {
 
-	for (size_t i = 0; i < SCREW_POSITIONS.size(); i++) {
+	for (size_t i = 0; i < SCREW_CIRCLE_POSITIONS.size(); i++) {
 		glPushMatrix();
-			glTranslatef(SCREW_POSITIONS[i].x, 0, SCREW_POSITIONS[i].y);
+			glTranslatef(SCREW_CIRCLE_POSITIONS[i].x, 0, SCREW_CIRCLE_POSITIONS[i].y);
 			glScaleUniformly(0.2);
 			objects[ScrewHead].draw();
 		glPopMatrix();

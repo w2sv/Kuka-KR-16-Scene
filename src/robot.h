@@ -28,55 +28,93 @@
 void loadTextures();
 
 
+#pragma region ParameterState
+struct AxisParameterState {
+public:
+	AxisParameterState(float startValue, Extrema&& limits);
+
+	void reset();
+	void updateLimitReached();
+	bool limitReached() const;
+	void clipValue();
+	float getValue() const;
+
+	void operator+=(float increment);
+	void operator-=(float decrement);
+	bool operator<=(float value);
+	bool operator>=(float value);
+protected:
+	float value;
+	bool limitReached_b;
+
+	const float startValue;
+	const Extrema limits;
+};
+
+
+struct AngleState : public AxisParameterState {
+	const char incrementationKey, decrementationKey;
+
+	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey);
+	void setArbitrarily();
+};
+struct VelocityState: public AxisParameterState {
+	const char identificationKey;
+
+	VelocityState(float max, char identificationKey);
+};
+#pragma endregion
+
+
+
 struct OrientationDimension {
 	public:
-		OrientationDimension(char incrementationKey, char decrementationKey, float startAngle, Extrema&& angleLimits, char velocityAlterationKey);
+		OrientationDimension(AngleState&& angle, VelocityState&& velocity);
 
 		void reset();
-		float getAngle() const;
-		bool angleLimitReached() const;
-		void setArbitraryAngle();
-
 		void update();
-	private:
-		const float maxVelocity = 3;
 
-		float angle;
-		float velocity;
-
-		bool angleLimitReached_b;
-		bool velocityLimitReached_b;
-
-		const char velocityAlterationKey;
-		const float startAngle;
-		const Extrema angleLimits;
-		const bool isFullRangeOfMotionDim;
-		const char incrementationKey, decrementationKey;
-
+		AngleState angle;
+		VelocityState velocity;
+	protected:
 		void updatePosition();
 		void updateVelocity();
 
-		void clipAngle();
+		virtual void adjustAngle() = 0;
+};
+
+
+struct UnlimitedMotionOrientationDimension : public OrientationDimension {
+	using OrientationDimension::OrientationDimension;
+
+private:
+	void adjustAngle();
+};
+
+struct LimitedMotionOrientationDimension : public OrientationDimension {
+	using OrientationDimension::OrientationDimension;
+
+private:
+	void adjustAngle();
 };
 
 
 #pragma region Axis
 struct Axis {
-	OrientationDimension orientation;
+	OrientationDimension* orientation;
 
-	Axis(OrientationDimension&& orientation);
+	Axis(OrientationDimension* orientation);
+	~Axis();
+
 	void adjustModelMatrixOrientationAccordingly() const;
 	void adjustModelMatrixOrientationInversely() const;
 };
 
-
 struct RotationAxis : public Axis {
-	using Axis::Axis;
+	RotationAxis(AngleState&& angle, VelocityState&& velocity);
 };
-
-
 struct TiltAxis : public Axis {
-	using Axis::Axis;
+	TiltAxis(AngleState&& angle, VelocityState&& velocity);
 };
 #pragma endregion
 
@@ -104,10 +142,12 @@ public:
 	void assumeSpatialTCPConfiguration() const;
 private:
 	const static Color BASE_COLOR;
+	const int N_AXES = 4;
+
 	bool drawTCPCoordSystem;
 	bool displayAxesAngles_b;
 
-	void displayAxesAngles() const;
+	void displayAxesStates() const;
 
 	/* ------------OBJECTS----------------- */
 
@@ -125,7 +165,7 @@ private:
 
 	void drawAxisWeight() const;
 
-	static const std::vector<Vector2> SCREW_POSITIONS;
+	static const std::vector<Vector2> SCREW_CIRCLE_POSITIONS;
 	void drawScrewCircle() const;
 
 	/* ------------COMPONENTS------------------- */
