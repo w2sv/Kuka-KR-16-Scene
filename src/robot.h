@@ -28,7 +28,7 @@
 void loadTextures();
 
 
-#pragma region ParameterState
+#pragma region AxisParameterState
 struct AxisParameterState {
 public:
 	AxisParameterState(float startValue, Extrema&& limits);
@@ -66,7 +66,7 @@ struct VelocityState: public AxisParameterState {
 #pragma endregion
 
 
-
+#pragma region OrientationDimension
 struct OrientationDimension {
 	public:
 		OrientationDimension(AngleState&& angle, VelocityState&& velocity);
@@ -97,6 +97,7 @@ struct LimitedMotionOrientationDimension : public OrientationDimension {
 private:
 	void adjustAngle();
 };
+#pragma endregion
 
 
 #pragma region Axis
@@ -122,7 +123,6 @@ struct TiltAxis : public Axis {
 std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints);
 
 
-
 class Robot
 {
 public:
@@ -144,10 +144,11 @@ private:
 	const static Color BASE_COLOR;
 	const int N_AXES = 4;
 
-	bool drawTCPCoordSystem;
+	bool drawTCPCoordSystem_b;
 	bool displayAxesAngles_b;
 
 	void displayAxesStates() const;
+	void drawTCPCoordSystem() const;
 
 	/* ------------OBJECTS----------------- */
 

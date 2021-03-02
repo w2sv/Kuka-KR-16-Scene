@@ -238,14 +238,34 @@ Robot::Robot():
 		{axes[2], std::bind(&Robot::drawThirdAxis, this)},
 		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
 	}),
-	drawTCPCoordSystem(false),
+	drawTCPCoordSystem_b(false),
 	displayAxesAngles_b(true)
 {}
-
-
 Robot::~Robot() {
 	for (size_t i = 0; i < N_AXES; i++)
 		delete axes[i];
+}
+
+
+void Robot::update() {
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->update();
+}
+void Robot::reset() {
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->reset();
+}
+void Robot::setArbitraryAxesConfiguration() {
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->angle.setArbitrarily();
+}
+
+
+void Robot::toggleDrawTCPCoordSystem() {
+	this->drawTCPCoordSystem_b = toggleFlag(this->drawTCPCoordSystem_b);
+}
+void Robot::toggleDisplayAxesAngles() {
+	this->displayAxesAngles_b = toggleFlag(this->displayAxesAngles_b);
 }
 
 
@@ -265,7 +285,7 @@ void Robot::displayAxesStates() const {
 
 		// add delimiter
 		oss << " ";
-		
+
 		// add velocity
 		oss << axes[i]->orientation->velocity.getValue() << "m/s";
 		if (axes[i]->orientation->velocity.limitReached())
@@ -273,34 +293,6 @@ void Robot::displayAxesStates() const {
 
 		projectText(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
 	}
-}
-
-
-void Robot::update() {
-	for (Axis* axisPointer : axes)
-		axisPointer->orientation->update();
-}
-
-
-void Robot::reset() {
-	for (Axis* axisPointer : axes)
-		axisPointer->orientation->reset();
-}
-
-
-void Robot::setArbitraryAxesConfiguration() {
-	for (Axis* axisPointer : axes)
-		axisPointer->orientation->angle.setArbitrarily();
-}
-
-
-void Robot::toggleDrawTCPCoordSystem() {
-	this->drawTCPCoordSystem = toggleFlag(this->drawTCPCoordSystem);
-}
-
-
-void Robot::toggleDisplayAxesAngles() {
-	this->displayAxesAngles_b = toggleFlag(this->displayAxesAngles_b);
 }
 
 
@@ -327,17 +319,26 @@ void Robot::assumeSpatialTCPConfiguration() const {
 
 #pragma region Drawing
 void Robot::draw() {
-	this->drawPedestal();
-	this->drawBase();
-
 	glPushMatrix();
-	Z::translate(this->LOWER_STEEL_CYLINDER_HEIGHT + this->PEDASTEL_HEIGHT);
-	for (Axis* const axisPointer : this->axes)
-		this->axis2DrawFunction[axisPointer]();
+		drawPedestal();
+		drawBase();
+
+		for (Axis* const axisPointer : axes)
+			axis2DrawFunction[axisPointer]();
+
+		if (drawTCPCoordSystem_b)
+			drawTCPCoordSystem();
 	glPopMatrix();
 
-	if (this->displayAxesAngles_b)
-		this->displayAxesStates();
+	if (displayAxesAngles_b)
+		displayAxesStates();
+}
+
+
+void Robot::drawTCPCoordSystem() const {
+	static Extrema TCP_COORD_SYSTEM_EXTREMA = Extrema(-1, 1);
+
+	drawCoordSystem(TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, 0.3);
 }
 
 
@@ -375,7 +376,6 @@ void Robot::drawAxisWeight() const {
 
 
 void Robot::drawScrewCircle() const {
-
 	for (size_t i = 0; i < SCREW_CIRCLE_POSITIONS.size(); i++) {
 		glPushMatrix();
 			glTranslatef(SCREW_CIRCLE_POSITIONS[i].x, 0, SCREW_CIRCLE_POSITIONS[i].y);
@@ -390,9 +390,10 @@ void Robot::drawScrewCircle() const {
 
 #pragma region Components
 void Robot::drawPedestal() const {
+	Z::translate(PEDASTEL_HEIGHT / 2);
+	
 	glPushMatrix();
-		glTranslatef(0, this->PEDASTEL_HEIGHT / 2, 0);
-		glScalef(8, this->PEDASTEL_HEIGHT, 8);
+		glScalef(8, PEDASTEL_HEIGHT, 8);
 			
 		Color(.6, .6, .6).render();
 		textures[Texture::Knobs].bind();
@@ -402,33 +403,32 @@ void Robot::drawPedestal() const {
 		glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
+
+	Z::translate(PEDASTEL_HEIGHT / 2);
 }
 
 
 void Robot::drawBase() const {
-	static float LOWER_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.2;
-	static float CENTRAL_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.7;
-	static float UPPER_SEGMENT_HEIGHT = this->LOWER_STEEL_CYLINDER_HEIGHT * 0.1;
+	static float LOWER_SEGMENT_HEIGHT = LOWER_STEEL_CYLINDER_HEIGHT * 0.2;
+	static float CENTRAL_SEGMENT_HEIGHT = LOWER_STEEL_CYLINDER_HEIGHT * 0.7;
+	static float UPPER_SEGMENT_HEIGHT = LOWER_STEEL_CYLINDER_HEIGHT * 0.1;
 	
 	textures[Texture::Steel].bind();
 	glEnable(GL_TEXTURE_2D);
 
-		// lower segment
-		glPushMatrix();
-			Z::translate(this->PEDASTEL_HEIGHT);
-				this->BASE_COLOR.render();
-				drawCylinder(1.4, 1, LOWER_SEGMENT_HEIGHT);
+	// lower segment
+	BASE_COLOR.render();
+	drawCylinder(1.4, 1, LOWER_SEGMENT_HEIGHT);
 
-			// central segment
-			Z::translate(LOWER_SEGMENT_HEIGHT);
-				setColor(.4, .4, .4);
-				drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
+	// central segment
+	Z::translate(LOWER_SEGMENT_HEIGHT);
+	setColor(.4, .4, .4);
+	drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
 
-			// upper segment
-			Z::translate(CENTRAL_SEGMENT_HEIGHT);
-				this->BASE_COLOR.render();
-				drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
-		glPopMatrix();
+	// upper segment
+	Z::translate(CENTRAL_SEGMENT_HEIGHT);
+	BASE_COLOR.render();
+	drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
 
 	glDisable(GL_TEXTURE_2D);
 }
@@ -587,48 +587,41 @@ void Robot::drawThirdAxis() const {
 void Robot::drawFourthAxis() const {
 	this->axes[3]->adjustModelMatrixOrientationAccordingly();
 	
+	// partial cone
+	drawCylinder(0.2, 0.3, 0.15);
+
+	// short disk
+	glTranslatef(0, 0.15, 0);
+	drawCylinder(0.3, 0.3, 0.08);
+
+	// long disk
+	glTranslatef(0, 0.08, 0);
+	drawCylinder(0.27, 0.27, 0.3);
+
+	glTranslatef(0, 0.3, 0);
+
+	// screw circle
 	glPushMatrix();
-		// partial cone
-		drawCylinder(0.2, 0.3, 0.15);
-
-		// short disk
-		glTranslatef(0, 0.15, 0);
-		drawCylinder(0.3, 0.3, 0.08);
-
-		// long disk
-		glTranslatef(0, 0.08, 0);
-		drawCylinder(0.27, 0.27, 0.3);
-
-		glTranslatef(0, 0.3, 0);
-
-		// screw circle
-		glPushMatrix();
-			static const float XY_SCALE_FACTOR = 0.86;
-			glScalef(XY_SCALE_FACTOR, 1, XY_SCALE_FACTOR);
-			this->drawScrewCircle();
-		glPopMatrix();
-
-		BASE_COLOR.render();
-		
-		// disk
-		drawCylinder(0.13, 0.13, 0.1);
-
-		// disk
-		glTranslatef(0, 0.1, 0);
-		drawCylinder(0.15, 0.15, 0.15);
-
-		// cone
-		glTranslatef(0, 0.15, 0);
-		drawCylinder(0.15, 0.1, 0.25);
-
-		if (this->drawTCPCoordSystem) {
-			static Extrema TCP_COORD_SYSTEM_EXTREMA = Extrema(-1, 1);
-
-			glTranslatef(0, 0.25, 0);
-			drawCoordSystem(TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, 0.3);
-		}
-
+		static const float XY_SCALE_FACTOR = 0.86;
+		glScalef(XY_SCALE_FACTOR, 1, XY_SCALE_FACTOR);
+		this->drawScrewCircle();
 	glPopMatrix();
+
+	BASE_COLOR.render();
+		
+	// disk
+	drawCylinder(0.13, 0.13, 0.1);
+
+	// disk
+	glTranslatef(0, 0.1, 0);
+	drawCylinder(0.15, 0.15, 0.15);
+
+	// cone
+	glTranslatef(0, 0.15, 0);
+	drawCylinder(0.15, 0.1, 0.25);
+
+	// translate to top of cone
+	glTranslatef(0, 0.25, 0);
 }
 #pragma endregion
 
