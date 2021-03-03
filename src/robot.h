@@ -54,18 +54,9 @@ protected:
 struct AngleState : public AxisParameterState {
 	const char incrementationKey, decrementationKey;
 	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey);
+	
+	float drawArbitraryValue() const;
 	void setArbitrarily();
-
-	// ------------TargetAngleApproaching------------------
-
-	void setTargetAngleAssumptionParameters(float approachVelocity);
-	void approachTargetAngle();
-	bool targetAngleReached() const;
-private:
-	int targetAngle;
-	std::function<float(float, float)> targetAngleApproachFunction;
-	float targetAngleApproachVelocity;
-	bool targetAngleReached_b;
 };
 struct VelocityState: public AxisParameterState {
 	const char identificationKey;
@@ -79,16 +70,33 @@ struct OrientationDimension {
 	public:
 		OrientationDimension(AngleState&& angle, VelocityState&& velocity);
 
+		AngleState angle;
+		VelocityState velocity;
+
 		void reset();
 		void update();
 
-		AngleState angle;
-		VelocityState velocity;
+		enum TargetAngleState {
+			Disabled,
+			YetToBeReached,
+			Reached
+		};
+
+		void setTargetAngleApproachParameters();
+		void resetTargetAngleApproachParameters();
+		TargetAngleState getTargetAngleState() const;
 	protected:
 		void updatePosition();
 		void updateVelocity();
 
 		virtual void adjustAngle() = 0;
+		virtual void setTargetAngleApproachManner() = 0;
+		
+		void approachTargetAngle();
+
+		int targetAngle;
+		bool targetAngleApproachManner;  // 0=decrementally, 1=incrementally
+		TargetAngleState targetAngleState;
 };
 
 
@@ -97,6 +105,7 @@ struct UnlimitedMotionOrientationDimension : public OrientationDimension {
 
 private:
 	void adjustAngle();
+	void setTargetAngleApproachManner();
 };
 
 struct LimitedMotionOrientationDimension : public OrientationDimension {
@@ -104,6 +113,7 @@ struct LimitedMotionOrientationDimension : public OrientationDimension {
 
 private:
 	void adjustAngle();
+	void setTargetAngleApproachManner();
 };
 #pragma endregion
 

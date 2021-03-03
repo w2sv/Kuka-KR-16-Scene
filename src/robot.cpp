@@ -47,50 +47,29 @@ VelocityState::VelocityState(float max, char identificationKey):
 	AxisParameterState::AxisParameterState(0.4, Extrema(0.1, max)),
 	identificationKey(identificationKey)
 {}
-
-
-#define UNINITIALIZED -1
-
 AngleState::AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey) :
 	AxisParameterState::AxisParameterState(startValue, std::move(limits)),
 	incrementationKey(incrementationKey),
-	decrementationKey(decrementationKey),
-	targetAngle(UNINITIALIZED),
-	targetAngleApproachFunction(nullptr),
-	targetAngleReached_b(true),
-	targetAngleApproachVelocity(UNINITIALIZED)
+	decrementationKey(decrementationKey)
 {}
 void AngleState::setArbitrarily() {
-	value = randInt(limits);
+	value = drawArbitraryValue();
 }
-
-
-void AngleState::setTargetAngleAssumptionParameters(float approachVelocity) {
-	targetAngleApproachVelocity = approachVelocity;
-	targetAngle = randInt(limits);
-
-	if (abs(int(targetAngle - value) % 360) < abs(int(targetAngle + value) % 360))
-		targetAngleApproachFunction = std::plus<float>();
-	else
-		targetAngleApproachFunction = std::minus<float>();
-
-	targetAngleReached_b = false;
-}
-bool AngleState::targetAngleReached() const {
-	return targetAngleReached_b;
-}
-void AngleState::approachTargetAngle() {
-	float step = std::min<float>(targetAngleApproachVelocity, abs(targetAngle - value));
-	value = targetAngleApproachFunction(value, step);
-	
-	targetAngleReached_b = value == targetAngleReached_b;
+float AngleState::drawArbitraryValue() const {
+	return randInt(limits);
 }
 
 
 #pragma region OrientationDimension
+#define UNINITIALIZED -1
+
 OrientationDimension::OrientationDimension(AngleState&& angle, VelocityState&& velocity):
 	angle(std::move(angle)),
-	velocity(std::move(velocity))
+	velocity(std::move(velocity)),
+
+	targetAngle(UNINITIALIZED),
+	targetAngleApproachManner(UNINITIALIZED),
+	targetAngleState(TargetAngleState::Disabled)
 {}
 
 
@@ -114,20 +93,33 @@ void OrientationDimension::updateVelocity() {
 	}
 }
 void OrientationDimension::updatePosition() {
-	if (!angle.targetAngleReached()) {
-		angle.approachTargetAngle();
-		return;
+	switch (targetAngleState) {
+		case (TargetAngleState::YetToBeReached):
+				approachTargetAngle();
+				adjustAngle();
+				break;
+		case (TargetAngleState::Disabled):
+			if (cg_key::keyState(angle.decrementationKey) != 0)
+				angle += velocity.getValue();
+			else if (cg_key::keyState(angle.incrementationKey) != 0)
+				angle -= velocity.getValue();
+			else
+				return;
+
+			adjustAngle();
+			angle.updateLimitReached();
 	}
-
-	else if (cg_key::keyState(angle.decrementationKey) != 0)
-		angle += velocity.getValue();
-	else if (cg_key::keyState(angle.incrementationKey) != 0)
-		angle -= velocity.getValue();
+}
+void OrientationDimension::approachTargetAngle() {
+	float step = std::min<float>(velocity.getValue(), abs(targetAngle - angle.getValue()));
+	if (targetAngleApproachManner == 1)
+		angle += step;
 	else
-		return;
+		angle -= step;
 
-	adjustAngle();
-	angle.updateLimitReached();
+	// update target angle state if applicable
+	if (targetAngle == angle.getValue())
+		targetAngleState = TargetAngleState::Reached;
 }
 void UnlimitedMotionOrientationDimension::adjustAngle() {
 	if (angle >= 360)
@@ -143,6 +135,35 @@ void LimitedMotionOrientationDimension::adjustAngle() {
 void OrientationDimension::reset() {
 	angle.reset();
 	velocity.reset();
+}
+
+void OrientationDimension::setTargetAngleApproachParameters() {
+	targetAngle = angle.drawArbitraryValue();
+	if (targetAngle == angle.getValue()) {
+		targetAngleState = TargetAngleState::Reached;
+		return;
+	}
+
+	setTargetAngleApproachManner();
+	targetAngleState = TargetAngleState::YetToBeReached;
+}
+void UnlimitedMotionOrientationDimension::setTargetAngleApproachManner() {
+	float decrementalDifference = targetAngle > angle.getValue() ? angle.getValue() + 360 - targetAngle : angle.getValue() - targetAngle;
+	float incrementalDifference = targetAngle < angle.getValue() ? 360 - angle.getValue() + targetAngle : targetAngle - angle.getValue();
+
+	targetAngleApproachManner = incrementalDifference < decrementalDifference;
+}
+void LimitedMotionOrientationDimension::setTargetAngleApproachManner() {
+	targetAngleApproachManner = targetAngle > angle.getValue();
+}
+
+void OrientationDimension::resetTargetAngleApproachParameters() {
+	targetAngle = UNINITIALIZED;
+	targetAngleApproachManner = UNINITIALIZED;
+	targetAngleState = TargetAngleState::Disabled;
+}
+OrientationDimension::TargetAngleState OrientationDimension::getTargetAngleState() const {
+	return targetAngleState;
 }
 #pragma endregion
 
@@ -283,10 +304,15 @@ void Robot::update() {
 	// check whether all axes have reached target angles
 	if (assumeArbitraryAxisConfiguration_b) {
 		for (Axis* axisPointer : axes) {
-			if (axisPointer->orientation->angle.targetAngleReached() == false)
+			if (axisPointer->orientation->getTargetAngleState() == OrientationDimension::TargetAngleState::YetToBeReached)
 				return;
 		}
+		
+		// reset target angle parameters if reached on all axes
 		assumeArbitraryAxisConfiguration_b = false;
+		for (Axis* axisPointer : axes) {
+			axisPointer->orientation->resetTargetAngleApproachParameters();
+		}
 	}
 }
 void Robot::reset() {
@@ -317,9 +343,9 @@ void Robot::displayAxesStates() const {
 		oss << roundf(axes[i]->orientation->angle.getValue() * 100.) / 100. << 'o';  // '°' not renderable by bitmap font
 		if (axes[i]->orientation->angle.limitReached())
 			oss << "!";
-
+		 
 		// pad to uniform length
-		// oss << std::string(MAX_ANGLE_STATE_DIGITS - oss.str().length(), ' ');
+		oss << std::string(MAX_ANGLE_STATE_DIGITS - oss.str().length(), ' ');
 
 		// add delimiter
 		oss << " ";
@@ -358,7 +384,7 @@ void Robot::initializeArbitraryAxisConfigurationAssumption() {
 	assumeArbitraryAxisConfiguration_b = true;
 
 	for (Axis* axisPointer : axes)
-		axisPointer->orientation->angle.setTargetAngleAssumptionParameters(axisPointer->orientation->velocity.getValue());
+		axisPointer->orientation->setTargetAngleApproachParameters();
 }
 #pragma endregion
 
