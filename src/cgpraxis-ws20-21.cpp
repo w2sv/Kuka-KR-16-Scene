@@ -57,7 +57,9 @@ void drawScene(){
 	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
 		robot->toggleDisplayAxesAngles();
 	else if (cg_key::specialKeyState(GLUT_KEY_F5) == 1)
-		robot->initializeArbitraryAxisConfigurationAssumption();
+		robot->initializeArbitraryAxisConfigurationApproach();
+	else if (cg_key::specialKeyState(GLUT_KEY_F6) == 1)
+		robot->toggleApproachArbitraryAxisConfigurationInfinitelyMode();
 }
 
 void displayFunc()

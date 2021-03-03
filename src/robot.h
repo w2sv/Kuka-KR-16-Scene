@@ -93,6 +93,7 @@ struct OrientationDimension {
 		virtual void setTargetAngleApproachManner() = 0;
 		
 		void approachTargetAngle();
+		void setTargetAngleReachedIfApplicable();
 
 		int targetAngle;
 		bool targetAngleApproachManner;  // 0=decrementally, 1=incrementally
@@ -155,16 +156,18 @@ public:
 	void reset();
 	void setArbitraryAxesConfiguration();
 
-	void initializeArbitraryAxisConfigurationAssumption();
+	void initializeArbitraryAxisConfigurationApproach();
 
 	void toggleDrawTCPCoordSystem();
 	void toggleDisplayAxesAngles();
+	void toggleApproachArbitraryAxisConfigurationInfinitelyMode();
 	void assumeSpatialTCPConfiguration() const;
 private:
 	const static Color BASE_COLOR;
 	const int N_AXES = 4;
 
-	bool assumeArbitraryAxisConfiguration_b;
+	bool approachArbitraryAxisConfigurationInfinitely_b;
+	bool approachArbitraryAxisConfiguration_b;
 
 	bool drawTCPCoordSystem_b;
 	bool displayAxesAngles_b;

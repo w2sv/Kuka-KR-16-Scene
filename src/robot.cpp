@@ -111,13 +111,17 @@ void OrientationDimension::updatePosition() {
 	}
 }
 void OrientationDimension::approachTargetAngle() {
-	float step = std::min<float>(velocity.getValue(), abs(targetAngle - angle.getValue()));
+	float step = std::min<float>(velocity.getValue(), abs(abs(angle.getValue()) - abs(targetAngle)));
+	
 	if (targetAngleApproachManner == 1)
 		angle += step;
 	else
 		angle -= step;
 
 	// update target angle state if applicable
+	setTargetAngleReachedIfApplicable();
+}
+void OrientationDimension::setTargetAngleReachedIfApplicable() {
 	if (targetAngle == angle.getValue())
 		targetAngleState = TargetAngleState::Reached;
 }
@@ -139,10 +143,9 @@ void OrientationDimension::reset() {
 
 void OrientationDimension::setTargetAngleApproachParameters() {
 	targetAngle = angle.drawArbitraryValue();
-	if (targetAngle == angle.getValue()) {
-		targetAngleState = TargetAngleState::Reached;
+	setTargetAngleReachedIfApplicable();
+	if (targetAngleState == TargetAngleState::Reached)
 		return;
-	}
 
 	setTargetAngleApproachManner();
 	targetAngleState = TargetAngleState::YetToBeReached;
@@ -291,7 +294,8 @@ Robot::Robot():
 	}),
 	drawTCPCoordSystem_b(false),
 	displayAxesAngles_b(true),
-	assumeArbitraryAxisConfiguration_b(false)
+	approachArbitraryAxisConfiguration_b(false),
+	approachArbitraryAxisConfigurationInfinitely_b(false)
 {}
 Robot::~Robot() {
 	for (size_t i = 0; i < N_AXES; i++)
@@ -304,17 +308,21 @@ void Robot::update() {
 		axisPointer->orientation->update();
 
 	// check whether all axes have reached target angles
-	if (assumeArbitraryAxisConfiguration_b) {
+	if (approachArbitraryAxisConfiguration_b) {
 		for (Axis* axisPointer : axes) {
 			if (axisPointer->orientation->getTargetAngleState() == OrientationDimension::TargetAngleState::YetToBeReached)
 				return;
 		}
 		
 		// reset target angle parameters if reached on all axes
-		assumeArbitraryAxisConfiguration_b = false;
-		for (Axis* axisPointer : axes) {
-			axisPointer->orientation->resetTargetAngleApproachParameters();
+		if (!approachArbitraryAxisConfigurationInfinitely_b) {
+			approachArbitraryAxisConfiguration_b = false;
+			for (Axis* axisPointer : axes) {
+				axisPointer->orientation->resetTargetAngleApproachParameters();
+			}
 		}
+		else
+			initializeArbitraryAxisConfigurationApproach();
 	}
 }
 void Robot::reset() {
@@ -328,10 +336,16 @@ void Robot::setArbitraryAxesConfiguration() {
 
 
 void Robot::toggleDrawTCPCoordSystem() {
-	this->drawTCPCoordSystem_b = toggleFlag(this->drawTCPCoordSystem_b);
+	drawTCPCoordSystem_b = toggleFlag(drawTCPCoordSystem_b);
 }
 void Robot::toggleDisplayAxesAngles() {
-	this->displayAxesAngles_b = toggleFlag(this->displayAxesAngles_b);
+	displayAxesAngles_b = toggleFlag(displayAxesAngles_b);
+}
+void Robot::toggleApproachArbitraryAxisConfigurationInfinitelyMode() {
+	approachArbitraryAxisConfigurationInfinitely_b = toggleFlag(approachArbitraryAxisConfigurationInfinitely_b);
+
+	if (approachArbitraryAxisConfigurationInfinitely_b)
+		initializeArbitraryAxisConfigurationApproach();
 }
 
 
@@ -382,8 +396,8 @@ void Robot::assumeSpatialTCPConfiguration() const {
 }
 
 
-void Robot::initializeArbitraryAxisConfigurationAssumption() {
-	assumeArbitraryAxisConfiguration_b = true;
+void Robot::initializeArbitraryAxisConfigurationApproach() {
+	approachArbitraryAxisConfiguration_b = true;
 
 	for (Axis* axisPointer : axes)
 		axisPointer->orientation->setTargetAngleApproachParameters();
