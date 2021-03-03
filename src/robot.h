@@ -93,7 +93,6 @@ struct OrientationDimension {
 		virtual void setTargetAngleApproachManner() = 0;
 		
 		void approachTargetAngle();
-		void setTargetAngleReachedIfApplicable();
 
 		int targetAngle;
 		bool targetAngleApproachManner;  // 0=decrementally, 1=incrementally

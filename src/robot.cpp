@@ -111,17 +111,13 @@ void OrientationDimension::updatePosition() {
 	}
 }
 void OrientationDimension::approachTargetAngle() {
-	float step = std::min<float>(velocity.getValue(), abs(abs(angle.getValue()) - abs(targetAngle)));
-	
+	float step = std::min<float>(velocity.getValue(), abs(targetAngle - angle.getValue()));
 	if (targetAngleApproachManner == 1)
 		angle += step;
 	else
 		angle -= step;
 
 	// update target angle state if applicable
-	setTargetAngleReachedIfApplicable();
-}
-void OrientationDimension::setTargetAngleReachedIfApplicable() {
 	if (targetAngle == angle.getValue())
 		targetAngleState = TargetAngleState::Reached;
 }
@@ -143,9 +139,10 @@ void OrientationDimension::reset() {
 
 void OrientationDimension::setTargetAngleApproachParameters() {
 	targetAngle = angle.drawArbitraryValue();
-	setTargetAngleReachedIfApplicable();
-	if (targetAngleState == TargetAngleState::Reached)
+	if (targetAngle == angle.getValue()) {
+		targetAngleState = TargetAngleState::Reached;
 		return;
+	}
 
 	setTargetAngleApproachManner();
 	targetAngleState = TargetAngleState::YetToBeReached;
