@@ -174,14 +174,15 @@ private:
 
 	/* ------------OBJECTS----------------- */
 
-	const static int N_OBJECTS = 4;
+	const static int N_OBJECTS = 5;
 	static cg_object3D objects[N_OBJECTS];
 
 	enum Object {
 		RotationAxis1,
 		ScrewHead,
 		TiltAxis1,
-		TiltAxis2
+		TiltAxis2,
+		KukaLogo
 	};
 
 	/* -------------PARTS------------------ */

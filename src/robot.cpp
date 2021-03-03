@@ -251,7 +251,8 @@ void Robot::loadObjects() {
 		"rotation_axis_1.obj", 
 		"screw_head.obj", 
 		"tilt_axis_1.obj", 
-		"tilt_axis_2.obj" 
+		"tilt_axis_2.obj",
+		"kuka_logo.obj"
 	};
 
 	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
@@ -269,6 +270,7 @@ void Robot::setObjectMaterials() {
 	objects[Object::ScrewHead].setMaterial(Color(Colors::GREY), 0.2, 0.5, 0);
 	objects[Object::TiltAxis1].setMaterial(Color(BASE_COLOR), spec, shine, emis);
 	objects[Object::TiltAxis2].setMaterial(Color(BASE_COLOR), spec, shine, emis);
+	objects[Object::KukaLogo].setMaterial(Color(Colors::BLACK), spec, shine, emis);
 }
 #pragma endregion
 
@@ -564,7 +566,7 @@ void Robot::drawSecondAxis()const {
 			glPushMatrix();
 				glTranslatef(0, 0, -LENGTH / 2);
 				
-				// draw axis
+				// draw axis with logo
 				glPushMatrix();
 					glScaleUniformly(1.7);
 				
@@ -572,6 +574,8 @@ void Robot::drawSecondAxis()const {
 					glEnable(GL_TEXTURE_2D);
 						objects[TiltAxis1].draw();
 					glDisable(GL_TEXTURE_2D);
+
+					objects[KukaLogo].draw();
 				glPopMatrix();
 
 				// draw upper screw circle
@@ -615,13 +619,21 @@ void Robot::drawThirdAxis() const {
 	// draw axis
 	glPushMatrix();
 		glTranslatef(LENGTH * 0.41, -WIDTH * 0.5, 0);  // translate slightly to the right, up, forward 
-		glScaleUniformly(5);
-		Y::rotate(90);
-		X::rotate(-90);
-			textures[Texture::Steel].bind();
-		glEnable(GL_TEXTURE_2D);
-			objects[TiltAxis2].draw();
-		glDisable(GL_TEXTURE_2D);
+		
+		glPushMatrix();
+			glScaleUniformly(5);
+			Y::rotate(90);
+			X::rotate(-90);
+				textures[Texture::Steel].bind();
+			glEnable(GL_TEXTURE_2D);
+				objects[TiltAxis2].draw();
+			glDisable(GL_TEXTURE_2D);
+		glPopMatrix();
+
+		Z::translate(-WIDTH * 0.1);
+		glScaleUniformly(1.4);
+		Z::rotate(90);
+		objects[KukaLogo].draw();
 	glPopMatrix();
 
 	// draw weight block at axis beginning along respective x-axes
