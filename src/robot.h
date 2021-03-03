@@ -24,9 +24,6 @@
 #include "window.h"
 
 
-void loadTextures();
-
-
 #pragma region AxisParameterState
 struct AxisParameterState {
 public:
@@ -147,6 +144,8 @@ public:
 	static void loadObjects();
 	static void setObjectMaterials();
 
+	static void loadTextures();
+
 	Robot();
 	~Robot();
 
@@ -173,6 +172,16 @@ private:
 
 	void displayAxesStates() const;
 	void drawTCPCoordSystem() const;
+
+	/* ------------TEXTURES----------------- */
+
+	const static int N_TEXTURES = 2;
+	static cg_image textures[N_TEXTURES];
+
+	enum Texture {
+		Knobs,
+		Steel
+	};
 
 	/* ------------OBJECTS----------------- */
 

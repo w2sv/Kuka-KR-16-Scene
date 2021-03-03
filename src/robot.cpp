@@ -203,36 +203,6 @@ std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 
 	return circlePoints;
 }
-
-
-
-#pragma region Textures
-#define NUM_TEXTURES 2
-cg_image textures[NUM_TEXTURES];
-
-
-enum Texture {
-	Knobs,
-	Steel
-};
-
-
-void loadTextures() {
-	const char* FILE_PATH = "resources\\textures\\";
-	const char* FILE_NAMES[NUM_TEXTURES] = {
-		"smoothed-square-textured-metal.bmp",
-		"warped-sheet-metal_roughness.bmp"
-	};
-
-	for (size_t i = 0; i < NUM_TEXTURES; i++) {
-		textures[i].load(concatenatedCharPtr(FILE_PATH, FILE_NAMES[i]), true);
-
-		textures[i].setMinFilter(GL_NEAREST);
-		textures[i].setMagFilter(GL_LINEAR);
-		textures[i].setWrapMode(GL_CLAMP);
-		textures[i].setEnvMode(GL_MODULATE);
-	}
-}
 #pragma endregion
 
 
@@ -242,12 +212,11 @@ const Color Robot::BASE_COLOR = Color(230./255., 80./255., 21./255.);
 const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
 
 
-#pragma region Objects
+#pragma region Objects/Textures
 cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
-
 void Robot::loadObjects() {
-	const char* FILE_PATH = "resources\\objects\\";
-	const char* FILE_NAMES[Robot::N_OBJECTS] = { 
+	const static char* FILE_PATH = "resources\\objects\\";
+	const static char* FILE_NAMES[Robot::N_OBJECTS] = { 
 		"rotation_axis_1.obj", 
 		"screw_head.obj", 
 		"tilt_axis_1.obj", 
@@ -259,8 +228,6 @@ void Robot::loadObjects() {
 		Robot::objects[i].load(concatenatedCharPtr(FILE_PATH, FILE_NAMES[i]), false);
 	}
 }
-
-
 void Robot::setObjectMaterials() {
 	GLfloat spec = 200;  // 0 -> saturated color
 	GLfloat shine = 30;
@@ -271,6 +238,25 @@ void Robot::setObjectMaterials() {
 	objects[Object::TiltAxis1].setMaterial(Color(BASE_COLOR), spec, shine, emis);
 	objects[Object::TiltAxis2].setMaterial(Color(BASE_COLOR), spec, shine, emis);
 	objects[Object::KukaLogo].setMaterial(Color(Colors::BLACK), spec, shine, emis);
+}
+
+
+cg_image Robot::textures[Robot::N_TEXTURES] = {};
+void Robot::loadTextures() {
+	const static char* FILE_PATH = "resources\\textures\\";
+	const static char* FILE_NAMES[Robot::N_TEXTURES] = {
+		"smoothed-square-textured-metal.bmp",
+		"warped-sheet-metal_roughness.bmp"
+	};
+
+	for (size_t i = 0; i < Robot::N_TEXTURES; i++) {
+		textures[i].load(concatenatedCharPtr(FILE_PATH, FILE_NAMES[i]), true);
+
+		textures[i].setMinFilter(GL_NEAREST);
+		textures[i].setMagFilter(GL_LINEAR);
+		textures[i].setWrapMode(GL_CLAMP);
+		textures[i].setEnvMode(GL_MODULATE);
+	}
 }
 #pragma endregion
 

@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	Robot::setObjectMaterials();
 
 	// load textures
-	loadTextures();
+	Robot::loadTextures();
 
 	// start main loop
 	glutMainLoop();
