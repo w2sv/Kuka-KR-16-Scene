@@ -25,14 +25,14 @@ public:
 private:
 	enum Mode {
 		Observer,
-		// Walk,
 		TCP,
-		Gyrate
+		Orbit
 	};
 
-	const Vector2 START_POSITION = Vector2(0, cg_globState::screenSize[1] * 0.5);
-	const float START_RADIUS = 40;
-	const float RADIUS_MIN = 7.4;
+	static const Vector2 START_POSITION;
+	static const float START_RADIUS;
+	static const float RADIUS_MIN;
+
 
 	Vector2 position;
 	Mode mode;
@@ -41,9 +41,8 @@ private:
 	Robot* robot;
 
 	void setObserverMode();
-	void setWalkMode();
 	void setTCPMode();
-	void setGyrateMode();
+	void setWalkMode();
 
 	void setCameraParameterAccordingly();
 

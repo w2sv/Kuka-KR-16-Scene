@@ -3,6 +3,13 @@
 using namespace TransformationAxes;
 
 
+
+const Vector2 Camera::START_POSITION = Vector2(0, cg_globState::screenSize[1] * 0.5);
+const float Camera::START_RADIUS = 40;
+const float Camera::RADIUS_MIN = 7.4;
+
+
+
 #pragma region Publics
 Camera::Camera(Robot* robot) :
 	mode(Mode::Observer),
@@ -20,8 +27,9 @@ void Camera::toggleMode() {
 }
 
 
+
 void Camera::toggleGyrateMode() {
-	mode = mode == Mode::Gyrate ? Mode::Observer : Mode::Gyrate;
+	mode = mode == Mode::Orbit ? Mode::Observer : Mode::Orbit;
 }
 
 
@@ -34,10 +42,11 @@ const void Camera::set() {
 			setWalkMode(); break;*/
 		case TCP:
 			setTCPMode(); break;
-		case Gyrate:
-			setGyrateMode(); break;
+		case Orbit:
+			setWalkMode(); break;
 	}
 }
+
 
 
 void Camera::reset() {
@@ -63,6 +72,7 @@ void Camera::setCameraParameterAccordingly() {
 }
 
 
+
 void Camera::updateRadiusViaScroll() {
 	static const float DELTA_RADIUS = 1.5;
 
@@ -73,12 +83,18 @@ void Camera::updateRadiusViaScroll() {
 	else if (cg_mouse::buttonState(GLUT_MOUSE_WHEEL_DOWN))
 		radius += DELTA_RADIUS;
 }
+
+
+
 void Camera::updateRadiusViaWheelPressing() {
 	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON)) {
 		radius = std::max<float>(radius + 0.1 * cg_mouse::moveY(), 1.0);
 		floorRadius();
 	}
 }
+
+
+
 void Camera::floorRadius() {
 	radius = std::max<float>(radius, RADIUS_MIN);
 }
@@ -100,6 +116,9 @@ void Camera::setObserverMode() {
 	
 	setCameraParameterAccordingly();
 }
+
+
+
 void Camera::setWalkMode() {
 	const static float DELTA_POSITION = 0.1;
 	
@@ -120,11 +139,16 @@ void Camera::setWalkMode() {
 
 	setCameraParameterAccordingly();
 }
+
+
+
 void Camera::setTCPMode() {
 	robot->assumeSpatialTCPConfiguration();
 }
 
-void Camera::setGyrateMode() {
+
+
+void Camera::setWalkMode() {
 	static const float X_POSITION_INCREMENT_PER_FRAME = 0.005;
 
 
