@@ -1,7 +1,7 @@
 #include "geometry.h"
 
 
-using namespace Axes;
+using namespace TransformationAxes;
 
 
 #define SLICES 20
@@ -86,14 +86,6 @@ void drawCube() {
 }
 
 
-void indicateCurrentPosition() {
-	glPushMatrix();
-			Color(0., 1., 0.).render();
-		glScalef(0.1, 0.1, 0.1);
-		drawCube();
-	glPopMatrix();
-}
-
 
 void drawQuadraticGrid(Extrema& extrema, int tiles, Color& color) {
 	color.render();
@@ -112,6 +104,7 @@ void drawQuadraticGrid(Extrema& extrema, int tiles, Color& color) {
 }
 
 
+
 void drawPlane(Extrema& xExtrema, Extrema& yExtrema) {
 	const float Z_COORDINATE = -0.01;
 	
@@ -122,6 +115,7 @@ void drawPlane(Extrema& xExtrema, Extrema& yExtrema) {
 		glVertex3f(xExtrema.min, Z_COORDINATE, yExtrema.max);
 	glEnd();
 }
+
 
 
 void drawCylinder(float startRadius, float endRadius, float height) {
@@ -149,6 +143,7 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 
 	gluDeleteQuadric(q);
 };
+
 
 
 OctagonalPrismVertices drawOctagonalPrism(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
@@ -213,6 +208,7 @@ OctagonalPrismVertices drawOctagonalPrism(float heigth, float straightEdgeLength
 }
 
 
+
 void drawOctagonalPrismCage(OctagonalPrismVertices vertices) {
 	glPushMatrix();
 		glDepthFunc(GL_LEQUAL);
@@ -232,5 +228,34 @@ void drawOctagonalPrismCage(OctagonalPrismVertices vertices) {
 			}
 		glEnd();
 		glPopAttrib();
+	glPopMatrix();
+}
+
+
+
+////////////////////////////////////////////////////////////
+/// Dev functions
+////////////////////////////////////////////////////////////
+void indicateCurrentPosition() {
+	glPushMatrix();
+	Color(0., 1., 0.).render();
+	//glScalef(0.1, 0.1, 0.1);
+	drawCube();
+	glPopMatrix();
+}
+
+
+
+void drawZVector() {
+	glPushMatrix();
+	glLineWidth(5);
+
+	glBegin(GL_LINES);
+	Color(0, 1, 0).render();
+	glVertex3f(0, 0, 0);
+
+	Color(1, 0, 0).render();
+	glVertex3f(0, 3, 0);
+	glEnd();
 	glPopMatrix();
 }

@@ -1,5 +1,7 @@
 #include "camera.h"
 
+using namespace TransformationAxes;
+
 
 #pragma region Publics
 Camera::Camera(Robot* robot) :
@@ -12,7 +14,7 @@ Camera::Camera(Robot* robot) :
 
 
 void Camera::toggleMode() {
-	static const int TOGGLE_MODES = 3;
+	static const int TOGGLE_MODES = 2;
 
 	this->mode = Mode((this->mode + 1) % TOGGLE_MODES);
 }
@@ -28,8 +30,8 @@ const void Camera::set() {
 	switch (mode) {
 		case Observer:
 			setObserverMode(); break;
-		case Walk:
-			setWalkMode(); break;
+		/*case Walk:
+			setWalkMode(); break;*/
 		case TCP:
 			setTCPMode(); break;
 		case Gyrate:
@@ -50,8 +52,6 @@ void Camera::reset() {
 void Camera::setCameraParameterAccordingly() {
 	double phi = 0.2 * position.x / cg_globState::screenSize[0] * M_PI + M_PI * 0.5;
 	double theta = 0.2 * position.y / cg_globState::screenSize[1] * M_PI;
-
-	std::cout << theta << std::endl;
 
 	double eyePosX = radius * cos(phi) * cos(theta);
 	double eyePosY = radius * sin(theta);
@@ -115,14 +115,12 @@ void Camera::setWalkMode() {
 	if (cg_key::specialKeyState(GLUT_KEY_RIGHT))
 		xStep -= DELTA_POSITION;
 
-	Axes::X::translate(xStep);
-	Axes::Y::translate(yStep);
+	X::translate(xStep);
+	Y::translate(yStep);
 
 	setCameraParameterAccordingly();
 }
 void Camera::setTCPMode() {
-	// TODO: debug
-
 	robot->assumeSpatialTCPConfiguration();
 }
 

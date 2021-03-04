@@ -13,8 +13,12 @@
 #include "utils.h"
 #include "robot.h"
 #include "camera.h"
-#include "environment.h"
 #include "image.h"
+
+
+
+static Extrema groundMeasures = Extrema(-20, 20);
+static Robot* robot = new Robot();
 
 
 
@@ -33,10 +37,6 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
-
-
-static Extrema groundMeasures = Extrema(-20, 20);
-static Robot* robot = new Robot();
 
 
 
@@ -62,45 +62,43 @@ void drawScene(){
 		robot->toggleApproachArbitraryAxisConfigurationInfinitelyMode();
 }
 
-void displayFunc()
-{
+
+
+void displayFunc(){
 	static cg_help help;
 	static cg_key key;
 	static Camera camera(robot);
 
 
-	if (key.keyState(27)) {
+	if (cg_key::keyState(27)) {
 		exit(0); // Escape -> Programm beenden
 	}
-	else if (1 == key.keyState('F')) {
+	else if (1 == cg_key::keyState('F')) {
 		help.toggleFps();	// Framecounter on/off
 	}
-	else if (1 == key.keyState('H')) {
+	else if (1 == cg_key::keyState('H')) {
 		help.toggle();	// Hilfetext on/off
 	}
-	else if (1 == key.keyState('K')) {
+	else if (1 == cg_key::keyState('K')) {
 		cg_globState::drawCoordSystem = toggleFlag(cg_globState::drawCoordSystem);	// Koordinatensystem on/off
 	}
-	else if (1 == key.keyState('W')) {
+	else if (1 == cg_key::keyState('W')) {
 		cg_globState::drawMode = (cg_globState::drawMode == GL_FILL) ? GL_LINE : GL_FILL; // Wireframe on/off
 	}
-	else if (1 == key.keyState('L')) {
+	else if (1 == cg_key::keyState('L')) {
 		cg_globState::lightMode = !cg_globState::lightMode;	// Beleuchtung on/off
 	}
-	else if (1 == key.keyState('C')) {
+	else if (1 == cg_key::keyState('C')) {
 		cg_globState::cullMode = !cg_globState::cullMode; // Backfaceculling on/off
 	}
 
 	// camera
-	else if (1 == key.keyState('I')) {
+	else if (1 == cg_key::keyState('I'))
 		camera.reset();
-	}
-	else if (1 == key.keyState('T'))
+	else if (1 == cg_key::keyState('T'))
 		camera.toggleMode();
-	else if (1 == key.keyState('G'))
+	else if (1 == cg_key::keyState('G'))
 		camera.toggleGyrateMode();
-
-	// Szene zeichnen: CLEAR, SETCAMERA, DRAW_SCENE
 
 	// Back-Buffer neu initialisieren
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

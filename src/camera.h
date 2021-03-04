@@ -25,7 +25,7 @@ public:
 private:
 	enum Mode {
 		Observer,
-		Walk,
+		// Walk,
 		TCP,
 		Gyrate
 	};

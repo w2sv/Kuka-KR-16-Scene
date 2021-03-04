@@ -10,24 +10,19 @@
 #include "light.h"
 
 
-const Color EDGE_COLOR(.1, .1, .1);
 
 void drawCube();
-
-// dev function, to be removed after dev termination
-void indicateCurrentPosition();
-
 void drawQuadraticGrid(Extrema& xExtrema, int tiles, Color& color);
-
 void drawPlane(Extrema& xExtrema, Extrema& yExtrema);
-
 void drawCylinder(float startRadius, float endRadius, float height);
 
+// --------------------------OctogonalPrism---------------------------
 
-#pragma region OctagonalPrism
 typedef std::vector<std::vector<std::vector<GLfloat>>> OctagonalPrismVertices;  // of shape [2][8][3]  TODO: incorporate dimensionalities into type via std::array
-
 OctagonalPrismVertices drawOctagonalPrism(float heigth, float straightEdgeLength, float diagonalEdgeLength);
-
 void drawOctagonalPrismCage(OctagonalPrismVertices);
-#pragma endregion
+
+// -----------Dev functions, to be removed after dev termination-----------
+
+void indicateCurrentPosition();
+void drawZVector();

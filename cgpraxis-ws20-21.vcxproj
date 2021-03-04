@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\cgpraxis-ws20-21.cpp" />
-    <ClCompile Include="src\environment.cpp" />
     <ClCompile Include="src\geometry.cpp" />
     <ClCompile Include="src\glutils.cpp" />
     <ClCompile Include="src\help.cpp" />
@@ -27,7 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\camera.h" />
-    <ClInclude Include="src\environment.h" />
     <ClInclude Include="src\geometry.h" />
     <ClInclude Include="src\glutils.h" />
     <ClInclude Include="src\help.h" />

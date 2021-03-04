@@ -8,9 +8,13 @@
 
 struct Vector3 {
 public:
+	Vector3(GLfloat x, GLfloat y, GLfloat z);
+
 	GLfloat x, y, z;
 
-	Vector3(GLfloat x, GLfloat y, GLfloat z);
+	Vector3 inverted() const;
+	void glTranslate() const;
+
 	friend std::ostream& operator<<(std::ostream& os, const Vector3& vector);
 };
 
@@ -38,7 +42,7 @@ namespace Colors {
 #pragma endregion
 
 
-namespace Axes {
+namespace TransformationAxes {
 	namespace X {
 		void rotate(float angle);
 		void translate(float distance);
@@ -54,6 +58,10 @@ namespace Axes {
 		void translate(float distance);
 	}
 }
+
+
+template <typename Axis>
+void rotateAcrossAxis(Axis& axis, float angle);
 
 
 void glScaleUniformly(float value);

@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <math.h>
+#include <stdexcept>
 
 #include "../dependencies/freeglut.h"
 
@@ -142,7 +143,7 @@ struct Axis {
 	~Axis();
 
 	void adjustGLModelMatrixOrientationAccordingly() const;
-	void adjustGLModelMatrixOrientationInversely() const;
+	void adjustGLModelMatrixOrientationInversely(char axis) const;
 };
 
 struct YawAxis : public Axis {
@@ -193,7 +194,7 @@ private:
 
 	/* ------------Textures----------------- */
 
-	const static int N_TEXTURES = 2;
+	static const int N_TEXTURES = 2;
 	static cg_image textures[N_TEXTURES];
 
 	enum Texture {
@@ -233,6 +234,7 @@ private:
 	const int N_AXES = 4;
 
 	std::vector<Axis*> axes;
+	static const std::vector<Vector3> AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS;
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
 
 	void drawFirstAxis() const;

@@ -8,6 +8,10 @@ Vector3::Vector3(GLfloat x, GLfloat y, GLfloat z) {
 	this->z = z;
 }
 
+Vector3 Vector3::inverted() const {
+	return Vector3(-x, -y, z);
+}
+
 
 std::ostream& operator<<(std::ostream& os, const Vector3& vec)
 {
@@ -15,6 +19,10 @@ std::ostream& operator<<(std::ostream& os, const Vector3& vec)
 	return os;
 }
 
+
+void Vector3::glTranslate() const {
+	glTranslatef(x, y, z);
+}
 
 
 Vector2::Vector2(GLdouble x, GLdouble y) {
@@ -49,7 +57,7 @@ namespace Colors {
 
 
 #pragma region Transformation
-namespace Axes {
+namespace TransformationAxes {
 	namespace X {
 		void rotate(float angle) {
 			glRotatef(angle, 1, 0, 0);
