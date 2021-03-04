@@ -25,15 +25,20 @@
 
 
 #pragma region AxisParameterState
+/*
+*	Interface for structs encapsulating singular robot axis parameter modifyable by
+*	user at runtime and the entirety of inherent attributes
+*/
 struct AxisParameterState {
 public:
 	AxisParameterState(float startValue, Extrema&& limits);
 
-	void reset();
-	void updateLimitReached();
-	bool limitReached() const;
-	void clipValue();
 	float getValue() const;
+	bool limitReached() const;
+	void reset();
+
+	void updateLimitReached();
+	void clipValue();
 
 	void operator+=(float increment);
 	void operator-=(float decrement);
@@ -49,17 +54,19 @@ protected:
 
 
 struct AngleState : public AxisParameterState {
-	const char incrementationKey, decrementationKey;
 	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey);
+	const char incrementationKey, decrementationKey;
 	
-	float drawArbitraryValue() const;
+	/// Draws hardware randomized value within value limits
+	int drawArbitraryValue() const;
 	void setArbitrarily();
 };
 struct VelocityState: public AxisParameterState {
-	const char identificationKey;
 	VelocityState(float max, char identificationKey);
+	const char identificationKey;
 };
 #pragma endregion
+
 
 
 #pragma region OrientationDimension
@@ -70,8 +77,10 @@ struct OrientationDimension {
 		AngleState angle;
 		VelocityState velocity;
 
-		void reset();
 		void update();
+		void reset();
+
+		// ---------------TargetAngleAttributes-------------------
 
 		enum TargetAngleState {
 			Disabled,
@@ -79,40 +88,50 @@ struct OrientationDimension {
 			Reached
 		};
 
-		void setTargetAngleApproachParameters();
-		void resetTargetAngleApproachParameters();
+		void setTargetAngleParameters();
 		TargetAngleState getTargetAngleState() const;
+		void resetTargetAngleParameters();
 	protected:
-		void updatePosition();
 		void updateVelocity();
-
+		void updateAngle();
+		/// Adjusts angle state wrt specific OrientationDimension kind, i.e. subclass
+		/// post update
 		virtual void adjustAngle() = 0;
-		virtual void setTargetAngleApproachManner() = 0;
-		
-		void approachTargetAngle();
+
+		// ---------------TargetAngleAttributes-------------------
 
 		int targetAngle;
 		bool targetAngleApproachManner;  // 0=decrementally, 1=incrementally
 		TargetAngleState targetAngleState;
+
+		/// Determines targetAngleApproachManner granting the quickest attainment
+		virtual void determineTargetAngleApproachManner() = 0;
+		void approachTargetAngle();
 };
 
 
-struct UnlimitedMotionOrientationDimension : public OrientationDimension {
+/**
+* Orientation Dimension of unlimited range of motion
+*/
+struct UnlimitedOrientationDimension : public OrientationDimension {
 	using OrientationDimension::OrientationDimension;
 
 private:
 	void adjustAngle();
-	void setTargetAngleApproachManner();
+	void determineTargetAngleApproachManner();
 };
-
-struct LimitedMotionOrientationDimension : public OrientationDimension {
+/**
+* Orientation Dimension of limited range of motion
+*/
+struct LimitedOrientationDimension : public OrientationDimension {
 	using OrientationDimension::OrientationDimension;
 
 private:
 	void adjustAngle();
-	void setTargetAngleApproachManner();
+	void determineTargetAngleApproachManner();
 };
 #pragma endregion
+
 
 
 #pragma region Axis
@@ -122,12 +141,12 @@ struct Axis {
 	Axis(OrientationDimension* orientation);
 	~Axis();
 
-	void adjustModelMatrixOrientationAccordingly() const;
-	void adjustModelMatrixOrientationInversely() const;
+	void adjustGLModelMatrixOrientationAccordingly() const;
+	void adjustGLModelMatrixOrientationInversely() const;
 };
 
-struct RotationAxis : public Axis {
-	RotationAxis(AngleState&& angle, VelocityState&& velocity);
+struct YawAxis : public Axis {
+	YawAxis(AngleState&& angle, VelocityState&& velocity);
 };
 struct TiltAxis : public Axis {
 	TiltAxis(AngleState&& angle, VelocityState&& velocity);
@@ -138,8 +157,7 @@ struct TiltAxis : public Axis {
 std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints);
 
 
-class Robot
-{
+class Robot{
 public:
 	static void loadObjects();
 	static void setObjectMaterials();
@@ -159,10 +177,10 @@ public:
 	void toggleDrawTCPCoordSystem();
 	void toggleDisplayAxesAngles();
 	void toggleApproachArbitraryAxisConfigurationInfinitelyMode();
+
 	void assumeSpatialTCPConfiguration() const;
 private:
 	const static Color BASE_COLOR;
-	const int N_AXES = 4;
 
 	bool approachArbitraryAxisConfigurationInfinitely_b;
 	bool approachArbitraryAxisConfiguration_b;
@@ -173,7 +191,7 @@ private:
 	void displayAxesStates() const;
 	void drawTCPCoordSystem() const;
 
-	/* ------------TEXTURES----------------- */
+	/* ------------Textures----------------- */
 
 	const static int N_TEXTURES = 2;
 	static cg_image textures[N_TEXTURES];
@@ -183,35 +201,36 @@ private:
 		Steel
 	};
 
-	/* ------------OBJECTS----------------- */
+	/* ------------Objects----------------- */
 
 	const static int N_OBJECTS = 5;
 	static cg_object3D objects[N_OBJECTS];
 
 	enum Object {
-		RotationAxis1,
+		YawAxis1,
 		ScrewHead,
 		TiltAxis1,
 		TiltAxis2,
 		KukaLogo
 	};
 
-	/* -------------PARTS------------------ */
+	/* -------------RepeatedlyUsedParts------------------ */
 
 	void drawAxisWeight() const;
-
-	static const std::vector<Vector2> SCREW_CIRCLE_POSITIONS;
 	void drawScrewCircle() const;
+	static const std::vector<Vector2> SCREW_CIRCLE_POSITIONS;
 
-	/* ------------COMPONENTS------------------- */
+	/* ------------------Components------------------- */
 
 	void drawPedestal() const;
-	const float PEDASTEL_HEIGHT = 3.;
+	const float PEDASTEL_HEIGHT = 3;
 
 	void drawBase() const;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.6;
 
 		/* --------------AXES------------------ */
+	
+	const int N_AXES = 4;
 
 	std::vector<Axis*> axes;
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
