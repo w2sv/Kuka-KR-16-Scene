@@ -54,11 +54,12 @@ protected:
 };
 
 
+
 struct AngleState : public AxisParameterState {
 	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey);
 	const char incrementationKey, decrementationKey;
 	
-	/// Draws hardware randomized value within value limits
+	/// Samples hardware randomized value within value limits
 	int drawArbitraryValue() const;
 	void setArbitrarily();
 };
@@ -92,6 +93,7 @@ struct OrientationDimension {
 		void setTargetAngleParameters();
 		TargetAngleState getTargetAngleState() const;
 		void resetTargetAngleParameters();
+		int getTargetAngle() const;
 	protected:
 		void updateVelocity();
 		void updateAngle();
@@ -121,6 +123,9 @@ private:
 	void adjustAngle();
 	void determineTargetAngleApproachManner();
 };
+
+
+
 /**
 * Orientation Dimension of limited range of motion
 */
@@ -142,8 +147,10 @@ struct Axis {
 	Axis(OrientationDimension* orientation);
 	~Axis();
 
-	void adjustGLModelMatrixOrientationAccordingly() const;
-	void adjustGLModelMatrixOrientationInversely(char axis) const;
+	void adjustGLModelMatrixAccordingly() const;
+	void adjustGLModelMatrixInversely() const;
+	
+	void adjustGLModelMatrixTargetAngleAccordingly() const;
 };
 
 struct YawAxis : public Axis {
@@ -176,7 +183,7 @@ public:
 	void initializeArbitraryAxisConfigurationApproach();
 
 	void toggleDrawTCPCoordSystem();
-	void toggleDisplayAxesAngles();
+	void toggleDisplayAxesStates();
 	void toggleApproachArbitraryAxisConfigurationInfinitelyMode();
 
 	void assumeSpatialTCPConfiguration() const;
@@ -187,10 +194,11 @@ private:
 	bool approachArbitraryAxisConfiguration_b;
 
 	bool drawTCPCoordSystem_b;
-	bool displayAxesAngles_b;
+	bool displayAxesStates_b;
 
 	void displayAxesStates() const;
-	void drawTCPCoordSystem() const;
+	static void drawShrunkCoordSystem();
+	void drawTargetAxesConfigurationCoordSystem() const;
 
 	/* ------------Textures----------------- */
 
@@ -226,7 +234,7 @@ private:
 	void drawPedestal() const;
 	const float PEDASTEL_HEIGHT = 3;
 
-	void drawBase() const;
+	void drawBottom() const;
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.6;
 
 		/* --------------AXES------------------ */

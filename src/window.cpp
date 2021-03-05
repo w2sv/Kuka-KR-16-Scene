@@ -21,7 +21,7 @@ void init(int argc, char **argv){
 	glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);
 	glutInitDisplayMode(USED_MODUS);
 	MainWin = glutCreateWindow(PROG_NAME);
-	// glutFullScreen();
+	glutFullScreen();
 
 	// OpenGL Initialisierung
 	glEnable(GL_DEPTH_TEST);	// Z-Buffer aktivieren

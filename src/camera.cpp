@@ -1,23 +1,22 @@
 #include "camera.h"
 
+
 using namespace TransformationAxes;
 
 
-
-const Vector2 Camera::START_POSITION = Vector2(0, cg_globState::screenSize[1] * 0.5);
 const float Camera::START_RADIUS = 40;
 const float Camera::RADIUS_MIN = 7.4;
-
 
 
 #pragma region Publics
 Camera::Camera(Robot* robot) :
 	mode(Mode::Observer),
 	robot(robot),
-
+	START_POSITION(Vector2(0, cg_globState::screenSize[1] * 0.5)),
 	position(START_POSITION),
 	radius(START_RADIUS)
 {}
+
 
 
 void Camera::toggleMode() {
@@ -28,7 +27,7 @@ void Camera::toggleMode() {
 
 
 
-void Camera::toggleGyrateMode() {
+void Camera::toggleOrbitMode() {
 	mode = mode == Mode::Orbit ? Mode::Observer : Mode::Orbit;
 }
 
@@ -38,12 +37,10 @@ const void Camera::set() {
 	switch (mode) {
 		case Observer:
 			setObserverMode(); break;
-		/*case Walk:
-			setWalkMode(); break;*/
 		case TCP:
 			setTCPMode(); break;
 		case Orbit:
-			setWalkMode(); break;
+			setOrbitMode(); break;
 	}
 }
 
@@ -148,9 +145,8 @@ void Camera::setTCPMode() {
 
 
 
-void Camera::setWalkMode() {
+void Camera::setOrbitMode() {
 	static const float X_POSITION_INCREMENT_PER_FRAME = 0.005;
-
 
 	updateRadiusViaScroll();
 	position.x -= int(X_POSITION_INCREMENT_PER_FRAME * cg_globState::screenSize[0]);

@@ -55,7 +55,7 @@ void drawScene(){
 	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1)
 		robot->toggleDrawTCPCoordSystem();
 	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
-		robot->toggleDisplayAxesAngles();
+		robot->toggleDisplayAxesStates();
 	else if (cg_key::specialKeyState(GLUT_KEY_F5) == 1)
 		robot->initializeArbitraryAxisConfigurationApproach();
 	else if (cg_key::specialKeyState(GLUT_KEY_F6) == 1)
@@ -97,8 +97,8 @@ void displayFunc(){
 		camera.reset();
 	else if (1 == cg_key::keyState('T'))
 		camera.toggleMode();
-	else if (1 == cg_key::keyState('G'))
-		camera.toggleGyrateMode();
+	else if (1 == cg_key::keyState('O'))
+		camera.toggleOrbitMode();
 
 	// Back-Buffer neu initialisieren
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

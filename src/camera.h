@@ -13,15 +13,14 @@
 #include "glutils.h"
 
 
-class Camera
-{
+class Camera{
 public:
 	Camera(Robot* robot);
 	
 	const void set();
 	void reset();
 	void toggleMode();
-	void toggleGyrateMode();
+	void toggleOrbitMode();
 private:
 	enum Mode {
 		Observer,
@@ -29,10 +28,9 @@ private:
 		Orbit
 	};
 
-	static const Vector2 START_POSITION;
+	const Vector2 START_POSITION;
 	static const float START_RADIUS;
 	static const float RADIUS_MIN;
-
 
 	Vector2 position;
 	Mode mode;
@@ -43,6 +41,7 @@ private:
 	void setObserverMode();
 	void setTCPMode();
 	void setWalkMode();
+	void setOrbitMode();
 
 	void setCameraParameterAccordingly();
 

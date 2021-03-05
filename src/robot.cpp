@@ -172,6 +172,10 @@ void OrientationDimension::resetTargetAngleParameters() {
 	targetAngleApproachManner = UNINITIALIZED;
 	targetAngleState = TargetAngleState::Disabled;
 }
+
+int OrientationDimension::getTargetAngle() const{
+	return targetAngle;
+}
 #pragma endregion
 
 
@@ -189,22 +193,17 @@ Axis::~Axis() {
 
 
 
-void Axis::adjustGLModelMatrixOrientationAccordingly() const {
+void Axis::adjustGLModelMatrixAccordingly() const {
 	Z::rotate(orientation->angle.getValue()); 
 }
-void Axis::adjustGLModelMatrixOrientationInversely(char axis) const {
-	float rotationAngle = -orientation->angle.getValue();
+void Axis::adjustGLModelMatrixInversely() const {
+	Z::rotate(-orientation->angle.getValue());
+}
 
-	switch (axis) {
-	case('X'):
-		X::rotate(rotationAngle); break;
-	case('Y'):
-		Y::rotate(rotationAngle); break;
-	case('Z'):
-		Z::rotate(rotationAngle); break;
-	default:
-		throw std::invalid_argument("Passed invalid axis char");
-	}
+
+
+void Axis::adjustGLModelMatrixTargetAngleAccordingly() const {
+	Z::rotate(orientation->getTargetAngle());
 }
 
 
@@ -314,7 +313,7 @@ Robot::Robot():
 		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
 	}),
 	drawTCPCoordSystem_b(false),
-	displayAxesAngles_b(true),
+	displayAxesStates_b(true),
 	approachArbitraryAxisConfiguration_b(false),
 	approachArbitraryAxisConfigurationInfinitely_b(false)
 {}
@@ -329,6 +328,7 @@ Robot::~Robot() {
 
 
 void Robot::update() {
+	// update axes states
 	for (Axis* axisPointer : axes)
 		axisPointer->orientation->update();
 
@@ -339,13 +339,13 @@ void Robot::update() {
 				return;
 		}
 		
-		// reset target angle parameters if reached on all axes
+		// reset target angle parameters if so and infinite approach mode false
 		if (!approachArbitraryAxisConfigurationInfinitely_b) {
 			approachArbitraryAxisConfiguration_b = false;
-			for (Axis* axisPointer : axes) {
+			for (Axis* axisPointer : axes)
 				axisPointer->orientation->resetTargetAngleParameters();
-			}
 		}
+		// otherwise initialize new approach cycle
 		else
 			initializeArbitraryAxisConfigurationApproach();
 	}
@@ -376,6 +376,122 @@ void Robot::initializeArbitraryAxisConfigurationApproach() {
 
 
 
+void Robot::assumeSpatialTCPConfiguration() const {
+	Z::translate(-(LOWER_STEEL_CYLINDER_HEIGHT + PEDASTEL_HEIGHT));
+
+	// 1. axis
+	axes[0]->adjustGLModelMatrixInversely();
+	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[0].inverted().glTranslate();
+
+	// 2. axis
+	X::rotate(-90);
+	axes[1]->adjustGLModelMatrixInversely();
+	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[1].inverted().glTranslate();
+
+	//// 3. axis
+	axes[2]->adjustGLModelMatrixInversely();
+	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[2].inverted().glTranslate();
+
+	//// 4. axis
+	Y::rotate(270);
+	axes[3]->adjustGLModelMatrixInversely();
+	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[3].inverted().glTranslate();
+}
+
+
+
+////////////////////////////////////////////////////////////
+/// ..Toggling
+////////////////////////////////////////////////////////////
+void Robot::toggleDrawTCPCoordSystem() {
+	drawTCPCoordSystem_b = toggleFlag(drawTCPCoordSystem_b);
+}
+void Robot::toggleDisplayAxesStates() {
+	displayAxesStates_b = toggleFlag(displayAxesStates_b);
+}
+void Robot::toggleApproachArbitraryAxisConfigurationInfinitelyMode() {
+	approachArbitraryAxisConfigurationInfinitely_b = toggleFlag(approachArbitraryAxisConfigurationInfinitely_b);
+
+	if (approachArbitraryAxisConfigurationInfinitely_b)
+		initializeArbitraryAxisConfigurationApproach();
+}
+
+
+
+////////////////////////////////////////////////////////////
+/// .Drawing
+////////////////////////////////////////////////////////////
+void Robot::draw() {
+
+	// draw target axis configuration coord system if applicable
+	if (approachArbitraryAxisConfiguration_b)
+		drawTargetAxesConfigurationCoordSystem();
+
+	// draw robot
+	glPushMatrix();
+		drawPedestal();
+		drawBottom();
+
+		for (Axis* const axisPointer : axes)
+			axis2DrawFunction[axisPointer]();
+
+		// draw tcp coord system if applicable
+		if (drawTCPCoordSystem_b)
+			drawShrunkCoordSystem();
+	glPopMatrix();
+
+	// display axes states text if applicable
+	if (displayAxesStates_b)
+		displayAxesStates();
+}
+
+
+
+void Robot::drawShrunkCoordSystem() {
+	static Extrema TCP_COORD_SYSTEM_EXTREMA = Extrema(-1, 1);
+
+	drawCoordSystem(TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, 0.3);
+}
+
+
+
+const std::vector<Vector3> Robot::AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS = {
+	Vector3(1.65, 1.63, 0.5),
+	Vector3(0, 0, -4.4),
+	Vector3(3.9 * 0.965, -0.5 / 2, 0),
+	Vector3(0, 1.03, 0)
+};
+
+
+
+void Robot::drawTargetAxesConfigurationCoordSystem() const {
+	glPushMatrix();
+		Z::translate(LOWER_STEEL_CYLINDER_HEIGHT + PEDASTEL_HEIGHT);
+
+		// 1. axis
+		axes[0]->adjustGLModelMatrixTargetAngleAccordingly();
+		AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[0].glTranslate();
+
+		// 2. axis
+		X::rotate(90);
+		axes[1]->adjustGLModelMatrixTargetAngleAccordingly();
+		AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[1].glTranslate();
+
+		// 3. axis
+		axes[2]->adjustGLModelMatrixTargetAngleAccordingly();
+		AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[2].glTranslate();
+
+		// 4. axis
+		Y::rotate(270);
+		axes[3]->adjustGLModelMatrixTargetAngleAccordingly();
+		AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[3].glTranslate();
+
+		drawShrunkCoordSystem();
+	glPopMatrix();
+}
+
+
+
 void Robot::displayAxesStates() const {
 	const int MAX_ANGLE_STATE_DIGITS = 7;
 
@@ -400,82 +516,6 @@ void Robot::displayAxesStates() const {
 
 		projectText(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
 	}
-}
-
-
-
-const std::vector<Vector3> Robot::AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS = {
-	Vector3(1.65, 1.63, 0.5),
-	Vector3(0, 0, -4.4),
-	Vector3(3.9 * 0.965, -0.5 / 2, 0),
-	Vector3(0, 1.03, 0)
-};
-
-
-
-void Robot::assumeSpatialTCPConfiguration() const {
-	Z::translate(-(LOWER_STEEL_CYLINDER_HEIGHT + PEDASTEL_HEIGHT));
-
-	// 1. axis
-	axes[0]->adjustGLModelMatrixOrientationInversely('Z');
-	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[0].inverted().glTranslate();
-
-	// 2. axis
-	X::rotate(-90);
-	axes[1]->adjustGLModelMatrixOrientationInversely('Z');
-	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[1].inverted().glTranslate();
-
-	//// 3. axis
-	axes[2]->adjustGLModelMatrixOrientationInversely('Z');
-	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[2].inverted().glTranslate();
-
-	//// 4. axis
-	Y::rotate(270);
-	axes[3]->adjustGLModelMatrixOrientationInversely('Z');
-	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[3].inverted().glTranslate();
-
-	X::rotate(-180);
-	// Y::rotate(-180);
-	// Z::rotate(-180);
-}
-
-
-
-////////////////////////////////////////////////////////////
-/// ..Toggling
-////////////////////////////////////////////////////////////
-void Robot::toggleDrawTCPCoordSystem() {
-	drawTCPCoordSystem_b = toggleFlag(drawTCPCoordSystem_b);
-}
-void Robot::toggleDisplayAxesAngles() {
-	displayAxesAngles_b = toggleFlag(displayAxesAngles_b);
-}
-void Robot::toggleApproachArbitraryAxisConfigurationInfinitelyMode() {
-	approachArbitraryAxisConfigurationInfinitely_b = toggleFlag(approachArbitraryAxisConfigurationInfinitely_b);
-
-	if (approachArbitraryAxisConfigurationInfinitely_b)
-		initializeArbitraryAxisConfigurationApproach();
-}
-
-
-
-////////////////////////////////////////////////////////////
-/// .Drawing
-////////////////////////////////////////////////////////////
-void Robot::draw() {
-	glPushMatrix();
-		drawPedestal();
-		drawBase();
-
-		for (Axis* const axisPointer : axes)
-			axis2DrawFunction[axisPointer]();
-
-		if (drawTCPCoordSystem_b)
-			drawTCPCoordSystem();
-	glPopMatrix();
-
-	if (displayAxesAngles_b)
-		displayAxesStates();
 }
 
 
@@ -554,7 +594,7 @@ void Robot::drawPedestal() const {
 
 
 
-void Robot::drawBase() const {
+void Robot::drawBottom() const {
 	static float LOWER_SEGMENT_HEIGHT = LOWER_STEEL_CYLINDER_HEIGHT * 0.2;
 	static float CENTRAL_SEGMENT_HEIGHT = LOWER_STEEL_CYLINDER_HEIGHT * 0.7;
 	static float UPPER_SEGMENT_HEIGHT = LOWER_STEEL_CYLINDER_HEIGHT * 0.1;
@@ -588,7 +628,7 @@ void Robot::drawBase() const {
 void Robot::drawFirstAxis() const {
 	static const float AXIS_MOUNT_DISK_HEIGHT = 0.3;
 
-	axes[0]->adjustGLModelMatrixOrientationAccordingly();
+	axes[0]->adjustGLModelMatrixAccordingly();
 
 	// hollow cylinder with second axis mount
 	glPushMatrix();
@@ -631,7 +671,7 @@ void Robot::drawSecondAxis()const {
 	static const float LENGTH = 4.4;
 
 	X::rotate(90);
-	this->axes[1]->adjustGLModelMatrixOrientationAccordingly();
+	this->axes[1]->adjustGLModelMatrixAccordingly();
 
 	glPushMatrix();
 
@@ -691,7 +731,7 @@ void Robot::drawThirdAxis() const {
 	static const float WIDTH = 0.5;
 	static const float MOUNT_PART_HEIGHT = 1.7;
 
-	this->axes[2]->adjustGLModelMatrixOrientationAccordingly();
+	this->axes[2]->adjustGLModelMatrixAccordingly();
 
 	// draw axis
 	glPushMatrix();
@@ -747,7 +787,7 @@ void Robot::drawThirdAxis() const {
 
 void Robot::drawFourthAxis() const {
 	Y::rotate(270);
-	this->axes[3]->adjustGLModelMatrixOrientationAccordingly();
+	this->axes[3]->adjustGLModelMatrixAccordingly();
 	
 	// partial cone
 	drawCylinder(0.2, 0.3, 0.15);
@@ -762,7 +802,7 @@ void Robot::drawFourthAxis() const {
 
 	glTranslatef(0, 0.3, 0);
 
-	// screw circle
+	// screw screw circle
 	glPushMatrix();
 		static const float XY_SCALE_FACTOR = 0.86;
 		glScalef(XY_SCALE_FACTOR, 1, XY_SCALE_FACTOR);
@@ -784,14 +824,6 @@ void Robot::drawFourthAxis() const {
 
 	// translate to top of cone
 	glTranslatef(0, 0.25, 0);
-}
-
-
-
-void Robot::drawTCPCoordSystem() const {
-	static Extrema TCP_COORD_SYSTEM_EXTREMA = Extrema(-1, 1);
-
-	drawCoordSystem(TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, 0.3);
 }
 #pragma endregion
 #pragma endregion
