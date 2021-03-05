@@ -238,9 +238,10 @@ private:
 	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.6;
 
 		/* --------------AXES------------------ */
-	
-	const int N_AXES = 4;
 
+	static const int N_AXES = 4;
+	const static ModelviewMatrixTransformation relativeAxesStartConfigurationTransformations[N_AXES + 1];
+	
 	std::vector<Axis*> axes;
 	static const std::vector<Vector3> AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS;
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;

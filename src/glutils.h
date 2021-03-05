@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <functional>
 
 #include "../dependencies/freeglut.h"
 
@@ -42,6 +43,7 @@ namespace Colors {
 #pragma endregion
 
 
+
 namespace TransformationAxes {
 	namespace X {
 		void rotate(float angle);
@@ -60,8 +62,21 @@ namespace TransformationAxes {
 }
 
 
-template <typename Axis>
-void rotateAcrossAxis(Axis& axis, float angle);
+
+typedef std::function<void(float)> RotationFunction;
+
+
+
+struct ModelviewMatrixTransformation {
+	ModelviewMatrixTransformation(Vector3&& shiftVector, RotationFunction rotationFunction = nullptr, float rotationAngle = -1);
+
+	Vector3 shiftVector;
+	std::function<void(float)> rotationFunction;
+	float rotationAngle;
+
+	void effectuate() const;
+};
+
 
 
 void glScaleUniformly(float value);

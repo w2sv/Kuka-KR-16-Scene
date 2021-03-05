@@ -455,6 +455,16 @@ void Robot::drawShrunkCoordSystem() {
 
 
 
+const ModelviewMatrixTransformation Robot::relativeAxesStartConfigurationTransformations[Robot::N_AXES + 1] = {
+	ModelviewMatrixTransformation(Vector3(0, 4.6, 0)),
+	ModelviewMatrixTransformation(Vector3(1.65, 1.63, 0.5), X::rotate, 90),
+	ModelviewMatrixTransformation(Vector3(0, 0, -4.4)),
+	ModelviewMatrixTransformation(Vector3(3.7635, -0.25, 0), Y::rotate, 270),
+	ModelviewMatrixTransformation(Vector3(0, 1.03, 0)),
+};
+
+
+
 const std::vector<Vector3> Robot::AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS = {
 	Vector3(1.65, 1.63, 0.5),
 	Vector3(0, 0, -4.4),
@@ -466,25 +476,13 @@ const std::vector<Vector3> Robot::AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS = {
 
 void Robot::drawTargetAxesConfigurationCoordSystem() const {
 	glPushMatrix();
-		Z::translate(LOWER_STEEL_CYLINDER_HEIGHT + PEDASTEL_HEIGHT);
 
-		// 1. axis
-		axes[0]->adjustGLModelMatrixTargetAngleAccordingly();
-		AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[0].glTranslate();
-
-		// 2. axis
-		X::rotate(90);
-		axes[1]->adjustGLModelMatrixTargetAngleAccordingly();
-		AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[1].glTranslate();
-
-		// 3. axis
-		axes[2]->adjustGLModelMatrixTargetAngleAccordingly();
-		AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[2].glTranslate();
-
-		// 4. axis
-		Y::rotate(270);
-		axes[3]->adjustGLModelMatrixTargetAngleAccordingly();
-		AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[3].glTranslate();
+		for (size_t i = 0; i < N_AXES + 1; i++) {
+			relativeAxesStartConfigurationTransformations[i].effectuate();
+			
+			if (i < N_AXES)
+				axes[i]->adjustGLModelMatrixTargetAngleAccordingly();
+		}
 
 		drawShrunkCoordSystem();
 	glPopMatrix();

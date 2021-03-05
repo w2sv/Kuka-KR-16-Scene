@@ -87,6 +87,27 @@ namespace TransformationAxes {
 }
 
 
+
+////////////////////////////////////////////////////////////
+/// .ModelviewMatrixTransformation
+////////////////////////////////////////////////////////////
+ModelviewMatrixTransformation::ModelviewMatrixTransformation(Vector3&& shiftVector, RotationFunction rotationFunction, float rotationAngle) :
+	shiftVector(std::move(shiftVector)),
+	rotationFunction(rotationFunction),
+	rotationAngle(rotationAngle)
+{}
+
+
+
+void ModelviewMatrixTransformation::effectuate() const {
+	shiftVector.glTranslate();
+
+	if (rotationFunction)
+		rotationFunction(rotationAngle);
+}
+
+
+
 void glScaleUniformly(float value) { 
 	glScalef(value, value, value); 
 }
