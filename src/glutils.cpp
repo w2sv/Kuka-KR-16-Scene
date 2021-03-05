@@ -35,6 +35,12 @@ Vector2::Vector2(GLdouble x, GLdouble y) {
 
 #pragma region Color
 Color::Color(double r, double g, double b) {
+	if (r > 1 || g > 1 || b > 1) {
+		r /= 255.;
+		g /= 255.;
+		b /= 255.;
+	}
+
 	this->r = r;
 	this->g = g;
 	this->b = b;
@@ -99,11 +105,15 @@ ModelviewMatrixTransformation::ModelviewMatrixTransformation(Vector3&& shiftVect
 
 
 
-void ModelviewMatrixTransformation::effectuate() const {
-	shiftVector.glTranslate();
+void ModelviewMatrixTransformation::effectuate(bool invertedly) const {
+	invertedly ? shiftVector.inverted().glTranslate() : shiftVector.glTranslate();
 
-	if (rotationFunction)
-		rotationFunction(rotationAngle);
+	if (rotationFunction) {
+		if (invertedly)
+			rotationFunction(-rotationAngle);
+		else
+			rotationFunction(rotationAngle);
+	}
 }
 
 

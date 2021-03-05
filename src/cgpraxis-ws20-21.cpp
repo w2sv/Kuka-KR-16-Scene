@@ -59,7 +59,7 @@ void drawScene(){
 	else if (cg_key::specialKeyState(GLUT_KEY_F5) == 1)
 		robot->initializeArbitraryAxisConfigurationApproach();
 	else if (cg_key::specialKeyState(GLUT_KEY_F6) == 1)
-		robot->toggleApproachArbitraryAxisConfigurationInfinitelyMode();
+		robot->toggleInfiniteArbitraryAxisConfigurationApproachMode();
 }
 
 

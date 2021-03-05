@@ -252,6 +252,7 @@ Robot::Robot():
 		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
 	}),
 	drawTCPCoordSystem_b(false),
+	drawTCPCoordSystemPrevious_b(false),
 	displayAxesStates_b(true),
 	approachArbitraryAxisConfiguration_b(false),
 	approachArbitraryAxisConfigurationInfinitely_b(false)
@@ -324,25 +325,12 @@ void Robot::initializeArbitraryAxisConfigurationApproach() {
 
 
 void Robot::assumeSpatialTCPConfiguration() const {
-	//Z::translate(-(LOWER_STEEL_CYLINDER_HEIGHT + PEDASTEL_HEIGHT));
-
-	//// 1. axis
-	//axes[0]->adjustGLModelMatrixInversely();
-	//AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[0].inverted().glTranslate();
-
-	//// 2. axis
-	//X::rotate(-90);
-	//axes[1]->adjustGLModelMatrixInversely();
-	//AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[1].inverted().glTranslate();
-
-	////// 3. axis
-	//axes[2]->adjustGLModelMatrixInversely();
-	//AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[2].inverted().glTranslate();
-
-	////// 4. axis
-	//Y::rotate(270);
-	//axes[3]->adjustGLModelMatrixInversely();
-	//AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[3].inverted().glTranslate();
+	for (size_t i = 0; i < N_AXES + 1; i++) {
+		relativeAxesStartConfigurationTransformations[i].effectuate(true);
+		if (i < N_AXES)
+			axes[i]->adjustGLModelMatrixAccordingly();
+	}
+	drawZVector();
 }
 
 
@@ -363,7 +351,7 @@ void Robot::toggleDisplayAxesStates() {
 
 
 
-void Robot::toggleApproachArbitraryAxisConfigurationInfinitelyMode() {
+void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 	approachArbitraryAxisConfigurationInfinitely_b = toggleFlag(approachArbitraryAxisConfigurationInfinitely_b);
 
 	if (approachArbitraryAxisConfigurationInfinitely_b) {
@@ -393,7 +381,7 @@ void Robot::loadObjects() {
 	}
 }
 
-
+ 
 
 void Robot::setObjectMaterials() {
 	GLfloat spec = 200;  // 0 -> saturated color
@@ -436,6 +424,9 @@ void Robot::loadTextures() {
 /// .Drawing
 ////////////////////////////////////////////////////////////
 void Robot::draw() {
+	/*glPushMatrix();
+		assumeSpatialTCPConfiguration();
+	glPopMatrix();*/
 
 	// draw target axis configuration coord system if applicable
 	if (approachArbitraryAxisConfiguration_b)
@@ -465,6 +456,8 @@ void Robot::draw() {
 	// display axes states text if applicable
 	if (displayAxesStates_b)
 		displayAxesStates();
+	if (approachArbitraryAxisConfigurationInfinitely_b)
+		displayInfiniteAutomaticConfigurationApproachModeText();
 }
 
 
@@ -481,7 +474,7 @@ const ModelviewMatrixTransformation Robot::relativeAxesStartConfigurationTransfo
 	ModelviewMatrixTransformation(Vector3(0, 4.6, 0)),
 	ModelviewMatrixTransformation(Vector3(1.65, 1.63, 0.5), X::rotate, 90),
 	ModelviewMatrixTransformation(Vector3(0, 0, -4.4)),
-	ModelviewMatrixTransformation(Vector3(3.7635, -0.25, 0), Y::rotate, 270),
+	ModelviewMatrixTransformation(Vector3(3.7635, -0.25, 0), Y::rotate, -90),
 	ModelviewMatrixTransformation(Vector3(0, 1.03, 0)),
 };
 
@@ -503,6 +496,9 @@ void Robot::drawTargetAxesConfigurationCoordSystem() const {
 
 
 
+////////////////////////////////////////////////////////////
+/// ..Text
+////////////////////////////////////////////////////////////
 void Robot::displayAxesStates() const {
 	const int MAX_ANGLE_STATE_DIGITS = 7;
 
@@ -525,8 +521,14 @@ void Robot::displayAxesStates() const {
 		if (axes[i]->orientation->velocity.limitReached())
 			oss << "!";
 
-		projectText(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
+		projectText(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(0.8, 0.8, 0.8), GLUT_BITMAP_9_BY_15);
 	}
+}
+
+
+
+void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
+	projectText(-0.9, 0.85, "Infinite Random Configuration Approach Mode", Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
 }
 
 

@@ -184,7 +184,7 @@ public:
 
 	void toggleDrawTCPCoordSystem();
 	void toggleDisplayAxesStates();
-	void toggleApproachArbitraryAxisConfigurationInfinitelyMode();
+	void toggleInfiniteArbitraryAxisConfigurationApproachMode();
 
 	void assumeSpatialTCPConfiguration() const;
 private:
@@ -197,6 +197,7 @@ private:
 	bool displayAxesStates_b;
 
 	void displayAxesStates() const;
+	void displayInfiniteAutomaticConfigurationApproachModeText() const;
 	static void drawShrunkCoordSystem();
 	void drawTargetAxesConfigurationCoordSystem() const;
 

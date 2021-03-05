@@ -74,7 +74,7 @@ struct ModelviewMatrixTransformation {
 	std::function<void(float)> rotationFunction;
 	float rotationAngle;
 
-	void effectuate() const;
+	void effectuate(bool invertedly = false) const;
 };
 
 
