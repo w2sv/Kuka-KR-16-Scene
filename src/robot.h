@@ -193,7 +193,7 @@ private:
 	bool approachArbitraryAxisConfigurationInfinitely_b;
 	bool approachArbitraryAxisConfiguration_b;
 
-	bool drawTCPCoordSystem_b;
+	bool drawTCPCoordSystem_b, drawTCPCoordSystemPrevious_b;
 	bool displayAxesStates_b;
 
 	void displayAxesStates() const;
@@ -243,7 +243,6 @@ private:
 	const static ModelviewMatrixTransformation relativeAxesStartConfigurationTransformations[N_AXES + 1];
 	
 	std::vector<Axis*> axes;
-	static const std::vector<Vector3> AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS;
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
 
 	void drawFirstAxis() const;

@@ -238,16 +238,152 @@ const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiu
 
 
 
+Robot::Robot():
+	axes({
+		new YawAxis(AngleState(0, Extrema(0, 360), 'a', 'd'), VelocityState(4, '1')),
+		new TiltAxis(AngleState(22.5, Extrema(-45, 60), 'w', 's'), VelocityState(2, '2')),
+		new TiltAxis(AngleState(-20, Extrema(-45, 75), 't', 'g'), VelocityState(2, '3')),
+		new YawAxis(AngleState(0, Extrema(0, 360), 'f', 'h'), VelocityState(4, '4'))
+	}),
+	axis2DrawFunction({
+		{axes[0], std::bind(&Robot::drawFirstAxis, this)},
+		{axes[1], std::bind(&Robot::drawSecondAxis, this)},
+		{axes[2], std::bind(&Robot::drawThirdAxis, this)},
+		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
+	}),
+	drawTCPCoordSystem_b(false),
+	displayAxesStates_b(true),
+	approachArbitraryAxisConfiguration_b(false),
+	approachArbitraryAxisConfigurationInfinitely_b(false)
+{}
+
+
+
+Robot::~Robot() {
+	for (size_t i = 0; i < N_AXES; i++)
+		delete axes[i];
+}
+
+
+
+////////////////////////////////////////////////////////////
+/// .Publics
+////////////////////////////////////////////////////////////
+void Robot::update() {
+	// update axes states
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->update();
+
+	// check whether all axes have reached target angles
+	if (approachArbitraryAxisConfiguration_b) {
+		for (Axis* axisPointer : axes) {
+			if (axisPointer->orientation->getTargetAngleState() == OrientationDimension::TargetAngleState::YetToBeReached)
+				return;
+		}
+		
+		// reset target angle parameters if so and infinite approach mode false
+		if (!approachArbitraryAxisConfigurationInfinitely_b) {
+			approachArbitraryAxisConfiguration_b = false;
+			drawTCPCoordSystem_b = drawTCPCoordSystemPrevious_b;
+			for (Axis* axisPointer : axes)
+				axisPointer->orientation->resetTargetAngleParameters();
+		}
+		// otherwise initialize new approach cycle
+		else
+			initializeArbitraryAxisConfigurationApproach();
+	}
+}
+
+
+
+void Robot::reset() {
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->reset();
+}
+
+
+
+void Robot::setArbitraryAxesConfiguration() {
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->angle.setArbitrarily();
+}
+
+
+
+void Robot::initializeArbitraryAxisConfigurationApproach() {
+	approachArbitraryAxisConfiguration_b = true;
+	
+	if (!approachArbitraryAxisConfigurationInfinitely_b)
+		drawTCPCoordSystemPrevious_b = drawTCPCoordSystem_b;
+	drawTCPCoordSystem_b = true;
+
+	for (Axis* axisPointer : axes)
+		axisPointer->orientation->setTargetAngleParameters();
+}
+
+
+
+void Robot::assumeSpatialTCPConfiguration() const {
+	//Z::translate(-(LOWER_STEEL_CYLINDER_HEIGHT + PEDASTEL_HEIGHT));
+
+	//// 1. axis
+	//axes[0]->adjustGLModelMatrixInversely();
+	//AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[0].inverted().glTranslate();
+
+	//// 2. axis
+	//X::rotate(-90);
+	//axes[1]->adjustGLModelMatrixInversely();
+	//AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[1].inverted().glTranslate();
+
+	////// 3. axis
+	//axes[2]->adjustGLModelMatrixInversely();
+	//AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[2].inverted().glTranslate();
+
+	////// 4. axis
+	//Y::rotate(270);
+	//axes[3]->adjustGLModelMatrixInversely();
+	//AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[3].inverted().glTranslate();
+}
+
+
+
+////////////////////////////////////////////////////////////
+/// ..Toggling
+////////////////////////////////////////////////////////////
+void Robot::toggleDrawTCPCoordSystem() {
+	if (!approachArbitraryAxisConfiguration_b)
+		drawTCPCoordSystem_b = toggleFlag(drawTCPCoordSystem_b);
+}
+
+
+
+void Robot::toggleDisplayAxesStates() {
+	displayAxesStates_b = toggleFlag(displayAxesStates_b);
+}
+
+
+
+void Robot::toggleApproachArbitraryAxisConfigurationInfinitelyMode() {
+	approachArbitraryAxisConfigurationInfinitely_b = toggleFlag(approachArbitraryAxisConfigurationInfinitely_b);
+
+	if (approachArbitraryAxisConfigurationInfinitely_b) {
+		drawTCPCoordSystemPrevious_b = drawTCPCoordSystem_b;
+		initializeArbitraryAxisConfigurationApproach();
+	}
+}
+
+
+
 ////////////////////////////////////////////////////////////
 /// .Objects
 ////////////////////////////////////////////////////////////
 cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 void Robot::loadObjects() {
 	const static char* FILE_PATH = "resources\\objects\\";
-	const static char* FILE_NAMES[Robot::N_OBJECTS] = { 
-		"rotation_axis_1.obj", 
-		"screw_head.obj", 
-		"tilt_axis_1.obj", 
+	const static char* FILE_NAMES[Robot::N_OBJECTS] = {
+		"rotation_axis_1.obj",
+		"screw_head.obj",
+		"tilt_axis_1.obj",
 		"tilt_axis_2.obj",
 		"kuka_logo.obj"
 	};
@@ -297,128 +433,6 @@ void Robot::loadTextures() {
 
 
 ////////////////////////////////////////////////////////////
-/// .Publics
-////////////////////////////////////////////////////////////
-Robot::Robot():
-	axes({
-		new YawAxis(AngleState(0, Extrema(0, 360), 'a', 'd'), VelocityState(4, '1')),
-		new TiltAxis(AngleState(22.5, Extrema(-45, 60), 'w', 's'), VelocityState(2, '2')),
-		new TiltAxis(AngleState(-20, Extrema(-45, 75), 't', 'g'), VelocityState(2, '3')),
-		new YawAxis(AngleState(0, Extrema(0, 360), 'f', 'h'), VelocityState(4, '4'))
-	}),
-	axis2DrawFunction({
-		{axes[0], std::bind(&Robot::drawFirstAxis, this)},
-		{axes[1], std::bind(&Robot::drawSecondAxis, this)},
-		{axes[2], std::bind(&Robot::drawThirdAxis, this)},
-		{axes[3], std::bind(&Robot::drawFourthAxis, this)},
-	}),
-	drawTCPCoordSystem_b(false),
-	displayAxesStates_b(true),
-	approachArbitraryAxisConfiguration_b(false),
-	approachArbitraryAxisConfigurationInfinitely_b(false)
-{}
-
-
-
-Robot::~Robot() {
-	for (size_t i = 0; i < N_AXES; i++)
-		delete axes[i];
-}
-
-
-
-void Robot::update() {
-	// update axes states
-	for (Axis* axisPointer : axes)
-		axisPointer->orientation->update();
-
-	// check whether all axes have reached target angles
-	if (approachArbitraryAxisConfiguration_b) {
-		for (Axis* axisPointer : axes) {
-			if (axisPointer->orientation->getTargetAngleState() == OrientationDimension::TargetAngleState::YetToBeReached)
-				return;
-		}
-		
-		// reset target angle parameters if so and infinite approach mode false
-		if (!approachArbitraryAxisConfigurationInfinitely_b) {
-			approachArbitraryAxisConfiguration_b = false;
-			for (Axis* axisPointer : axes)
-				axisPointer->orientation->resetTargetAngleParameters();
-		}
-		// otherwise initialize new approach cycle
-		else
-			initializeArbitraryAxisConfigurationApproach();
-	}
-}
-
-
-
-void Robot::reset() {
-	for (Axis* axisPointer : axes)
-		axisPointer->orientation->reset();
-}
-
-
-
-void Robot::setArbitraryAxesConfiguration() {
-	for (Axis* axisPointer : axes)
-		axisPointer->orientation->angle.setArbitrarily();
-}
-
-
-
-void Robot::initializeArbitraryAxisConfigurationApproach() {
-	approachArbitraryAxisConfiguration_b = true;
-
-	for (Axis* axisPointer : axes)
-		axisPointer->orientation->setTargetAngleParameters();
-}
-
-
-
-void Robot::assumeSpatialTCPConfiguration() const {
-	Z::translate(-(LOWER_STEEL_CYLINDER_HEIGHT + PEDASTEL_HEIGHT));
-
-	// 1. axis
-	axes[0]->adjustGLModelMatrixInversely();
-	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[0].inverted().glTranslate();
-
-	// 2. axis
-	X::rotate(-90);
-	axes[1]->adjustGLModelMatrixInversely();
-	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[1].inverted().glTranslate();
-
-	//// 3. axis
-	axes[2]->adjustGLModelMatrixInversely();
-	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[2].inverted().glTranslate();
-
-	//// 4. axis
-	Y::rotate(270);
-	axes[3]->adjustGLModelMatrixInversely();
-	AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS[3].inverted().glTranslate();
-}
-
-
-
-////////////////////////////////////////////////////////////
-/// ..Toggling
-////////////////////////////////////////////////////////////
-void Robot::toggleDrawTCPCoordSystem() {
-	drawTCPCoordSystem_b = toggleFlag(drawTCPCoordSystem_b);
-}
-void Robot::toggleDisplayAxesStates() {
-	displayAxesStates_b = toggleFlag(displayAxesStates_b);
-}
-void Robot::toggleApproachArbitraryAxisConfigurationInfinitelyMode() {
-	approachArbitraryAxisConfigurationInfinitely_b = toggleFlag(approachArbitraryAxisConfigurationInfinitely_b);
-
-	if (approachArbitraryAxisConfigurationInfinitely_b)
-		initializeArbitraryAxisConfigurationApproach();
-}
-
-
-
-////////////////////////////////////////////////////////////
 /// .Drawing
 ////////////////////////////////////////////////////////////
 void Robot::draw() {
@@ -429,15 +443,23 @@ void Robot::draw() {
 
 	// draw robot
 	glPushMatrix();
+		
+		// base
 		drawPedestal();
 		drawBottom();
 
-		for (Axis* const axisPointer : axes)
-			axis2DrawFunction[axisPointer]();
+		// axes
+		for (size_t i = 0; i < N_AXES; i++) {
+			relativeAxesStartConfigurationTransformations[i].effectuate();
+			axes[i]->adjustGLModelMatrixAccordingly();
+			axis2DrawFunction[axes[i]]();
+		}
 
-		// draw tcp coord system if applicable
-		if (drawTCPCoordSystem_b)
+		// tcp coord system if applicable
+		if (drawTCPCoordSystem_b) {
+			relativeAxesStartConfigurationTransformations[4].effectuate();
 			drawShrunkCoordSystem();
+		}
 	glPopMatrix();
 
 	// display axes states text if applicable
@@ -461,15 +483,6 @@ const ModelviewMatrixTransformation Robot::relativeAxesStartConfigurationTransfo
 	ModelviewMatrixTransformation(Vector3(0, 0, -4.4)),
 	ModelviewMatrixTransformation(Vector3(3.7635, -0.25, 0), Y::rotate, 270),
 	ModelviewMatrixTransformation(Vector3(0, 1.03, 0)),
-};
-
-
-
-const std::vector<Vector3> Robot::AXIS_END_POSITION_ATTAINMENT_SHIFT_VECTORS = {
-	Vector3(1.65, 1.63, 0.5),
-	Vector3(0, 0, -4.4),
-	Vector3(3.9 * 0.965, -0.5 / 2, 0),
-	Vector3(0, 1.03, 0)
 };
 
 
@@ -573,9 +586,9 @@ void Robot::drawScrewCircle() const {
 /// ..Components
 ////////////////////////////////////////////////////////////
 void Robot::drawPedestal() const {
-	Z::translate(PEDASTEL_HEIGHT / 2);
-	
 	glPushMatrix();
+		Z::translate(PEDASTEL_HEIGHT / 2);
+
 		glScalef(8, PEDASTEL_HEIGHT, 8);
 			
 		Color(.6, .6, .6).render();
@@ -586,8 +599,6 @@ void Robot::drawPedestal() const {
 		glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
-
-	Z::translate(PEDASTEL_HEIGHT / 2);
 }
 
 
@@ -597,24 +608,28 @@ void Robot::drawBottom() const {
 	static float CENTRAL_SEGMENT_HEIGHT = LOWER_STEEL_CYLINDER_HEIGHT * 0.7;
 	static float UPPER_SEGMENT_HEIGHT = LOWER_STEEL_CYLINDER_HEIGHT * 0.1;
 	
-	textures[Texture::Steel].bind();
-	glEnable(GL_TEXTURE_2D);
+	glPushMatrix();
+		Z::translate(PEDASTEL_HEIGHT);
 
-	// lower segment
-	BASE_COLOR.render();
-	drawCylinder(1.4, 1, LOWER_SEGMENT_HEIGHT);
+		textures[Texture::Steel].bind();
+		glEnable(GL_TEXTURE_2D);
 
-	// central segment
-	Z::translate(LOWER_SEGMENT_HEIGHT);
-	setColor(.4, .4, .4);
-	drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
+		// lower segment
+		BASE_COLOR.render();
+		drawCylinder(1.4, 1, LOWER_SEGMENT_HEIGHT);
 
-	// upper segment
-	Z::translate(CENTRAL_SEGMENT_HEIGHT);
-	BASE_COLOR.render();
-	drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
+		// central segment
+		Z::translate(LOWER_SEGMENT_HEIGHT);
+		setColor(.4, .4, .4);
+		drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
 
-	glDisable(GL_TEXTURE_2D);
+		// upper segment
+		Z::translate(CENTRAL_SEGMENT_HEIGHT);
+		BASE_COLOR.render();
+		drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
+
+		glDisable(GL_TEXTURE_2D);
+	glPopMatrix();
 }
 
 
@@ -625,8 +640,6 @@ void Robot::drawBottom() const {
 ////////////////////////////////////////////////////////////
 void Robot::drawFirstAxis() const {
 	static const float AXIS_MOUNT_DISK_HEIGHT = 0.3;
-
-	axes[0]->adjustGLModelMatrixAccordingly();
 
 	// hollow cylinder with second axis mount
 	glPushMatrix();
@@ -646,11 +659,10 @@ void Robot::drawFirstAxis() const {
 		drawAxisWeight();
 	glPopMatrix();
 
-	// draw second axis mount disk
-	glTranslatef(1.65, 1.63, 0.2);
-		BASE_COLOR.render();
-
 	glPushMatrix();
+		// draw second axis mount disk
+			BASE_COLOR.render();
+		glTranslatef(1.65, 1.63, 0.2);
 		X::rotate(90);
 		
 		textures[Texture::Steel].bind();
@@ -658,18 +670,12 @@ void Robot::drawFirstAxis() const {
 			drawCylinder(0.5, 0.5, AXIS_MOUNT_DISK_HEIGHT);
 		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
-
-	// translate located both at the top and in the center of the second axis mount disk
-	glTranslatef(0, 0, AXIS_MOUNT_DISK_HEIGHT);
 }
 
 
 
 void Robot::drawSecondAxis()const {
 	static const float LENGTH = 4.4;
-
-	X::rotate(90);
-	this->axes[1]->adjustGLModelMatrixAccordingly();
 
 	glPushMatrix();
 
@@ -718,8 +724,6 @@ void Robot::drawSecondAxis()const {
 		Z::translate(0.09);
 		this->drawAxisWeight();
 	glPopMatrix();
-
-	glTranslatef(0, 0, -LENGTH);
 }
 
 
@@ -728,8 +732,6 @@ void Robot::drawThirdAxis() const {
 	static const float LENGTH = 3.9;
 	static const float WIDTH = 0.5;
 	static const float MOUNT_PART_HEIGHT = 1.7;
-
-	this->axes[2]->adjustGLModelMatrixAccordingly();
 
 	// draw axis
 	glPushMatrix();
@@ -777,51 +779,48 @@ void Robot::drawThirdAxis() const {
 		Z::rotate(45);
 		this->drawAxisWeight();
 	glPopMatrix();
-
-	glTranslatef(LENGTH * 0.965, -WIDTH / 2, 0);
 }
 
 
 
 void Robot::drawFourthAxis() const {
-	Y::rotate(270);
-	this->axes[3]->adjustGLModelMatrixAccordingly();
-	
-	// partial cone
-	drawCylinder(0.2, 0.3, 0.15);
-
-	// short disk
-	glTranslatef(0, 0.15, 0);
-	drawCylinder(0.3, 0.3, 0.08);
-
-	// long disk
-	glTranslatef(0, 0.08, 0);
-	drawCylinder(0.27, 0.27, 0.3);
-
-	glTranslatef(0, 0.3, 0);
-
-	// screw screw circle
 	glPushMatrix();
-		static const float XY_SCALE_FACTOR = 0.86;
-		glScalef(XY_SCALE_FACTOR, 1, XY_SCALE_FACTOR);
-		this->drawScrewCircle();
-	glPopMatrix();
+		// partial cone
+		drawCylinder(0.2, 0.3, 0.15);
 
-	BASE_COLOR.render();
+		// short disk
+		glTranslatef(0, 0.15, 0);
+		drawCylinder(0.3, 0.3, 0.08);
+
+		// long disk
+		glTranslatef(0, 0.08, 0);
+		drawCylinder(0.27, 0.27, 0.3);
+
+		glTranslatef(0, 0.3, 0);
+
+		// screw screw circle
+		glPushMatrix();
+			static const float XY_SCALE_FACTOR = 0.86;
+			glScalef(XY_SCALE_FACTOR, 1, XY_SCALE_FACTOR);
+			this->drawScrewCircle();
+		glPopMatrix();
+
+		BASE_COLOR.render();
 		
-	// disk
-	drawCylinder(0.13, 0.13, 0.1);
+		// disk
+		drawCylinder(0.13, 0.13, 0.1);
 
-	// disk
-	glTranslatef(0, 0.1, 0);
-	drawCylinder(0.15, 0.15, 0.15);
+		// disk
+		glTranslatef(0, 0.1, 0);
+		drawCylinder(0.15, 0.15, 0.15);
 
-	// cone
-	glTranslatef(0, 0.15, 0);
-	drawCylinder(0.15, 0.1, 0.25);
+		// cone
+		glTranslatef(0, 0.15, 0);
+		drawCylinder(0.15, 0.1, 0.25);
 
-	// translate to top of cone
-	glTranslatef(0, 0.25, 0);
+		// translate to top of cone
+		glTranslatef(0, 0.25, 0);
+	glPopMatrix();
 }
 #pragma endregion
 #pragma endregion
