@@ -94,30 +94,6 @@ namespace TransformationAxes {
 
 
 
-////////////////////////////////////////////////////////////
-/// .ModelviewMatrixTransformation
-////////////////////////////////////////////////////////////
-ModelviewMatrixTransformation::ModelviewMatrixTransformation(Vector3&& shiftVector, RotationFunction rotationFunction, float rotationAngle) :
-	shiftVector(std::move(shiftVector)),
-	rotationFunction(rotationFunction),
-	rotationAngle(rotationAngle)
-{}
-
-
-
-void ModelviewMatrixTransformation::effectuate(bool invertedly) const {
-	invertedly ? shiftVector.inverted().glTranslate() : shiftVector.glTranslate();
-
-	if (rotationFunction) {
-		if (invertedly)
-			rotationFunction(-rotationAngle);
-		else
-			rotationFunction(rotationAngle);
-	}
-}
-
-
-
 void glScaleUniformly(float value) { 
 	glScalef(value, value, value); 
 }

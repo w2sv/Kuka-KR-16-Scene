@@ -142,22 +142,23 @@ private:
 
 #pragma region Axis
 struct Axis {
-	OrientationDimension* orientation;
-
-	Axis(OrientationDimension* orientation);
+	Axis(OrientationDimension* orientation, glRotationFunction rotationFunction);
 	~Axis();
 
+	OrientationDimension* orientation;
+	const glRotationFunction rotate;
+
 	void adjustGLModelMatrixAccordingly() const;
-	void adjustGLModelMatrixInversely(char rotationAxis) const;
+	void adjustGLModelMatrixInversely() const;
 	
 	void adjustGLModelMatrixTargetAngleAccordingly() const;
 };
 
 struct YawAxis : public Axis {
-	YawAxis(AngleState&& angle, VelocityState&& velocity);
+	YawAxis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction);
 };
 struct TiltAxis : public Axis {
-	TiltAxis(AngleState&& angle, VelocityState&& velocity);
+	TiltAxis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction);
 };
 #pragma endregion
 
@@ -182,11 +183,16 @@ public:
 
 	void initializeArbitraryAxisConfigurationApproach();
 
+	/* ------------Toggling----------------- */
+
 	void toggleDrawTCPCoordSystem();
 	void toggleDisplayAxesStates();
 	void toggleInfiniteArbitraryAxisConfigurationApproachMode();
 
-	void assumeSpatialTCPConfiguration() const;
+	/* ------------Camera----------------- */
+
+	void attachCameraToTCP() const;
+	void attachCameraToTCPReversely() const;
 private:
 	const static Color BASE_COLOR;
 
@@ -196,8 +202,13 @@ private:
 	bool drawTCPCoordSystem_b, drawTCPCoordSystemPrevious_b;
 	bool displayAxesStates_b;
 
+	/* -----------------TextDisplay----------------- */
+
 	void displayAxesStates() const;
 	void displayInfiniteAutomaticConfigurationApproachModeText() const;
+
+	/* -----------------CoordSystem----------------- */
+
 	static void drawShrunkCoordSystem();
 	void drawTargetAxesConfigurationCoordSystem() const;
 
@@ -241,7 +252,7 @@ private:
 		/* --------------AXES------------------ */
 
 	static const int N_AXES = 4;
-	const static ModelviewMatrixTransformation relativeAxesStartConfigurationTransformations[N_AXES + 1];
+	const static Vector3 relativeAxesStartPositionShiftVectors[N_AXES + 1];
 	
 	std::vector<Axis*> axes;
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
@@ -250,5 +261,9 @@ private:
 	void drawSecondAxis() const;
 	void drawThirdAxis() const;
 	void drawFourthAxis() const;
+
+	/* ------------------Camera------------------- */
+
+	void approachSpatialTCPConfigurationInversely() const;
 };
 #endif

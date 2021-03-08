@@ -186,8 +186,9 @@ int OrientationDimension::getTargetAngle() const{
 ////////////////////////////////////////////////////////////
 /// Axis
 ////////////////////////////////////////////////////////////
-Axis::Axis(OrientationDimension* orientation):
-	orientation(orientation)
+Axis::Axis(OrientationDimension* orientation, glRotationFunction rotationFunction):
+	orientation(orientation),
+	rotate(rotationFunction)
 {}
 Axis::~Axis() {
 	delete orientation;
@@ -196,36 +197,25 @@ Axis::~Axis() {
 
 
 void Axis::adjustGLModelMatrixAccordingly() const {
-	Z::rotate(orientation->angle.incrementationStepCoeff * orientation->angle.getValue()); 
+	rotate(orientation->angle.incrementationStepCoeff * orientation->angle.getValue()); 
 }
-void Axis::adjustGLModelMatrixInversely(char rotationAxis) const {
-	float rotationAngle = orientation->angle.decrementationStepCoeff * orientation->angle.getValue();
-	
-	switch (rotationAxis) {
-		case ('X'):
-			X::rotate(rotationAngle); break;
-		case ('Y'):
-			Y::rotate(rotationAngle); break;
-		case ('Z'):
-			Z::rotate(rotationAngle); break;
-		default:
-			throw("Passed invalid rotation axis");
-	}
+void Axis::adjustGLModelMatrixInversely() const {
+	rotate(orientation->angle.decrementationStepCoeff * orientation->angle.getValue());
 }
 
 
 
 void Axis::adjustGLModelMatrixTargetAngleAccordingly() const {
-	Z::rotate(orientation->angle.incrementationStepCoeff * orientation->getTargetAngle());
+	rotate(orientation->angle.incrementationStepCoeff * orientation->getTargetAngle());
 }
 
 
 
-YawAxis::YawAxis(AngleState&& angle, VelocityState&& velocity):
-	Axis::Axis(new UnlimitedOrientationDimension(std::move(angle), std::move(velocity)))
+YawAxis::YawAxis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction):
+	Axis::Axis(new UnlimitedOrientationDimension(std::move(angle), std::move(velocity)), rotationFunction)
 {}
-TiltAxis::TiltAxis(AngleState&& angle, VelocityState&& velocity) :
-	Axis::Axis(new LimitedOrientationDimension(std::move(angle), std::move(velocity)))
+TiltAxis::TiltAxis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction) :
+	Axis::Axis(new LimitedOrientationDimension(std::move(angle), std::move(velocity)), rotationFunction)
 {}
 #pragma endregion
 
@@ -246,17 +236,17 @@ std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 
 
 
-const Color Robot::BASE_COLOR = Color(230./255., 80./255., 21./255.);
+const Color Robot::BASE_COLOR = Color(230, 80, 21);
 const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
 
 
 
 Robot::Robot():
 	axes({
-		new YawAxis(AngleState(0, Extrema(0, 360), 'd', 'a', true), VelocityState(4, '1')),
-		new TiltAxis(AngleState(22.5, Extrema(-45, 60), 'w', 's'), VelocityState(2, '2')),
-		new TiltAxis(AngleState(-20, Extrema(-45, 75), 't', 'g'), VelocityState(2, '3')),
-		new YawAxis(AngleState(0, Extrema(0, 360), 'f', 'h'), VelocityState(4, '4'))
+		new YawAxis(AngleState(0, Extrema(0, 360), 'd', 'a', true), VelocityState(3, '1'), &Z::rotate),
+		new TiltAxis(AngleState(22.5, Extrema(-45, 60), 'w', 's'), VelocityState(2, '2'), &Y::rotate),
+		new TiltAxis(AngleState(-20, Extrema(-45, 75), 't', 'g'), VelocityState(2, '3'), &Y::rotate),
+		new YawAxis(AngleState(0, Extrema(0, 360), 'f', 'h'), VelocityState(3, '4'), &X::rotate)
 	}),
 	axis2DrawFunction({
 		{axes[0], std::bind(&Robot::drawFirstAxis, this)},
@@ -334,10 +324,6 @@ void Robot::initializeArbitraryAxisConfigurationApproach() {
 	for (Axis* axisPointer : axes)
 		axisPointer->orientation->setTargetAngleParameters();
 }
-
-
-
-
 
 
 
@@ -426,62 +412,10 @@ void Robot::loadTextures() {
 
 
 
-const ModelviewMatrixTransformation Robot::relativeAxesStartConfigurationTransformations[Robot::N_AXES + 1] = {
-	ModelviewMatrixTransformation(Vector3(0, 4.6, 0)),
-	ModelviewMatrixTransformation(Vector3(1.65, 1.63, 0.5), X::rotate, 90),
-	ModelviewMatrixTransformation(Vector3(0, 0, -4.4)),
-	ModelviewMatrixTransformation(Vector3(3.7635, -0.25, 0), Y::rotate, -90),
-	ModelviewMatrixTransformation(Vector3(0, 1.03, 0)),
-};
-
-
-
-void Robot::assumeSpatialTCPConfiguration() const {
-	for (size_t i = 0; i < 4; i++) {
-		relativeAxesStartConfigurationTransformations[i].effectuate(true);
-		axes[i]->adjustGLModelMatrixInversely('Z');
-	}
-	relativeAxesStartConfigurationTransformations[4].effectuate(true);
-
-
-	// Z::rotate(90);
-	/*relativeAxesStartConfigurationTransformations[0].effectuate(true);
-	axes[0]->adjustGLModelMatrixInversely('Z');*/
-
-	/*relativeAxesStartConfigurationTransformations[1].shiftVector.inverted().glTranslate();
-	X::rotate(-90);
-	axes[1]->adjustGLModelMatrixAccordingly();*/
-
-}
-
-
-
 ////////////////////////////////////////////////////////////
 /// .Drawing
 ////////////////////////////////////////////////////////////
 void Robot::draw() {
-	/*glPushMatrix();
-		Color(1, 0, 0).render();
-		glTranslatef(10, 4, 0);
-		glScaleUniformly(4);
-		drawCube();
-	glPopMatrix();
-
-	glPushMatrix();
-		Color(0, 0, 1).render();
-		glTranslatef(-10, 4, 0);
-		glScaleUniformly(4);
-		drawCube();
-	glPopMatrix();
-
-	glPushMatrix();
-		Color(0, 1, 0).render();
-		glTranslatef(0, 4, 10);
-		glScaleUniformly(4);
-		drawCube();
-	glPopMatrix();*/
-
-
 	// draw target axis configuration coord system if applicable
 	if (approachArbitraryAxisConfiguration_b)
 		drawTargetAxesConfigurationCoordSystem();
@@ -495,15 +429,14 @@ void Robot::draw() {
 
 		// axes
 		for (size_t i = 0; i < N_AXES; i++) {
-			relativeAxesStartConfigurationTransformations[i].effectuate();
+			relativeAxesStartPositionShiftVectors[i].glTranslate();
 			axes[i]->adjustGLModelMatrixAccordingly();
 			axis2DrawFunction[axes[i]]();
-			drawShrunkCoordSystem();
 		}
 
 		// tcp coord system if applicable
 		if (drawTCPCoordSystem_b) {
-			relativeAxesStartConfigurationTransformations[4].effectuate();
+			relativeAxesStartPositionShiftVectors[4].glTranslate();
 			drawShrunkCoordSystem();
 		}
 	glPopMatrix();
@@ -529,7 +462,7 @@ void Robot::drawTargetAxesConfigurationCoordSystem() const {
 	glPushMatrix();
 
 		for (size_t i = 0; i < N_AXES + 1; i++) {
-			relativeAxesStartConfigurationTransformations[i].effectuate();
+			relativeAxesStartPositionShiftVectors[i].glTranslate();
 			
 			if (i < N_AXES)
 				axes[i]->adjustGLModelMatrixTargetAngleAccordingly();
@@ -678,6 +611,7 @@ void Robot::drawBottom() const {
 		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
+#pragma endregion
 
 
 
@@ -685,6 +619,16 @@ void Robot::drawBottom() const {
 ////////////////////////////////////////////////////////////
 /// ...TransformationAxes
 ////////////////////////////////////////////////////////////
+const Vector3 Robot::relativeAxesStartPositionShiftVectors[Robot::N_AXES + 1] = {
+	Vector3(0, 4.6, 0),
+	Vector3(1.65, 1.63, 0.5),
+	Vector3(0, 4.4, 0),
+	Vector3(3.7635, 0, -0.25),
+	Vector3(1.03, 0, 0),
+};
+
+
+
 void Robot::drawFirstAxis() const {
 	static const float AXIS_MOUNT_DISK_HEIGHT = 0.3;
 
@@ -725,6 +669,7 @@ void Robot::drawSecondAxis()const {
 	static const float LENGTH = 4.4;
 
 	glPushMatrix();
+		X::rotate(90);
 
 		// draw axis with objects residing upon it 
 		glPushMatrix();
@@ -782,27 +727,28 @@ void Robot::drawThirdAxis() const {
 
 	// draw axis
 	glPushMatrix();
-		glTranslatef(LENGTH * 0.41, -WIDTH * 0.5, 0);  // translate slightly to the right, up, forward 
+		Z::rotate(-90);
+		glTranslatef(-WIDTH * 0.5, 0, -LENGTH * 0.41);  // translate slightly to the right, up, forward 
 		
 		glPushMatrix();
 			glScaleUniformly(5);
-			Y::rotate(90);
-			X::rotate(-90);
 				textures[Texture::Steel].bind();
 			glEnable(GL_TEXTURE_2D);
 				objects[TiltAxis2].draw();
 			glDisable(GL_TEXTURE_2D);
 		glPopMatrix();
 
-		Z::translate(-WIDTH * 0.1);
+		// Z::translate(WIDTH * 0.1);
 		glScaleUniformly(1.4);
-		Z::rotate(90);
+		Z::rotate(180);
+		Y::rotate(90);
 		objects[KukaLogo].draw();
 	glPopMatrix();
 
 	// draw weight block at axis beginning along respective x-axes
 	glPushMatrix();
-		glTranslatef(-0.6, -WIDTH / 2, 0);
+		glTranslatef(-0.6, 0, -WIDTH / 2);
+		X::rotate(90);
 
 		static const float LATERAL_SCALING_FACTOR = 0.5;
 		static const float Z_INCREMENT = 0.35;
@@ -820,10 +766,11 @@ void Robot::drawThirdAxis() const {
 
 	// draw singular weight along y-axis
 	glPushMatrix();
-		glTranslatef(0.17, -WIDTH, 0);
+		glTranslatef(0, 0.17, -WIDTH);
 		glScaleUniformly(0.8);
-		X::rotate(180);
+		X::rotate(-90);
 		Z::rotate(45);
+
 		this->drawAxisWeight();
 	glPopMatrix();
 }
@@ -832,6 +779,8 @@ void Robot::drawThirdAxis() const {
 
 void Robot::drawFourthAxis() const {
 	glPushMatrix();
+		Y::rotate(-90);
+
 		// partial cone
 		drawCylinder(0.2, 0.3, 0.15);
 
@@ -870,5 +819,35 @@ void Robot::drawFourthAxis() const {
 	glPopMatrix();
 }
 #pragma endregion
+
+
+
+////////////////////////////////////////////////////////////
+/// .Camera
+////////////////////////////////////////////////////////////
+void Robot::attachCameraToTCP() const {
+	Z::rotate(90);
+	approachSpatialTCPConfigurationInversely();
+}
+
+
+
+void Robot::attachCameraToTCPReversely() const {
+	Z::rotate(-90);
+	X::translate(-1);
+
+	approachSpatialTCPConfigurationInversely();
+}
+
+
+
+void Robot::approachSpatialTCPConfigurationInversely() const {
+	relativeAxesStartPositionShiftVectors[N_AXES].inverted().glTranslate();
+
+	for (int i = N_AXES - 1; i >= 0; i--) {
+		axes[i]->adjustGLModelMatrixInversely();
+		relativeAxesStartPositionShiftVectors[i].inverted().glTranslate();
+	}
+}
 #pragma endregion
 #pragma endregion

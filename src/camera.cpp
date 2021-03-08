@@ -19,16 +19,8 @@ Camera::Camera(Robot* robot) :
 
 
 
-void Camera::toggleMode() {
-	static const int TOGGLE_MODES = 2;
-
-	this->mode = Mode((this->mode + 1) % TOGGLE_MODES);
-}
-
-
-
-void Camera::toggleOrbitMode() {
-	mode = mode == Mode::Orbit ? Mode::Observer : Mode::Orbit;
+void Camera::toggleMode(Mode mode) {
+	this->mode = this->mode == mode ? Mode::Observer : mode;
 }
 
 
@@ -39,6 +31,8 @@ const void Camera::set() {
 			setObserverMode(); break;
 		case TCP:
 			setTCPMode(); break;
+		case ReverseTCP:
+			setReverseTCPMode(); break;
 		case Orbit:
 			setOrbitMode(); break;
 	}
@@ -47,6 +41,7 @@ const void Camera::set() {
 
 
 void Camera::reset() {
+	mode = Observer;
 	position = Vector2(START_POSITION);
 	radius = START_RADIUS;
 }
@@ -116,34 +111,14 @@ void Camera::setObserverMode() {
 
 
 
-void Camera::setWalkMode() {
-	const static float DELTA_POSITION = 0.1;
-	
-	static float xStep = 0;
-	static float yStep = 0;
-
-	if (cg_key::specialKeyState(GLUT_KEY_DOWN))
-		yStep -= DELTA_POSITION;
-	if (cg_key::specialKeyState(GLUT_KEY_UP))
-		yStep += DELTA_POSITION;
-	if (cg_key::specialKeyState(GLUT_KEY_LEFT))
-		xStep += DELTA_POSITION;
-	if (cg_key::specialKeyState(GLUT_KEY_RIGHT))
-		xStep -= DELTA_POSITION;
-
-	X::translate(xStep);
-	Y::translate(yStep);
-
-	setCameraParameterAccordingly();
+void Camera::setTCPMode() {
+	robot->attachCameraToTCP();
 }
 
 
 
-void Camera::setTCPMode() {
-	// gluPerspective(300, 3, 0, 0);
-
-	robot->assumeSpatialTCPConfiguration();
-	// glFrustum(0, 0, 0, 0, 0, -2);
+void Camera::setReverseTCPMode() {
+	robot->attachCameraToTCPReversely();
 }
 
 

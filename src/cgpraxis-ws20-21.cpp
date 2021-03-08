@@ -96,9 +96,11 @@ void displayFunc(){
 	else if (1 == cg_key::keyState('I'))
 		camera.reset();
 	else if (1 == cg_key::keyState('T'))
-		camera.toggleMode();
+		camera.toggleMode(Camera::Mode::TCP);
 	else if (1 == cg_key::keyState('O'))
-		camera.toggleOrbitMode();
+		camera.toggleMode(Camera::Mode::Orbit);
+	else if (1 == cg_key::keyState('R'))
+		camera.toggleMode(Camera::Mode::ReverseTCP);
 
 	// Back-Buffer neu initialisieren
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

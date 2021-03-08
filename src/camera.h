@@ -19,15 +19,16 @@ public:
 	
 	const void set();
 	void reset();
-	void toggleMode();
-	void toggleOrbitMode();
-private:
+
 	enum Mode {
 		Observer,
 		TCP,
+		ReverseTCP,
 		Orbit
 	};
 
+	void toggleMode(Mode mode);
+private:
 	const Vector2 START_POSITION;
 	static const float START_RADIUS;
 	static const float RADIUS_MIN;
@@ -40,7 +41,7 @@ private:
 
 	void setObserverMode();
 	void setTCPMode();
-	void setWalkMode();
+	void setReverseTCPMode();
 	void setOrbitMode();
 
 	void setCameraParameterAccordingly();
