@@ -54,11 +54,11 @@ protected:
 };
 
 
-
 struct AngleState : public AxisParameterState {
-	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey);
+	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey, bool invertedControl = false);
 	const char incrementationKey, decrementationKey;
-	
+	const int incrementationStepCoeff, decrementationStepCoeff;
+
 	/// Samples hardware randomized value within value limits
 	int drawArbitraryValue() const;
 	void setArbitrarily();
@@ -148,7 +148,7 @@ struct Axis {
 	~Axis();
 
 	void adjustGLModelMatrixAccordingly() const;
-	void adjustGLModelMatrixInversely() const;
+	void adjustGLModelMatrixInversely(char rotationAxis) const;
 	
 	void adjustGLModelMatrixTargetAngleAccordingly() const;
 };

@@ -140,7 +140,10 @@ void Camera::setWalkMode() {
 
 
 void Camera::setTCPMode() {
+	// gluPerspective(300, 3, 0, 0);
+
 	robot->assumeSpatialTCPConfiguration();
+	// glFrustum(0, 0, 0, 0, 0, -2);
 }
 
 

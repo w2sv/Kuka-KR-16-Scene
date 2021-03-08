@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <vector>
-#include <functional>
 
 #include "../dependencies/freeglut.h"
 
@@ -63,7 +62,7 @@ namespace TransformationAxes {
 
 
 
-typedef std::function<void(float)> RotationFunction;
+typedef void(*RotationFunction)(float);
 
 
 
@@ -71,7 +70,7 @@ struct ModelviewMatrixTransformation {
 	ModelviewMatrixTransformation(Vector3&& shiftVector, RotationFunction rotationFunction = nullptr, float rotationAngle = -1);
 
 	Vector3 shiftVector;
-	std::function<void(float)> rotationFunction;
+	RotationFunction rotationFunction;
 	float rotationAngle;
 
 	void effectuate(bool invertedly = false) const;
