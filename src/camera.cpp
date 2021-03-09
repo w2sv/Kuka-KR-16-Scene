@@ -12,7 +12,7 @@ const float Camera::RADIUS_MIN = 7.4;
 Camera::Camera(Robot* robot) :
 	mode(Mode::Observer),
 	robot(robot),
-	START_POSITION(Vector2(0, cg_globState::screenSize[1] * 0.5)),
+	START_POSITION(Vector2(0, GlobalState::screenSize[1] * 0.5)),
 	position(START_POSITION),
 	radius(START_RADIUS)
 {}
@@ -51,8 +51,8 @@ void Camera::reset() {
 
 #pragma region ParameterUpdating
 void Camera::setCameraParameterAccordingly() {
-	double phi = 0.2 * position.x / cg_globState::screenSize[0] * M_PI + M_PI * 0.5;
-	double theta = 0.2 * position.y / cg_globState::screenSize[1] * M_PI;
+	double phi = 0.2 * position.x / GlobalState::screenSize[0] * M_PI + M_PI * 0.5;
+	double theta = 0.2 * position.y / GlobalState::screenSize[1] * M_PI;
 
 	double eyePosX = radius * cos(phi) * cos(theta);
 	double eyePosY = radius * sin(theta);
@@ -127,7 +127,7 @@ void Camera::setOrbitMode() {
 	static const float X_POSITION_INCREMENT_PER_FRAME = 0.005;
 
 	updateRadiusViaScroll();
-	position.x -= int(X_POSITION_INCREMENT_PER_FRAME * cg_globState::screenSize[0]);
+	position.x -= int(X_POSITION_INCREMENT_PER_FRAME * GlobalState::screenSize[0]);
 
 	setCameraParameterAccordingly();
 }

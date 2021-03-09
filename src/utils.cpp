@@ -1,6 +1,10 @@
 #include "utils.h"
 
 
+////////////////////////////////////////////////////////////
+/// File System
+////////////////////////////////////////////////////////////
+
 char* concatenatedCharPtr(const char* a, const char* b) {
 	// Reference: https://stackoverflow.com/a/1995057
 
@@ -32,12 +36,20 @@ char* getResourceSubDirPath(char* subDirTitle){
 
 
 
+////////////////////////////////////////////////////////////
+/// Math
+////////////////////////////////////////////////////////////
+
 float toRadian(float degrees) {
 	return M_PI / 180. * degrees;
 }
 
 
-#pragma region CoordinateExtrema
+
+////////////////////////////////////////////////////////////
+/// Spatial
+////////////////////////////////////////////////////////////
+
 Extrema::Extrema(float min, float max) {
 	assert(min < max);
 
@@ -46,10 +58,11 @@ Extrema::Extrema(float min, float max) {
 }
 
 
+
 float Extrema::spread() const {
 	return abs(this->max - this->min);
 }
-#pragma endregion
+
 
 
 Measurements::Measurements(float height, float width, float depth) :
@@ -59,10 +72,10 @@ Measurements::Measurements(float height, float width, float depth) :
 {}
 
 
-bool toggleFlag(bool flag) {
-	return (bool)(-(int)flag + 1);
-}
 
+////////////////////////////////////////////////////////////
+/// Random
+////////////////////////////////////////////////////////////
 
 int randInt(const Extrema& bounds) {
 	// Reference: https://stackoverflow.com/a/7560564

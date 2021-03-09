@@ -45,6 +45,7 @@
 #define MENU_TEXT_PER_VERTEX_NORMALS 	"Lighting: set normals per vertex"
 #define MENU_TEXT_EXIT					"Exit"
 
+
 enum MENU_IDs
 {
 	ID_MENU_WIREFRAME = 1,
@@ -72,19 +73,5 @@ void menuFunc ( int );					// Menue an Maustaste
 /////////////////////////////////////////////////////////////////////////////////
 void init ( int argc, char **argv );
 
-
-
-/////////////////////////////////////////////////////////////////////////////////
-//	Globale Variablen
-/////////////////////////////////////////////////////////////////////////////////
-struct cg_globState{
-	static double screenSize[2];		// Zeichenmodus für Flächen {GL_LINE || GL_FILL}
-	static GLenum drawMode;			// Beleuchtung an / aus
-	static bool lightMode;			// Backface-Culling an / aus
-	static int normalMode;			// Hilfe-Instanz
-	static bool cullMode;			// Backface-Culling an / aus
-
-	static bool drawCoordSystem;
-};
 
 #endif // WINDOW_H

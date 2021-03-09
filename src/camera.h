@@ -8,7 +8,7 @@
 #include "../dependencies/freeglut.h"
 
 #include "input.h"
-#include "window.h"
+#include "state.h"
 #include "robot.h"
 #include "glutils.h"
 

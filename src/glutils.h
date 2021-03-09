@@ -6,6 +6,8 @@
 
 #include "../dependencies/freeglut.h"
 
+#include "utils.h"
+
 
 struct Vector3 {
 public:
@@ -68,3 +70,7 @@ typedef std::function<void(float)> glRotationFunction;
 
 
 void glScaleUniformly(float value);
+
+
+
+void drawCoordSystem(Extrema& x, Extrema& y, Extrema& z, float coneScale = 1);

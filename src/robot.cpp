@@ -332,19 +332,19 @@ void Robot::initializeArbitraryAxisConfigurationApproach() {
 ////////////////////////////////////////////////////////////
 void Robot::toggleDrawTCPCoordSystem() {
 	if (!approachArbitraryAxisConfiguration_b)
-		drawTCPCoordSystem_b = toggleFlag(drawTCPCoordSystem_b);
+		drawTCPCoordSystem_b = !drawTCPCoordSystem_b;
 }
 
 
 
 void Robot::toggleDisplayAxesStates() {
-	displayAxesStates_b = toggleFlag(displayAxesStates_b);
+	displayAxesStates_b = !displayAxesStates_b;
 }
 
 
 
 void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
-	approachArbitraryAxisConfigurationInfinitely_b = toggleFlag(approachArbitraryAxisConfigurationInfinitely_b);
+	approachArbitraryAxisConfigurationInfinitely_b = !approachArbitraryAxisConfigurationInfinitely_b;
 
 	if (approachArbitraryAxisConfigurationInfinitely_b) {
 		drawTCPCoordSystemPrevious_b = drawTCPCoordSystem_b;
@@ -499,14 +499,14 @@ void Robot::displayAxesStates() const {
 		if (axes[i]->orientation->velocity.limitReached())
 			oss << "!";
 
-		projectText(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(0.8, 0.8, 0.8), GLUT_BITMAP_9_BY_15);
+		Text::project(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(0.8, 0.8, 0.8), GLUT_BITMAP_9_BY_15);
 	}
 }
 
 
 
 void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
-	projectText(-0.9, 0.85, "Infinite Random Configuration Approach Mode", Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
+	Text::project(-0.9, 0.85, "Infinite Random Configuration Approach Mode", Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
 }
 
 
@@ -521,7 +521,7 @@ void Robot::drawAxisWeight() const {
 	const static float UPPER_CYLINDER_HEIGTH = 0.05;
 
 	glPushMatrix();
-		setDefaultLightAndMaterial(cg_globState::lightMode);
+		setDefaultLightAndMaterial(GlobalState::lightMode);
 
 		// draw lower octPrism pedastel
 			Colors::BLACK.render();

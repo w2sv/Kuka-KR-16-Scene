@@ -22,7 +22,7 @@
 #include "utils.h"
 #include "help.h"
 #include "image.h"
-#include "window.h"
+#include "state.h"
 
 
 #pragma region AxisParameterState

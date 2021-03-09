@@ -1,12 +1,7 @@
 #include "window.h"
-#include "input.h"
 
-double cg_globState::screenSize[] = { 0 };
-GLenum cg_globState::drawMode = GL_FILL;
-bool cg_globState::lightMode = true;
-int cg_globState::normalMode = 0;
-bool cg_globState::cullMode = false;
-bool cg_globState::drawCoordSystem = false;
+#include "input.h"
+#include "state.h"
 
 
 void init(int argc, char **argv){
@@ -73,8 +68,8 @@ void reshapeFunc(int w, int h){
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_MODELVIEW);	// sicherheitshalber
 	glLoadIdentity();				// Modelierungsmatrix einstellen
-	cg_globState::screenSize[0] = (double)w;
-	cg_globState::screenSize[1] = (double)h;
+	GlobalState::screenSize[0] = (double)w;
+	GlobalState::screenSize[1] = (double)h;
 }
 
 
@@ -87,19 +82,19 @@ void menuFunc(int item){
 			exit(0);
 			break;
 		case ID_MENU_WIREFRAME:
-			cg_globState::drawMode = cg_globState::drawMode == GL_FILL ? GL_LINE : GL_FILL;
+			GlobalState::drawMode = GlobalState::drawMode == GL_FILL ? GL_LINE : GL_FILL;
 			break;
 		case ID_MENU_SHADE:
-			cg_globState::lightMode = cg_globState::lightMode == GL_TRUE ? GL_FALSE : GL_TRUE;
+			GlobalState::lightMode = GlobalState::lightMode == GL_TRUE ? GL_FALSE : GL_TRUE;
 			break;
 		case ID_MENU_NO_NORMALS:
-			cg_globState::normalMode = 0;
+			GlobalState::normalMode = 0;
 			break;
 		case ID_MENU_PER_SURFACE_NORMALS:
-			cg_globState::normalMode = 1;
+			GlobalState::normalMode = 1;
 			break;
 		case ID_MENU_PER_VERTEX_NORMALS:
-			cg_globState::normalMode = 2;
+			GlobalState::normalMode = 2;
 			break;
 	}
 }

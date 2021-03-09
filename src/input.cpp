@@ -1,7 +1,6 @@
 #include "input.h"
 #include "../dependencies/freeglut.h"
 
-#include <iostream>
 
 char cg_key::keys[] = { 0 };
 char cg_key::specialKeys[] = { 0 };
