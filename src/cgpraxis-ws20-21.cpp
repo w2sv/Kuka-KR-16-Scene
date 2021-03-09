@@ -138,10 +138,19 @@ void displayFunc(){
 	drawScene();
 
 	// Hilfetext einblenden
-	if (GlobalState::drawHelp)
-		help.draw();
-	if (GlobalState::drawFps)
-		help.displayFps();
+	if (GlobalState::drawHelp || GlobalState::drawFps || robot->textToBeDisplayed()) {
+		Text::OrthogonalProjection::activate(true);
+
+		if (GlobalState::drawHelp)
+			help.draw();
+		if (GlobalState::drawFps)
+			help.displayFps();
+		if (robot->textToBeDisplayed())
+			robot->displayText();
+
+		Text::OrthogonalProjection::deactivate(true);
+	}
+	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_CULL_FACE);

@@ -193,6 +193,9 @@ public:
 
 	void attachCameraToTCP() const;
 	void attachCameraToTCPReversely() const;
+
+	bool textToBeDisplayed() const;
+	void displayText() const;
 private:
 	const static Color BASE_COLOR;
 

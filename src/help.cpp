@@ -15,33 +15,35 @@
 ////////////////////////////////////////////////////////////
 /// Text
 ////////////////////////////////////////////////////////////
-void Text::print(float x, float y, const char* text, void* font){
+void Text::display(float x, float y, const char* text, void* font){
 	glRasterPos2f(x, y);
-	unsigned int l = strlen(text);
-	for (unsigned int i = 0; i < l; ++i)
+	for (size_t i = 0; i < strlen(text); ++i)
 		glutBitmapCharacter(font, text[i]);
 }
 
 
 
-void Text::print(float x, float y, const char* text, float r, float g, float b, void* font){
-	glColor3f(r, g, b);
-	print(x, y, text, font);
+void Text::displayColored(float x, float y, const char* text, Color& color, void* font){
+	color.render(false);
+	display(x, y, text, font);
 }
 
 
 
-void Text::printWithShadow(float x, float y, const char* text, float r, float g, float b, float shadow, void* font){
-	print(x + shadow, y - shadow, text, 0, 0, 0, font);
-	print(x, y, text, r, g, b, font);
+void Text::printWithShadow(float x, float y, const char* text, Color& color, float shadow, void* font){
+	displayColored(x + shadow, y - shadow, text, Color(Colors::BLACK), font);
+	displayColored(x, y, text, color, font);
 }
 
 
 
-void Text::project(float x, float y, const char* text, Color& color, void* font) {
-	GLfloat akt_color[4];
+static GLfloat currentColor[4] = { -1 };
+
+
+
+void Text::OrthogonalProjection::activate(bool alterDepthTest) {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glGetFloatv(GL_CURRENT_COLOR, akt_color);
+	glGetFloatv(GL_CURRENT_COLOR, currentColor);
 
 	//orthogonale projektion setzen
 	glMatrixMode(GL_PROJECTION);
@@ -54,9 +56,15 @@ void Text::project(float x, float y, const char* text, Color& color, void* font)
 	glLoadIdentity();
 
 	glDisable(GL_LIGHTING);
+	if (alterDepthTest)
+		glDisable(GL_DEPTH_TEST);
+}
 
-	print(x, y, text, color.r, color.g, color.b, font);
 
+
+void Text::OrthogonalProjection::deactivate(bool alterDepthTest) {
+	if (alterDepthTest)
+		glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 
 	//reset matrices
@@ -64,27 +72,24 @@ void Text::project(float x, float y, const char* text, Color& color, void* font)
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-	glColor4fv(akt_color);
+	glColor4fv(currentColor);
 	glPopAttrib();
 }
 
 
-
 int cg_help::frames = 0;
-float cg_help::bg_size = 0.8f;
-
-
-
 void cg_help::drawBackground(){
+	float CORNER_COORD = 0.8f;
+
 	glFrontFace(GL_CCW);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4f(0.3f, 0.3f, 0.3f, 0.1f);
 	glBegin(GL_QUADS);
-		glVertex2f(-bg_size, bg_size);
-		glVertex2f(-bg_size, -bg_size);
-		glVertex2f(bg_size, -bg_size);
-		glVertex2f(bg_size, bg_size);
+		glVertex2f(-CORNER_COORD, CORNER_COORD);
+		glVertex2f(-CORNER_COORD, -CORNER_COORD);
+		glVertex2f(CORNER_COORD, -CORNER_COORD);
+		glVertex2f(CORNER_COORD, CORNER_COORD);
 	glEnd();
 	glDisable(GL_BLEND);
 }
@@ -92,6 +97,8 @@ void cg_help::drawBackground(){
 
 
 void cg_help::displayFps(){
+	frames++;
+
 	static time_t lastTime = 0;
 
 	time_t now;
@@ -107,7 +114,7 @@ void cg_help::displayFps(){
 	}
 	char fpstext[20];
 	sprintf(fpstext, "FPS: %.0f", fps);
-	Text::printWithShadow(-0.78f, -0.78f, fpstext, 1, 0.3, 0.1, 0.003f, GLUT_BITMAP_HELVETICA_18);
+	Text::printWithShadow(-0.78f, -0.78f, fpstext, Color(1, 0.3, 0.1), 0.003f, GLUT_BITMAP_HELVETICA_18);
 }
 
 
@@ -115,51 +122,24 @@ void cg_help::displayFps(){
 void cg_help::draw(){
 	const static char* TITLE = "KUKA kr 16";
 
-	GLfloat akt_color[4];
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glGetFloatv(GL_CURRENT_COLOR, akt_color);
-
-	//orthogonale projektion setzen
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D(-1.0f, 1.0f, -1.0f, 1.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_LIGHTING);
-
-	// hintergrund
 	drawBackground();
-	// title
-	Text::printWithShadow(-0.6f, 0.7f, TITLE, 1.0f, 1.0f, 0.0f, 0.003f, GLUT_BITMAP_TIMES_ROMAN_24);
-	// tasten
+	Text::printWithShadow(-0.6f, 0.7f, TITLE, Color(1, 1, 0), 0.003f, GLUT_BITMAP_TIMES_ROMAN_24);
+	
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	
 	float posy = 0.5f;
 	int i = 0;
 	while (spalte1[i]){
-		Text::print(-0.6f, posy, spalte1[i], GLUT_BITMAP_9_BY_15);
-		posy -= 0.1f;
-		++i;
-	}
-	posy = 0.5f;
-	i = 0;
-	while (spalte2[i]){
-		Text::print(0.05f, posy, spalte2[i], GLUT_BITMAP_9_BY_15);
+		Text::display(-0.6f, posy, spalte1[i], GLUT_BITMAP_9_BY_15);
 		posy -= 0.1f;
 		++i;
 	}
 
-	// ruecksetzen
-	glEnable(GL_DEPTH_TEST);
-	//reset matrices
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glColor4fv(akt_color);
-	glPopAttrib();
+	posy = 0.5f;
+	i = 0;
+	while (spalte2[i]){
+		Text::display(0.05f, posy, spalte2[i], GLUT_BITMAP_9_BY_15);
+		posy -= 0.1f;
+		++i;
+	}
 }

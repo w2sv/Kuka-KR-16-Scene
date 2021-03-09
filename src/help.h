@@ -36,10 +36,14 @@ const char *spalte2[] = {
 namespace Text {
 	static void* DEFAULT_FONT = GLUT_BITMAP_HELVETICA_18;
 
-	void print(float x, float y, const char* text, void* font = DEFAULT_FONT);
-	void print(float x, float y, const char* text, float r, float g, float b, void* font = DEFAULT_FONT);
-	void printWithShadow(float x, float y, const char* text, float r, float g, float b, float shadow, void* font = DEFAULT_FONT);
-	void project(float x, float y, const char* text, Color& color, void* font = DEFAULT_FONT);
+	void display(float x, float y, const char* text, void* font = DEFAULT_FONT);
+	void displayColored(float x, float y, const char* text, Color& color, void* font = DEFAULT_FONT);
+	void printWithShadow(float x, float y, const char* text, Color& color, float shadow, void* font = DEFAULT_FONT);
+	
+	namespace OrthogonalProjection {
+		void activate(bool alterDepthTest);
+		void deactivate(bool alterDepthTest);
+	}
 }
 
 
@@ -51,7 +55,6 @@ public:
 
 private:
 	static int frames;
-	static float bg_size;
 
 	void drawBackground();
 };

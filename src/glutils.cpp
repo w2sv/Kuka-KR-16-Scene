@@ -47,10 +47,13 @@ Color::Color(double r, double g, double b) {
 }
 
 
-void Color::render() const {
+void Color::render(bool materialized) const {
 	glColor3f(r, g, b);
-	GLfloat amb_diff[4] = { r, g, b, 1};
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, amb_diff);
+
+	if (materialized) {
+		GLfloat amb_diff[4] = { r, g, b, 1 };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, amb_diff);
+	}
 }
 
 

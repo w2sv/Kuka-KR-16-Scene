@@ -355,6 +355,58 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 
 
 ////////////////////////////////////////////////////////////
+/// .Text
+////////////////////////////////////////////////////////////
+bool Robot::textToBeDisplayed() const {
+	return approachArbitraryAxisConfigurationInfinitely_b || displayAxesStates_b;
+}
+
+
+
+void Robot::displayText() const {
+	if (displayAxesStates_b)
+		displayAxesStates();
+	if (approachArbitraryAxisConfigurationInfinitely_b)
+		displayInfiniteAutomaticConfigurationApproachModeText();
+}
+
+
+
+void Robot::displayAxesStates() const {
+	const int MAX_ANGLE_STATE_DIGITS = 7;
+
+	for (size_t i = 0; i < N_AXES; i++) {
+		std::ostringstream oss;
+
+		// add angle state
+		oss << roundf(axes[i]->orientation->angle.getValue() * 100.) / 100. << 'o';  // '°' not renderable by bitmap font
+		if (axes[i]->orientation->angle.limitReached())
+			oss << "!";
+
+		// pad to uniform length
+		oss << std::string(MAX_ANGLE_STATE_DIGITS - oss.str().length(), ' ');
+
+		// add delimiter
+		oss << " ";
+
+		// add velocity
+		oss << axes[i]->orientation->velocity.getValue() << "m/s";
+		if (axes[i]->orientation->velocity.limitReached())
+			oss << "!";
+
+		Text::displayColored(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(0.8, 0.8, 0.8), GLUT_BITMAP_9_BY_15);
+	}
+}
+
+
+
+void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
+	Text::displayColored(-0.9, 0.85, "Infinite Random Configuration Approach Mode", Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
+}
+
+
+
+////////////////////////////////////////////////////////////
 /// .Objects
 ////////////////////////////////////////////////////////////
 cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
@@ -440,12 +492,6 @@ void Robot::draw() {
 			drawShrunkCoordSystem();
 		}
 	glPopMatrix();
-
-	// display axes states text if applicable
-	if (displayAxesStates_b)
-		displayAxesStates();
-	if (approachArbitraryAxisConfigurationInfinitely_b)
-		displayInfiniteAutomaticConfigurationApproachModeText();
 }
 
 
@@ -470,43 +516,6 @@ void Robot::drawTargetAxesConfigurationCoordSystem() const {
 
 		drawShrunkCoordSystem();
 	glPopMatrix();
-}
-
-
-
-////////////////////////////////////////////////////////////
-/// ..Text
-////////////////////////////////////////////////////////////
-void Robot::displayAxesStates() const {
-	const int MAX_ANGLE_STATE_DIGITS = 7;
-
-	for (size_t i = 0; i < N_AXES; i++) {
-		std::ostringstream oss;
-
-		// add angle state
-		oss << roundf(axes[i]->orientation->angle.getValue() * 100.) / 100. << 'o';  // '°' not renderable by bitmap font
-		if (axes[i]->orientation->angle.limitReached())
-			oss << "!";
-
-		// pad to uniform length
-		oss << std::string(MAX_ANGLE_STATE_DIGITS - oss.str().length(), ' ');
-
-		// add delimiter
-		oss << " ";
-
-		// add velocity
-		oss << axes[i]->orientation->velocity.getValue() << "m/s";
-		if (axes[i]->orientation->velocity.limitReached())
-			oss << "!";
-
-		Text::project(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(0.8, 0.8, 0.8), GLUT_BITMAP_9_BY_15);
-	}
-}
-
-
-
-void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
-	Text::project(-0.9, 0.85, "Infinite Random Configuration Approach Mode", Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
 }
 
 

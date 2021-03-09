@@ -33,9 +33,9 @@ public:
 #pragma region Color
 struct Color {
 	GLfloat r, g, b;
-
 	Color(double r, double g, double b);
-	void render() const;
+	
+	void render(bool materialized = true) const;
 };
 
 
