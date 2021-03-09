@@ -359,7 +359,7 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 ////////////////////////////////////////////////////////////
 cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 void Robot::loadObjects() {
-	const static char* FILE_PATH = "resources\\objects\\";
+	const static char* DIR_PATH = getResourceSubDirPath("objects");
 	const static char* FILE_NAMES[Robot::N_OBJECTS] = {
 		"rotation_axis_1.obj",
 		"screw_head.obj",
@@ -369,7 +369,7 @@ void Robot::loadObjects() {
 	};
 
 	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
-		Robot::objects[i].load(concatenatedCharPtr(FILE_PATH, FILE_NAMES[i]), false);
+		Robot::objects[i].load(joinPath(DIR_PATH, FILE_NAMES[i]), false);
 	}
 }
 
@@ -394,14 +394,14 @@ void Robot::setObjectMaterials() {
 ////////////////////////////////////////////////////////////
 cg_image Robot::textures[Robot::N_TEXTURES] = {};
 void Robot::loadTextures() {
-	const static char* FILE_PATH = "resources\\textures\\";
+	const static char* DIR_PATH = getResourceSubDirPath("textures");
 	const static char* FILE_NAMES[Robot::N_TEXTURES] = {
 		"smoothed-square-textured-metal.bmp",
 		"warped-sheet-metal_roughness.bmp"
 	};
 
 	for (size_t i = 0; i < Robot::N_TEXTURES; i++) {
-		textures[i].load(concatenatedCharPtr(FILE_PATH, FILE_NAMES[i]), true);
+		textures[i].load(joinPath(DIR_PATH, FILE_NAMES[i]), true);
 
 		textures[i].setMinFilter(GL_NEAREST);
 		textures[i].setMagFilter(GL_LINEAR);

@@ -12,6 +12,26 @@ char* concatenatedCharPtr(const char* a, const char* b) {
 }
 
 
+
+char* joinPath(const char* a, const char* b) {
+	return concatenatedCharPtr(concatenatedCharPtr(a, "\\"), b);
+}
+
+
+
+char* getResourceSubDirPath(char* subDirTitle){
+	static const char* TARGET_WKDIR_TAIL = "cgpraxis-ws20-21";
+
+	char* subDirPath = joinPath("resources", subDirTitle);
+	std::string workDir(_getcwd(NULL, 0));
+
+	if (workDir.substr(workDir.size() - strlen(TARGET_WKDIR_TAIL)) != TARGET_WKDIR_TAIL)
+		return concatenatedCharPtr("..\\", subDirPath);
+	return subDirPath;
+}
+
+
+
 float toRadian(float degrees) {
 	return M_PI / 180. * degrees;
 }

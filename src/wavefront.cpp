@@ -155,11 +155,11 @@ bool cg_object3D::readClusterVertex(char** r_line, int* p, int* t, int* n)
 }
 
 
-void cg_object3D::load(const char* filename, bool use_vbos)
+void cg_object3D::load(const char* filepath, bool use_vbos)
 {
-	FILE* f = fopen(filename, "r");
+	FILE* f = fopen(filepath, "r");
 	if (!f) {
-		std::cerr << filename << "does not exist" << std::endl;
+		std::cerr << filepath << " does not exist" << std::endl;
 		std::getchar();
 		std::exit(1);
 	};
@@ -214,7 +214,7 @@ void cg_object3D::load(const char* filename, bool use_vbos)
 			}
 			else
 			{
-				printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filename, line);
+				printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filepath, line);
 				return;
 			}
 			break;
@@ -282,7 +282,7 @@ void cg_object3D::load(const char* filename, bool use_vbos)
 						npoints++;
 					else
 					{
-						printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filename, line);
+						printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filepath, line);
 						return;
 					}
 				}
@@ -294,7 +294,7 @@ void cg_object3D::load(const char* filename, bool use_vbos)
 						hnormals++;
 					else
 					{
-						printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filename, line);
+						printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filepath, line);
 						return;
 					}
 				}
@@ -306,7 +306,7 @@ void cg_object3D::load(const char* filename, bool use_vbos)
 						ntexcoords++;
 					else
 					{
-						printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filename, line);
+						printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filepath, line);
 						return;
 					}
 				}
@@ -388,7 +388,7 @@ void cg_object3D::load(const char* filename, bool use_vbos)
 				}
 				else
 				{
-					printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filename, line);
+					printf("Fehler in Wavefrontdatei %s in Zeile %d\n", filepath, line);
 					return;
 				}
 				break;

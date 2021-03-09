@@ -1,5 +1,6 @@
 #pragma once
 
+#include <direct.h>
 #include <string>
 #include <cassert>
 #include <random>
@@ -20,6 +21,14 @@
 
 
 char* concatenatedCharPtr(const char* a, const char* b);
+
+
+/// Concatenates passed path components whilst adding \\ in between 
+char* joinPath(const char* a, const char* b);
+
+
+/// Assures base level of created relative file path to be set to repository root
+char* getResourceSubDirPath(char* subDirTitle);
 
 
 float toRadian(float degrees);
