@@ -423,7 +423,7 @@ void Robot::displayAxesStates() const {
 
 
 void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
-	Text::displayColored(-0.9, 0.85, "Infinite Random Configuration Approach Mode", Color(1, 0, 0), GLUT_BITMAP_9_BY_15);
+	Text::displayColored(-0.9, 0.85, "Infinite Random Configuration Approach Mode", Color(214, 15, 38), GLUT_BITMAP_9_BY_15);
 }
 
 

@@ -101,16 +101,16 @@ void displayFunc(){
 		GlobalState::cullMode = !GlobalState::cullMode; // Backfaceculling on/off
 
 	// camera
-	else if (1 == cg_key::keyState('I'))
+	else if (1 == cg_key::specialKeyState(GLUT_KEY_LEFT))
 		camera.reset();
-	
-	else if (1 == cg_key::keyState('T'))
-		camera.toggleMode(Camera::Mode::TCP);
-	
-	else if (1 == cg_key::keyState('O'))
+
+	else if (1 == cg_key::keyState(GLUT_KEY_RIGHT))
 		camera.toggleMode(Camera::Mode::Orbit);
 	
-	else if (1 == cg_key::keyState('R'))
+	else if (1 == cg_key::specialKeyState(GLUT_KEY_UP))
+		camera.toggleMode(Camera::Mode::TCP);
+
+	else if (1 == cg_key::keyState(GLUT_KEY_DOWN))
 		camera.toggleMode(Camera::Mode::ReverseTCP);
 
 	// Back-Buffer neu initialisieren

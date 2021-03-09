@@ -113,8 +113,6 @@ void displayHelp() {
 		"linke Taste      Kamerabewegung",
 		"mittlere Taste   Zoom",
 		"rechte Taste     Kontextmenü",
-
-		NULL
 	};
 	static const char* spalte2[] = {
 		"Tastatur:",
@@ -126,8 +124,6 @@ void displayHelp() {
 		"k,K    - Koordinatensystem (An/Aus)",
 		"", "", "", "",
 		"ESC    - Beenden",
-
-		NULL
 	};
 
 	drawBackground();
@@ -158,5 +154,5 @@ void displayFps(){
 	static char fpstext[9];
 
 	sprintf(fpstext, "FPS: %.0f", GlobalState::fps);
-	Text::displayWithShadow(-0.78f, -0.78f, fpstext, Color(1, 0.3, 0.1), 0.003f, GLUT_BITMAP_HELVETICA_18);	
+	Text::displayWithShadow(-0.78f, -0.78f, fpstext, Color(214, 121, 15), 0.003f, GLUT_BITMAP_HELVETICA_18);
 }
