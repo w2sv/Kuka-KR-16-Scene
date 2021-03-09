@@ -20,7 +20,7 @@
 
 
 static Extrema groundMeasures = Extrema(-20, 20);
-static Robot* robot = new Robot();
+static Robot* robot = new Robot;
 
 
 
@@ -72,19 +72,21 @@ void drawScene(){
 
 
 void displayFunc(){
-	static cg_help help;
 	static cg_key key;
 	static Camera camera(robot);
+	static Text::OrthogonalProjection orthogonalProjection;
+
+	GlobalState::updateFps();
 
 
 	if (cg_key::keyState(27))
 		exit(0); // Escape -> Programm beenden
 	
 	else if (1 == cg_key::keyState('F'))
-		GlobalState::drawFps = !GlobalState::drawFps;	// Framecounter on/off
+		GlobalState::displayFps = !GlobalState::displayFps;	// Framecounter on/off
 	
 	else if (1 == cg_key::keyState('H'))
-		GlobalState::drawHelp = !GlobalState::drawHelp;	// Hilfetext on/off
+		GlobalState::displayHelp = !GlobalState::displayHelp;	// Hilfetext on/off
 	
 	else if (1 == cg_key::keyState('K'))
 		GlobalState::drawCoordSystem = !GlobalState::drawCoordSystem;	// Koordinatensystem on/off
@@ -134,23 +136,22 @@ void displayFunc(){
 	glCullFace(GL_BACK);
 	GlobalState::cullMode ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 
-	// Modell zeichnen /////////////////!!!!!!!!!!!!!!!!!!!!!!!!///////////////////////
+	// Modell zeichnen
 	drawScene();
 
 	// Hilfetext einblenden
-	if (GlobalState::drawHelp || GlobalState::drawFps || robot->textToBeDisplayed()) {
-		Text::OrthogonalProjection::activate(true);
+	if (GlobalState::displayHelp || GlobalState::displayFps || robot->textToBeDisplayed()) {
+		orthogonalProjection.activate(true);
 
-		if (GlobalState::drawHelp)
-			help.draw();
-		if (GlobalState::drawFps)
-			help.displayFps();
+		if (GlobalState::displayHelp)
+			displayHelp();
+		if (GlobalState::displayFps)
+			displayFps();
 		if (robot->textToBeDisplayed())
 			robot->displayText();
 
-		Text::OrthogonalProjection::deactivate(true);
+		orthogonalProjection.deactivate(true);
 	}
-	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_CULL_FACE);

@@ -1,4 +1,26 @@
-﻿#include "robot.h"
+﻿#include <iostream>  // !
+#include <limits>
+#include <functional>
+#include <map>
+#include <vector>
+#include <sstream>
+#include <string>
+#include <math.h>
+
+#include "../dependencies/freeglut.h"
+
+#include "geometry.h"
+#include "input.h"
+#include "wavefront.h"
+#include "glutils.h"
+#include "utils.h"
+#include "image.h"
+#include "state.h"
+#include "help.h"
+
+#include "robot.h"
+
+
 
 using namespace TransformationAxes;
 

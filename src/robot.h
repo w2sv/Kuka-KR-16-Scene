@@ -3,26 +3,15 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#include <iostream>  // !
-#include <limits>
-#include <functional>
 #include <map>
 #include <vector>
-#include <sstream>
-#include <string>
-#include <math.h>
-#include <stdexcept>
 
 #include "../dependencies/freeglut.h"
 
-#include "geometry.h"
-#include "input.h"
 #include "wavefront.h"
 #include "glutils.h"
 #include "utils.h"
-#include "help.h"
 #include "image.h"
-#include "state.h"
 
 
 #pragma region AxisParameterState

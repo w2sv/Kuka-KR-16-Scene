@@ -2,11 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
 
-#include "../dependencies/freeglut.h"
-
-#define __EXPORT_HELP
+#include "state.h"
 
 #include "help.h"
 
@@ -30,14 +27,19 @@ void Text::displayColored(float x, float y, const char* text, Color& color, void
 
 
 
-void Text::printWithShadow(float x, float y, const char* text, Color& color, float shadow, void* font){
+void Text::displayWithShadow(float x, float y, const char* text, Color& color, float shadow, void* font){
 	displayColored(x + shadow, y - shadow, text, Color(Colors::BLACK), font);
 	displayColored(x, y, text, color, font);
 }
 
 
 
-static GLfloat currentColor[4] = { -1 };
+////////////////////////////////////////////////////////////
+/// .OrthogonalProjection
+////////////////////////////////////////////////////////////
+Text::OrthogonalProjection::OrthogonalProjection():
+	currentColor{NULL}
+{}
 
 
 
@@ -67,18 +69,26 @@ void Text::OrthogonalProjection::deactivate(bool alterDepthTest) {
 		glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 
-	//reset matrices
+	// reset matrices
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
+	
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
+	
 	glColor4fv(currentColor);
 	glPopAttrib();
+
+	// reset color
+	memset(currentColor, NULL, 4);
 }
 
 
-int cg_help::frames = 0;
-void cg_help::drawBackground(){
+
+////////////////////////////////////////////////////////////
+/// Display functions
+////////////////////////////////////////////////////////////
+void drawBackground(){
 	float CORNER_COORD = 0.8f;
 
 	glFrontFace(GL_CCW);
@@ -96,40 +106,38 @@ void cg_help::drawBackground(){
 
 
 
-void cg_help::displayFps(){
-	frames++;
+void displayHelp() {
+	static const char* spalte1[] = {
+		"Maus",
+		"",
+		"linke Taste      Kamerabewegung",
+		"mittlere Taste   Zoom",
+		"rechte Taste     Kontextmenü",
 
-	static time_t lastTime = 0;
+		NULL
+	};
+	static const char* spalte2[] = {
+		"Tastatur:",
+		"",
+		"f,F    - Framerate (An/Aus)",
+		"l,L    - Licht global (An/Aus)",
+		"h,H,F1 - Hilfe (An/Aus)",
+		"w,W    - WireFrame (An/Aus)",
+		"k,K    - Koordinatensystem (An/Aus)",
+		"", "", "", "",
+		"ESC    - Beenden",
 
-	time_t now;
-	time(&now);
-
-	float fps = 0;
-
-	//wenn ueber eine Sekunde vergangen ist
-	if (now - lastTime >= 1){
-		fps = ((float)frames) / (float)(now - lastTime);	//fps neu ausrechnen
-		lastTime = now;	//alte Zeit speichern
-		frames = 0;					//frame-zaehler zuruecksetzen
-	}
-	char fpstext[20];
-	sprintf(fpstext, "FPS: %.0f", fps);
-	Text::printWithShadow(-0.78f, -0.78f, fpstext, Color(1, 0.3, 0.1), 0.003f, GLUT_BITMAP_HELVETICA_18);
-}
-
-
-
-void cg_help::draw(){
-	const static char* TITLE = "KUKA kr 16";
+		NULL
+	};
 
 	drawBackground();
-	Text::printWithShadow(-0.6f, 0.7f, TITLE, Color(1, 1, 0), 0.003f, GLUT_BITMAP_TIMES_ROMAN_24);
-	
+	Text::displayWithShadow(-0.6f, 0.7f, "KUKA kr 16", Color(1, 1, 0), 0.003f, GLUT_BITMAP_TIMES_ROMAN_24);
+
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	
+
 	float posy = 0.5f;
 	int i = 0;
-	while (spalte1[i]){
+	while (spalte1[i]) {
 		Text::display(-0.6f, posy, spalte1[i], GLUT_BITMAP_9_BY_15);
 		posy -= 0.1f;
 		++i;
@@ -137,9 +145,18 @@ void cg_help::draw(){
 
 	posy = 0.5f;
 	i = 0;
-	while (spalte2[i]){
+	while (spalte2[i]) {
 		Text::display(0.05f, posy, spalte2[i], GLUT_BITMAP_9_BY_15);
 		posy -= 0.1f;
 		++i;
 	}
+}
+
+
+
+void displayFps(){
+	static char fpstext[9];
+
+	sprintf(fpstext, "FPS: %.0f", GlobalState::fps);
+	Text::displayWithShadow(-0.78f, -0.78f, fpstext, Color(1, 0.3, 0.1), 0.003f, GLUT_BITMAP_HELVETICA_18);	
 }
