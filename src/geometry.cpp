@@ -87,7 +87,7 @@ void drawCube() {
 
 
 
-void drawQuadraticGrid(Extrema& extrema, int tiles, Color& color) {
+void drawQuadraticGrid(const Extrema& extrema, int tiles, Color& color) {
 	color.render();
 
 	glBegin(GL_LINES);
@@ -105,7 +105,7 @@ void drawQuadraticGrid(Extrema& extrema, int tiles, Color& color) {
 
 
 
-void drawPlane(Extrema& xExtrema, Extrema& yExtrema) {
+void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema) {
 	const float Z_COORDINATE = -0.01;
 	
 	glBegin(GL_QUADS);

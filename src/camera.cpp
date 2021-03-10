@@ -1,9 +1,6 @@
 #include "camera.h"
 
 
-using namespace TransformationAxes;
-
-
 const float Camera::START_RADIUS = 40;
 const float Camera::RADIUS_MIN = 7.4;
 
@@ -12,10 +9,10 @@ const float Camera::RADIUS_MIN = 7.4;
 Camera::Camera(Robot* robot) :
 	mode(Mode::Observer),
 	robot(robot),
-	START_POSITION(Vector2(0, GlobalState::screenSize[1] * 0.5)),
-	position(START_POSITION),
 	radius(START_RADIUS)
-{}
+{
+	resetPosition(); 
+}
 
 
 
@@ -25,7 +22,7 @@ void Camera::toggleMode(Mode mode) {
 
 
 
-const void Camera::set() {
+void Camera::set() {
 	switch (mode) {
 		case Observer:
 			setObserverMode(); break;
@@ -42,8 +39,14 @@ const void Camera::set() {
 
 void Camera::reset() {
 	mode = Observer;
-	position = Vector2(START_POSITION);
+	resetPosition();
 	radius = START_RADIUS;
+}
+
+
+
+void Camera::resetPosition() {
+	position.set(0, GlobalState::screenSize[1] * 0.5);
 }
 #pragma endregion
 

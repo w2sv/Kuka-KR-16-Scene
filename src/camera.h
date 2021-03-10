@@ -17,7 +17,7 @@ class Camera{
 public:
 	Camera(Robot* robot);
 	
-	const void set();
+	void set();
 	void reset();
 
 	enum Mode {
@@ -29,7 +29,6 @@ public:
 
 	void toggleMode(Mode mode);
 private:
-	const Vector2 START_POSITION;
 	static const float START_RADIUS;
 	static const float RADIUS_MIN;
 
@@ -38,6 +37,8 @@ private:
 	float radius;
 
 	Robot* robot;
+
+	void resetPosition();
 
 	void setObserverMode();
 	void setTCPMode();

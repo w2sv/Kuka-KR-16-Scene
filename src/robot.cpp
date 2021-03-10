@@ -489,7 +489,7 @@ void Robot::loadTextures() {
 ////////////////////////////////////////////////////////////
 /// .Drawing
 ////////////////////////////////////////////////////////////
-void Robot::draw() {
+void Robot::draw() const {
 	// draw target axis configuration coord system if applicable
 	if (approachArbitraryAxisConfiguration_b)
 		drawTargetAxesConfigurationCoordSystem();
@@ -505,7 +505,7 @@ void Robot::draw() {
 		for (size_t i = 0; i < N_AXES; i++) {
 			relativeAxesStartPositionShiftVectors[i].glTranslate();
 			axes[i]->adjustGLModelMatrixAccordingly();
-			axis2DrawFunction[axes[i]]();
+			axis2DrawFunction.at(axes[i])();
 		}
 
 		// tcp coord system if applicable
@@ -519,7 +519,7 @@ void Robot::draw() {
 
 
 void Robot::drawShrunkCoordSystem() {
-	static Extrema TCP_COORD_SYSTEM_EXTREMA = Extrema(-1, 1);
+	static Extrema TCP_COORD_SYSTEM_EXTREMA(-1, 1);
 
 	drawCoordSystem(TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, 0.3);
 }

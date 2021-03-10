@@ -1,7 +1,12 @@
-#include "window.h"
-
 #include "input.h"
 #include "state.h"
+#include "glutils.h"
+
+#include "../dependencies/freeglut.h"
+#include "../dependencies/glext.h"
+
+#include "window.h"
+
 
 
 void init(int argc, char **argv){
@@ -15,8 +20,7 @@ void init(int argc, char **argv){
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutInitWindowPosition(WIN_POS_X, WIN_POS_Y);
 	glutInitDisplayMode(USED_MODUS);
-	MainWin = glutCreateWindow(PROG_NAME);
-	glutFullScreen();
+	MainWin = glutCreateWindow(WINDOW_TITLE);
 
 	// OpenGL Initialisierung
 	glEnable(GL_DEPTH_TEST);	// Z-Buffer aktivieren
@@ -66,11 +70,13 @@ void reshapeFunc(int w, int h){
 	glLoadIdentity();
 	gluPerspective(45, (double)w / (double)h, 1, 2000);
 	glViewport(0, 0, w, h);
+
 	glMatrixMode(GL_MODELVIEW);	// sicherheitshalber
 	glLoadIdentity();				// Modelierungsmatrix einstellen
-	GlobalState::screenSize[0] = (double)w;
-	GlobalState::screenSize[1] = (double)h;
+	GlobalState::screenSize[0] = w;
+	GlobalState::screenSize[1] = h;
 }
+
 
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -96,5 +102,29 @@ void menuFunc(int item){
 		case ID_MENU_PER_VERTEX_NORMALS:
 			GlobalState::normalMode = 2;
 			break;
+	}
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//	Fullscreen toggling
+/////////////////////////////////////////////////////////////////////////////////
+void toggleFullScreenMode() {
+	static Vector2 previousWindowSize;
+	static Vector2 previousWindowPosition;
+
+	if (previousWindowSize.isEmpty() && previousWindowPosition.isEmpty()) {
+		previousWindowSize.set(GlobalState::screenSize[0], GlobalState::screenSize[1]);
+		previousWindowPosition.set(glutGet(GLUT_WINDOW_X), glutGet(GLUT_WINDOW_Y));
+
+		glutFullScreen();
+	}
+	else {
+		glutPositionWindow(previousWindowPosition.x, previousWindowPosition.y);
+		reshapeFunc(previousWindowSize.x, previousWindowSize.y);
+
+		previousWindowSize.clear();
+		previousWindowPosition.clear();
 	}
 }

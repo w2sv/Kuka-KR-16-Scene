@@ -2,11 +2,11 @@
 
 
 #pragma region Vector
-Vector3::Vector3(GLfloat x, GLfloat y, GLfloat z) {
-	this->x = x;
-	this->y = y;
-	this->z = z;
-}
+Vector3::Vector3(GLdouble x, GLdouble y, GLdouble z):
+	x(x), y(y), z(z)
+{}
+
+
 
 Vector3 Vector3::inverted() const {
 	return Vector3(-x, -y, z);
@@ -25,9 +25,30 @@ void Vector3::glTranslate() const {
 }
 
 
-Vector2::Vector2(GLdouble x, GLdouble y) {
+Vector2::Vector2(GLdouble x, GLdouble y):
+	x(x), y(y)
+{}
+
+
+Vector2::Vector2():
+	x(NULL), y(NULL)
+{}
+
+
+void Vector2::set(GLdouble x, GLdouble y) {
 	this->x = x;
 	this->y = y;
+}
+
+
+void Vector2::clear() {
+	x = NULL;
+	y = NULL;
+}
+
+
+bool Vector2::isEmpty() const {
+	return x == NULL && y == NULL;
 }
 #pragma endregion
 
@@ -104,7 +125,7 @@ void glScaleUniformly(float value) {
 
 
 
-void drawCoordSystem(Extrema& x, Extrema& y, Extrema& z, float coneScale) {
+void drawCoordSystem(const Extrema& x, const Extrema& y, const Extrema& z, float coneScale) {
 	GLfloat i;
 	GLfloat akt_color[4];
 	GLint akt_mode;

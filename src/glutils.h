@@ -11,9 +11,9 @@
 
 struct Vector3 {
 public:
-	Vector3(GLfloat x, GLfloat y, GLfloat z);
+	Vector3(GLdouble x, GLdouble y, GLdouble z);
 
-	GLfloat x, y, z;
+	GLdouble x, y, z;
 
 	Vector3 inverted() const;
 	void glTranslate() const;
@@ -27,6 +27,11 @@ public:
 	GLdouble x, y;
 
 	Vector2(GLdouble x, GLdouble y);
+	Vector2();
+
+	void set(GLdouble x, GLdouble y);
+	void clear();
+	bool isEmpty() const;
 };
 
 
@@ -73,4 +78,4 @@ void glScaleUniformly(float value);
 
 
 
-void drawCoordSystem(Extrema& x, Extrema& y, Extrema& z, float coneScale = 1);
+void drawCoordSystem(const Extrema& x, const Extrema& y, const Extrema& z, float coneScale = 1);

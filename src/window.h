@@ -8,7 +8,7 @@
 //	Fenster Initialisierung
 /////////////////////////////////////////////////////////////////////////////////
 //! Fenstertitel
-#define PROG_NAME	"PrakCG Projekt Janek Zangenberg"
+#define WINDOW_TITLE "Praxisorientierte Einführung in die Computergraphik | WS 20-21 | Janek Zangenberg"
 
 //! Die Startposition des Fensters (linke, obere Ecke)
 #define WIN_POS_X	0
@@ -46,8 +46,7 @@
 #define MENU_TEXT_EXIT					"Exit"
 
 
-enum MENU_IDs
-{
+enum MENU_IDs{
 	ID_MENU_WIREFRAME = 1,
 	ID_MENU_SHADE,
 	ID_MENU_NO_NORMALS,
@@ -74,4 +73,8 @@ void menuFunc ( int );					// Menue an Maustaste
 void init ( int argc, char **argv );
 
 
+/////////////////////////////////////////////////////////////////////////////////
+//	Fullscreen toggling
+/////////////////////////////////////////////////////////////////////////////////
+void toggleFullScreenMode();
 #endif // WINDOW_H

@@ -165,7 +165,7 @@ public:
 	Robot();
 	~Robot();
 
-	void draw();  // TODO: make const again
+	void draw() const;
 	void update();
 	void reset();
 	void setArbitraryAxesConfiguration();

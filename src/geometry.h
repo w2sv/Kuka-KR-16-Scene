@@ -12,8 +12,8 @@
 
 
 void drawCube();
-void drawQuadraticGrid(Extrema& xExtrema, int tiles, Color& color);
-void drawPlane(Extrema& xExtrema, Extrema& yExtrema);
+void drawQuadraticGrid(const Extrema& xExtrema, int tiles, Color& color);
+void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema);
 void drawCylinder(float startRadius, float endRadius, float height);
 
 // --------------------------OctogonalPrism---------------------------
