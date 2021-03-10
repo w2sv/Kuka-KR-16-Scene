@@ -54,63 +54,92 @@ void drawScene(const Robot& robot){
 
 
 void processInput(Robot& robot, Camera& camera) {
+
+	/// ---------------------Robot----------------------
+
+	// axes angle/velocity
 	robot.update();
 
+	// reset
 	if (cg_key::specialKeyState(GLUT_KEY_F1) == 1)
 		robot.reset();
 
+	// set arbitrary configuration
 	else if (cg_key::specialKeyState(GLUT_KEY_F2) == 1)
 		robot.setArbitraryAxesConfiguration();
 
-	else if (cg_key::keyState('k') == 1)
+	// toggle tcp coord system
+	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1)
 		robot.toggleDrawTCPCoordSystem();
 
-	else if (cg_key::keyState('m') == 1)
-		robot.toggleDisplayAxesStates();
-
-	else if (cg_key::specialKeyState(GLUT_KEY_F10) == 1)
+	// approach random configuration
+	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
 		robot.initializeArbitraryAxisConfigurationApproach();
 
-	else if (cg_key::specialKeyState(GLUT_KEY_F11) == 1)
+	// approach random configuration infinitely
+	else if (cg_key::specialKeyState(GLUT_KEY_F5) == 1)
 		robot.toggleInfiniteArbitraryAxisConfigurationApproachMode();
 
+	/// ---------------------Camera----------------------
 
-	else if (cg_key::keyState('q'))
-		exit(0); // Escape -> Programm beenden
-
-	else if (1 == cg_key::keyState('n'))
-		GlobalState::displayFps = !GlobalState::displayFps;	// Framecounter on/off
-
-	else if (1 == cg_key::keyState(27))
-		GlobalState::displayHelp = !GlobalState::displayHelp;	// Hilfetext on/off
-
-	else if (1 == cg_key::keyState('j'))
-		GlobalState::drawCoordSystem = !GlobalState::drawCoordSystem;	// Koordinatensystem on/off
-
-	else if (1 == cg_key::keyState('y'))
-		GlobalState::drawMode = (GlobalState::drawMode == GL_FILL) ? GL_LINE : GL_FILL; // Wireframe on/off
-
-	else if (1 == cg_key::keyState('x'))
-		GlobalState::lightMode = !GlobalState::lightMode;	// Beleuchtung on/off
-
-	else if (1 == cg_key::keyState('v'))
-		GlobalState::cullMode = !GlobalState::cullMode; // Backfaceculling on/off
-
-	else if (1 == cg_key::keyState('o'))
-		toggleFullScreenMode();
-
-	// camera
+	// reset
 	else if (1 == cg_key::specialKeyState(GLUT_KEY_LEFT))
 		camera.reset();
 
+	// orbit mode
 	else if (1 == cg_key::specialKeyState(GLUT_KEY_RIGHT))
 		camera.toggleMode(Camera::Mode::Orbit);
 
+	// tcp mode
 	else if (1 == cg_key::specialKeyState(GLUT_KEY_UP))
 		camera.toggleMode(Camera::Mode::TCP);
 
+	// reverse tcp mode
 	else if (1 == cg_key::specialKeyState(GLUT_KEY_DOWN))
 		camera.toggleMode(Camera::Mode::ReverseTCP);
+
+
+	/// ---------------------Generic----------------------
+
+	// quit program
+	else if (cg_key::keyState('q'))
+		exit(0); // Escape -> Programm beenden
+
+	// display help
+	else if (1 == cg_key::keyState(27))
+		GlobalState::displayHelp = !GlobalState::displayHelp;
+
+	// full screen mode
+	else if (1 == cg_key::keyState('p'))
+		toggleFullScreenMode();
+	
+	/// ---------------------Display----------------------
+
+	// display fps
+	else if (1 == cg_key::keyState('b'))
+		GlobalState::displayFps = !GlobalState::displayFps;
+
+	// global coord system
+	else if (1 == cg_key::keyState('n'))
+		GlobalState::drawCoordSystem = !GlobalState::drawCoordSystem;
+
+	// display axes states text
+	else if (cg_key::keyState('m') == 1)
+		robot.toggleDisplayAxesStates();
+
+	/// ---------------------Graphics----------------------
+
+	// wireframe mode
+	else if (1 == cg_key::keyState('y'))
+		GlobalState::drawMode = (GlobalState::drawMode == GL_FILL) ? GL_LINE : GL_FILL; // Wireframe on/off
+
+	// light mode
+	else if (1 == cg_key::keyState('x'))
+		GlobalState::lightMode = !GlobalState::lightMode;
+
+	// backfaceculling
+	else if (1 == cg_key::keyState('c'))
+		GlobalState::cullMode = !GlobalState::cullMode;
 }
 
 
@@ -149,7 +178,7 @@ void displayFunc(){
 	// Modell zeichnen
 	drawScene(robot);
 
-	// Hilfetext einblenden
+	// project text
 	if (GlobalState::displayHelp || GlobalState::displayFps || robot.textToBeDisplayed()) {
 		orthogonalProjection.activate(true);
 

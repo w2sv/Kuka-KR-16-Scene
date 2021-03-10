@@ -73,6 +73,34 @@ Measurements::Measurements(float height, float width, float depth) :
 
 
 
+Vector2::Vector2(double x, double y) :
+	x(x), y(y)
+{}
+
+
+Vector2::Vector2() :
+	x(NULL), y(NULL)
+{}
+
+
+void Vector2::set(double x, double y) {
+	this->x = x;
+	this->y = y;
+}
+
+
+void Vector2::clear() {
+	x = NULL;
+	y = NULL;
+}
+
+
+bool Vector2::isEmpty() const {
+	return x == NULL && y == NULL;
+}
+
+
+
 ////////////////////////////////////////////////////////////
 /// Random
 ////////////////////////////////////////////////////////////

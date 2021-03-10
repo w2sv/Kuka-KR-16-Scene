@@ -55,6 +55,18 @@ struct Measurements {
 	Measurements(float height, float width, float depth);
 };
 
+struct Vector2 {
+public:
+	double x, y;
+
+	Vector2(double x, double y);
+	Vector2();
+
+	void set(double x, double y);
+	void clear();
+	bool isEmpty() const;
+};
+
 ////////////////////////////////////////////////////////////
 /// Random
 ////////////////////////////////////////////////////////////

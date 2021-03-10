@@ -21,7 +21,6 @@
 #include "robot.h"
 
 
-
 using namespace TransformationAxes;
 
 
@@ -416,14 +415,14 @@ void Robot::displayAxesStates() const {
 		if (axes[i]->orientation->velocity.limitReached())
 			oss << "!";
 
-		Text::displayColored(0.75, 0.8 - (i * 0.05), oss.str().c_str(), Color(0.8, 0.8, 0.8), GLUT_BITMAP_9_BY_15);
+		Text::displayColored(Vector2(0.75, 0.8 - (i * 0.05)), oss.str().c_str(), Color(0.8, 0.8, 0.8), GLUT_BITMAP_9_BY_15);
 	}
 }
 
 
 
 void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
-	Text::displayColored(-0.9, 0.85, "Infinite Random Configuration Approach Mode", Color(214, 15, 38), GLUT_BITMAP_9_BY_15);
+	Text::displayColored(Vector2(-0.9, 0.85), "Infinite Random Configuration Approach Mode", Color(214, 15, 38), GLUT_BITMAP_9_BY_15);
 }
 
 
@@ -797,7 +796,7 @@ void Robot::drawThirdAxis() const {
 
 	// draw singular weight along y-axis
 	glPushMatrix();
-		glTranslatef(0, 0.17, -WIDTH);
+		glTranslatef(0.1, -0.04, -WIDTH);
 		glScaleUniformly(0.8);
 		X::rotate(-90);
 		Z::rotate(45);

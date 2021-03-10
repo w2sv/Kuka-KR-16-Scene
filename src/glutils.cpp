@@ -23,33 +23,6 @@ std::ostream& operator<<(std::ostream& os, const Vector3& vec)
 void Vector3::glTranslate() const {
 	glTranslatef(x, y, z);
 }
-
-
-Vector2::Vector2(GLdouble x, GLdouble y):
-	x(x), y(y)
-{}
-
-
-Vector2::Vector2():
-	x(NULL), y(NULL)
-{}
-
-
-void Vector2::set(GLdouble x, GLdouble y) {
-	this->x = x;
-	this->y = y;
-}
-
-
-void Vector2::clear() {
-	x = NULL;
-	y = NULL;
-}
-
-
-bool Vector2::isEmpty() const {
-	return x == NULL && y == NULL;
-}
 #pragma endregion
 
 

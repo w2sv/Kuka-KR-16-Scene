@@ -22,19 +22,6 @@ public:
 };
 
 
-struct Vector2 {
-public:
-	GLdouble x, y;
-
-	Vector2(GLdouble x, GLdouble y);
-	Vector2();
-
-	void set(GLdouble x, GLdouble y);
-	void clear();
-	bool isEmpty() const;
-};
-
-
 #pragma region Color
 struct Color {
 	GLfloat r, g, b;

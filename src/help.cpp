@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "state.h"
+#include "utils.h"
 
 #include "help.h"
 
@@ -12,24 +13,24 @@
 ////////////////////////////////////////////////////////////
 /// Text
 ////////////////////////////////////////////////////////////
-void Text::display(float x, float y, const char* text, void* font){
-	glRasterPos2f(x, y);
+void Text::display(const Vector2& position, const char* text, void* font){
+	glRasterPos2f(position.x, position.y);
 	for (size_t i = 0; i < strlen(text); ++i)
 		glutBitmapCharacter(font, text[i]);
 }
 
 
 
-void Text::displayColored(float x, float y, const char* text, Color& color, void* font){
+void Text::displayColored(const Vector2& position, const char* text, Color& color, void* font){
 	color.render(false);
-	display(x, y, text, font);
+	display(position, text, font);
 }
 
 
 
-void Text::displayWithShadow(float x, float y, const char* text, Color& color, float shadow, void* font){
-	displayColored(x + shadow, y - shadow, text, Color(Colors::BLACK), font);
-	displayColored(x, y, text, color, font);
+void Text::displayWithShadow(const Vector2& position, const char* text, Color& color, float shadow, void* font){
+	displayColored(Vector2(position.x + shadow, position.y - shadow), text, Color(Colors::BLACK), font);
+	displayColored(position, text, color, font);
 }
 
 
@@ -89,7 +90,7 @@ void Text::OrthogonalProjection::deactivate(bool alterDepthTest) {
 /// Display functions
 ////////////////////////////////////////////////////////////
 void drawBackground(){
-	float CORNER_COORD = 0.8f;
+	static const float CORNER_COORD = 0.8f;
 
 	glFrontFace(GL_CCW);
 	glEnable(GL_BLEND);
@@ -106,46 +107,44 @@ void drawBackground(){
 
 
 
+void displaySectionTitle(const Vector2& position, const char* title) {
+	Text::displayWithShadow(position, title, Color(0, 1, 0), 0.003, GLUT_BITMAP_9_BY_15);
+}
+
+
+
+void displayColumn(Vector2& startPos, const char** column, float verticalSpace, const Color& color) {
+	color.render(false);
+	
+	size_t i = 0;
+	while (true) {
+		if (column[i]) {
+			Text::display(startPos, column[i], GLUT_BITMAP_8_BY_13);
+			startPos.y += verticalSpace;
+
+			i++;
+		}
+		else
+			return;
+	}
+}
+
+
+
 void displayHelp() {
-	static const char* spalte1[] = {
-		"Maus",
-		"",
-		"linke Taste      Kamerabewegung",
-		"mittlere Taste   Zoom",
-		"rechte Taste     Kontextmenü",
-	};
-	static const char* spalte2[] = {
-		"Tastatur:",
-		"",
-		"f,F    - Framerate (An/Aus)",
-		"l,L    - Licht global (An/Aus)",
-		"h,H,F1 - Hilfe (An/Aus)",
-		"w,W    - WireFrame (An/Aus)",
-		"k,K    - Koordinatensystem (An/Aus)",
-		"", "", "", "",
-		"ESC    - Beenden",
-	};
+	
 
 	drawBackground();
-	Text::displayWithShadow(-0.6f, 0.7f, "KUKA kr 16", Color(1, 1, 0), 0.003f, GLUT_BITMAP_TIMES_ROMAN_24);
 
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	// display help window title
+	Text::displayWithShadow(Vector2(-0.6f, 0.7f), "KUKA KR 16", Color(1, 1, 0), 0.003f, GLUT_BITMAP_9_BY_15);
 
-	float posy = 0.5f;
-	int i = 0;
-	while (spalte1[i]) {
-		Text::display(-0.6f, posy, spalte1[i], GLUT_BITMAP_9_BY_15);
-		posy -= 0.1f;
-		++i;
-	}
+	static const char* FIRST_COLUMN[4] = { "1. Axis", "2. Axis", "3. Axis", "4. Axis" };
 
-	posy = 0.5f;
-	i = 0;
-	while (spalte2[i]) {
-		Text::display(0.05f, posy, spalte2[i], GLUT_BITMAP_9_BY_15);
-		posy -= 0.1f;
-		++i;
-	}
+	displaySectionTitle(Vector2(-0.8, 0.5), "Robot Control");
+	displayColumn(Vector2(-0.7, -0.5), FIRST_COLUMN, 0.05, Colors::WHITE);
+
+
 }
 
 
@@ -154,5 +153,5 @@ void displayFps(){
 	static char fpstext[9];
 
 	sprintf(fpstext, "FPS: %.0f", GlobalState::fps);
-	Text::displayWithShadow(-0.78f, -0.78f, fpstext, Color(214, 121, 15), 0.003f, GLUT_BITMAP_HELVETICA_18);
+	Text::displayWithShadow(Vector2(-0.78f, -0.78f), fpstext, Color(214, 121, 15), 0.003f, GLUT_BITMAP_HELVETICA_18);
 }
