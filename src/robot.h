@@ -6,8 +6,6 @@
 #include <map>
 #include <vector>
 
-#include "../dependencies/freeglut.h"
-
 #include "wavefront.h"
 #include "glutils.h"
 #include "utils.h"
@@ -188,7 +186,7 @@ public:
 	bool textToBeDisplayed() const;
 	void displayText() const;
 private:
-	const static Color BASE_COLOR;
+	static const Color BASE_COLOR;
 
 	bool approachArbitraryAxisConfigurationInfinitely_b;
 	bool approachArbitraryAxisConfiguration_b;

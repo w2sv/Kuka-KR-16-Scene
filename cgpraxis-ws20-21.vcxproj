@@ -21,6 +21,7 @@
     <ClCompile Include="src\light.cpp" />
     <ClCompile Include="src\robot.cpp" />
     <ClCompile Include="src\state.cpp" />
+    <ClCompile Include="src\text.cpp" />
     <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\wavefront.cpp" />
     <ClCompile Include="src\window.cpp" />
@@ -35,6 +36,7 @@
     <ClInclude Include="src\light.h" />
     <ClInclude Include="src\robot.h" />
     <ClInclude Include="src\state.h" />
+    <ClInclude Include="src\text.h" />
     <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\wavefront.h" />
     <ClInclude Include="src\window.h" />
@@ -119,6 +121,9 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

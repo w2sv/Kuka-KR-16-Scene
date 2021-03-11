@@ -1,44 +1,31 @@
 #include "glutils.h"
 
 
-#pragma region Vector
-Vector3::Vector3(GLdouble x, GLdouble y, GLdouble z):
-	x(x), y(y), z(z)
+////////////////////////////////////////////////////////////
+/// Color
+////////////////////////////////////////////////////////////
+
+Color::Color(GLfloat r, GLfloat g, GLfloat b):
+	r(r),
+	g(g),
+	b(b)
 {}
 
 
-
-Vector3 Vector3::inverted() const {
-	return Vector3(-x, -y, z);
+Color Color::fromUnnormalizedValues(unsigned int r, unsigned int g, unsigned int b) {
+	return Color(
+		(float)r / 255.,
+		(float)g / 255.,
+		(float)b / 255.
+	);
 }
 
 
-std::ostream& operator<<(std::ostream& os, const Vector3& vec)
-{
-	os << vec.x << '/' << vec.y << '/' << vec.z << std::endl;
-	return os;
-}
-
-
-void Vector3::glTranslate() const {
-	glTranslatef(x, y, z);
-}
-#pragma endregion
-
-
-
-#pragma region Color
-Color::Color(double r, double g, double b) {
-	if (r > 1 || g > 1 || b > 1) {
-		r /= 255.;
-		g /= 255.;
-		b /= 255.;
-	}
-
-	this->r = r;
-	this->g = g;
-	this->b = b;
-}
+Color::Color(GLfloat rgb):
+	r(rgb),
+	g(rgb),
+	b(rgb)
+{}
 
 
 void Color::render(bool materialized) const {
@@ -51,16 +38,18 @@ void Color::render(bool materialized) const {
 }
 
 
-namespace Colors {
-	const Color BLACK = { .1, .1, .1 };
-	const Color GREY = { .3, .3, .3 };
-	const Color WHITE = { 1., 1., 1. };
+namespace COLORS {
+	const Color BLACK(.1f);
+	const Color GREY(.3f);
+	const Color WHITE(1.f);
 }
-#pragma endregion
 
 
-#pragma region Transformation
-namespace TransformationAxes {
+////////////////////////////////////////////////////////////
+/// Transformation
+////////////////////////////////////////////////////////////
+
+namespace glTransformationAxes {
 	namespace X {
 		void rotate(float angle) {
 			glRotatef(angle, 1, 0, 0);
@@ -90,13 +79,19 @@ namespace TransformationAxes {
 }
 
 
+void glTranslatev(const Vector3& vector) {
+	glTranslatef(vector.x, vector.y, vector.z);
+}
+
 
 void glScaleUniformly(float value) { 
 	glScalef(value, value, value); 
 }
-#pragma endregion
 
 
+////////////////////////////////////////////////////////////
+/// Miscellanous
+////////////////////////////////////////////////////////////
 
 void drawCoordSystem(const Extrema& x, const Extrema& y, const Extrema& z, float coneScale) {
 	GLfloat i;

@@ -1,5 +1,9 @@
 #include "utils.h"
 
+#include <direct.h>
+#include <string>
+#include <random>
+
 
 ////////////////////////////////////////////////////////////
 /// File System
@@ -16,11 +20,9 @@ char* concatenatedCharPtr(const char* a, const char* b) {
 }
 
 
-
 char* joinPath(const char* a, const char* b) {
 	return concatenatedCharPtr(concatenatedCharPtr(a, "\\"), b);
 }
-
 
 
 char* getResourceSubDirPath(char* subDirTitle){
@@ -35,7 +37,6 @@ char* getResourceSubDirPath(char* subDirTitle){
 }
 
 
-
 ////////////////////////////////////////////////////////////
 /// Math
 ////////////////////////////////////////////////////////////
@@ -45,24 +46,19 @@ float toRadian(float degrees) {
 }
 
 
-
 ////////////////////////////////////////////////////////////
 /// Spatial
 ////////////////////////////////////////////////////////////
 
-Extrema::Extrema(float min, float max) {
-	assert(min < max);
-
-	this->min = min;
-	this->max = max;
-}
-
+Extrema::Extrema(float min, float max) :
+	min(min),
+	max(max)
+{}
 
 
 float Extrema::spread() const {
-	return abs(this->max - this->min);
+	return abs(max - min);
 }
-
 
 
 Measurements::Measurements(float height, float width, float depth) :
@@ -72,8 +68,7 @@ Measurements::Measurements(float height, float width, float depth) :
 {}
 
 
-
-Vector2::Vector2(double x, double y) :
+Vector2::Vector2(float x, float y) :
 	x(x), y(y)
 {}
 
@@ -83,7 +78,7 @@ Vector2::Vector2() :
 {}
 
 
-void Vector2::set(double x, double y) {
+void Vector2::set(float x, float y) {
 	this->x = x;
 	this->y = y;
 }
@@ -99,6 +94,33 @@ bool Vector2::isEmpty() const {
 	return x == NULL && y == NULL;
 }
 
+
+#if DEBUG
+std::ostream& operator<<(std::ostream& os, const Vector2& vec) {
+	os << vec.x << '/' << vec.y << '/' << std::endl;
+	return os;
+}
+#endif
+
+
+Vector3::Vector3(float x, float y, float z) :
+	x(x),
+	y(y),
+	z(z)
+{}
+
+
+Vector3 Vector3::inverted() const {
+	return Vector3(-x, -y, z);
+}
+
+
+#if DEBUG
+std::ostream& operator<<(std::ostream& os, const Vector3& vec) {
+	os << vec.x << '/' << vec.y << '/' << vec.z << std::endl;
+	return os;
+}
+#endif
 
 
 ////////////////////////////////////////////////////////////

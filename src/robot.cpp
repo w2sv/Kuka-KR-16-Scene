@@ -1,8 +1,8 @@
-﻿#include <iostream>  // !
+﻿#include "robot.h"
+
+
 #include <limits>
 #include <functional>
-#include <map>
-#include <vector>
 #include <sstream>
 #include <string>
 #include <math.h>
@@ -11,17 +11,13 @@
 
 #include "geometry.h"
 #include "input.h"
-#include "wavefront.h"
 #include "glutils.h"
-#include "utils.h"
-#include "image.h"
 #include "state.h"
-#include "help.h"
-
-#include "robot.h"
+#include "text.h"
 
 
-using namespace TransformationAxes;
+
+using namespace glTransformationAxes;
 
 
 #pragma region AxisParameterState
@@ -459,10 +455,10 @@ void Robot::setObjectMaterials() {
 	GLfloat emis = 1; // 0 -> matt, 1->bright
 
 	objects[Object::YawAxis1].setMaterial(Color(BASE_COLOR), spec, shine, emis);
-	objects[Object::ScrewHead].setMaterial(Color(Colors::GREY), 0.2, 0.5, 0);
+	objects[Object::ScrewHead].setMaterial(Color(COLORS::GREY), 0.2, 0.5, 0);
 	objects[Object::TiltAxis1].setMaterial(Color(BASE_COLOR), spec, shine, emis);
 	objects[Object::TiltAxis2].setMaterial(Color(BASE_COLOR), spec, shine, emis);
-	objects[Object::KukaLogo].setMaterial(Color(Colors::BLACK), spec, shine, emis);
+	objects[Object::KukaLogo].setMaterial(Color(COLORS::BLACK), spec, shine, emis);
 }
 
 
@@ -559,23 +555,23 @@ void Robot::drawAxisWeight() const {
 		setDefaultLightAndMaterial(GlobalState::lightMode);
 
 		// draw lower octPrism pedastel
-			Colors::BLACK.render();
+			COLORS::BLACK.render();
 		Z::translate(PEDASTEL_HEIGHT / 2);
 		OctagonalPrismVertices pedastelVertices = drawOctagonalPrism(PEDASTEL_HEIGHT, 0.5, 0.2);
 
-			Colors::GREY.render();
+			COLORS::GREY.render();
 		drawOctagonalPrismCage(pedastelVertices);
 
 		// draw octPrism block
-			Colors::BLACK.render();
+			COLORS::BLACK.render();
 			Z::translate(BLOCK_HEIGHT / 2);
 		OctagonalPrismVertices blockVertices = drawOctagonalPrism(BLOCK_HEIGHT, 0.3, 0.3);
 
-			Colors::GREY.render();
+			COLORS::GREY.render();
 		drawOctagonalPrismCage(blockVertices);
 
 		// draw upper black cylinder
-			Colors::BLACK.render();
+			COLORS::BLACK.render();
 			Z::translate(BLOCK_HEIGHT / 2);
 		drawCylinder(0.1, 0.1, UPPER_CYLINDER_HEIGTH);
 	glPopMatrix();
@@ -652,7 +648,7 @@ void Robot::drawBottom() const {
 
 #pragma region Axes
 ////////////////////////////////////////////////////////////
-/// ...TransformationAxes
+/// ...glTransformationAxes
 ////////////////////////////////////////////////////////////
 const Vector3 Robot::relativeAxesStartPositionShiftVectors[Robot::N_AXES + 1] = {
 	Vector3(0, 4.6, 0),
@@ -744,7 +740,7 @@ void Robot::drawSecondAxis()const {
 	
 			OctagonalPrismVertices weightPedastelVertices = drawOctagonalPrism(0.15, 0.6, 0.1);
 			
-			Colors::BLACK.render();
+			COLORS::BLACK.render();
 		drawOctagonalPrismCage(weightPedastelVertices);
 
 		// draw weight

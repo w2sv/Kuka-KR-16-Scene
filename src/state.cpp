@@ -9,7 +9,7 @@ bool GlobalState::lightMode = true;
 int GlobalState::normalMode = 0;
 bool GlobalState::cullMode = false;
 bool GlobalState::drawCoordSystem = false;
-bool GlobalState::displayHelp = true;
+bool GlobalState::displayHelp = false;
 bool GlobalState::displayFps = true;
 float GlobalState::fps = NULL;
 

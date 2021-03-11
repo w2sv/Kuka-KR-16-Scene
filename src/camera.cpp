@@ -1,11 +1,21 @@
 #include "camera.h"
 
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <limits>
+
+#include "../dependencies/freeglut.h"
+
+#include "input.h"
+#include "state.h"
+
+
+
 const float Camera::START_RADIUS = 40;
 const float Camera::RADIUS_MIN = 7.4;
 
 
-#pragma region Publics
 Camera::Camera(Robot* robot) :
 	mode(Mode::Observer),
 	robot(robot),
@@ -15,11 +25,9 @@ Camera::Camera(Robot* robot) :
 }
 
 
-
 void Camera::toggleMode(Mode mode) {
 	this->mode = this->mode == mode ? Mode::Observer : mode;
 }
-
 
 
 void Camera::set() {
@@ -36,7 +44,6 @@ void Camera::set() {
 }
 
 
-
 void Camera::reset() {
 	mode = Observer;
 	resetPosition();
@@ -44,15 +51,15 @@ void Camera::reset() {
 }
 
 
+////////////////////////////////////////////////////////////
+/// Parameter Updating
+////////////////////////////////////////////////////////////
 
 void Camera::resetPosition() {
 	position.set(0, GlobalState::screenSize[1] * 0.5);
 }
-#pragma endregion
 
 
-
-#pragma region ParameterUpdating
 void Camera::setCameraParameterAccordingly() {
 	double phi = 0.2 * position.x / GlobalState::screenSize[0] * M_PI + M_PI * 0.5;
 	double theta = 0.2 * position.y / GlobalState::screenSize[1] * M_PI;
@@ -67,7 +74,6 @@ void Camera::setCameraParameterAccordingly() {
 }
 
 
-
 void Camera::updateRadiusViaScroll() {
 	static const float DELTA_RADIUS = 1.5;
 
@@ -80,7 +86,6 @@ void Camera::updateRadiusViaScroll() {
 }
 
 
-
 void Camera::updateRadiusViaWheelPressing() {
 	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON)) {
 		radius = std::max<float>(radius + 0.1 * cg_mouse::moveY(), 1.0);
@@ -89,15 +94,15 @@ void Camera::updateRadiusViaWheelPressing() {
 }
 
 
-
 void Camera::floorRadius() {
 	radius = std::max<float>(radius, RADIUS_MIN);
 }
-#pragma endregion
 
 
+////////////////////////////////////////////////////////////
+/// Mode setting
+////////////////////////////////////////////////////////////
 
-#pragma region ModeSetting
 void Camera::setObserverMode() {
 
 	// Query position alteration input
@@ -113,17 +118,14 @@ void Camera::setObserverMode() {
 }
 
 
-
 void Camera::setTCPMode() {
 	robot->attachCameraToTCP();
 }
 
 
-
 void Camera::setReverseTCPMode() {
 	robot->attachCameraToTCPReversely();
 }
-
 
 
 void Camera::setOrbitMode() {
@@ -134,4 +136,3 @@ void Camera::setOrbitMode() {
 
 	setCameraParameterAccordingly();
 }
-#pragma endregion

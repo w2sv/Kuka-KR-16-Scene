@@ -1,10 +1,5 @@
 #pragma once
 
-#include <direct.h>
-#include <string>
-#include <cassert>
-#include <random>
-
 
 #ifndef	M_PI				// Pi
 #define M_PI 3.14159265358979323846
@@ -51,20 +46,30 @@ struct Extrema {
 
 struct Measurements {
 	float height, width, depth;
-
 	Measurements(float height, float width, float depth);
 };
 
 struct Vector2 {
-public:
-	double x, y;
-
-	Vector2(double x, double y);
+	float x, y;
+	Vector2(float x, float y);
 	Vector2();
 
-	void set(double x, double y);
+	void set(float x, float y);
 	void clear();
 	bool isEmpty() const;
+#if DEBUG
+	friend std::ostream& operator<<(std::ostream& os, const Vector2& vector);
+#endif
+};
+
+struct Vector3 {
+	float x, y, z;
+	Vector3(float x, float y, float z);
+
+	Vector3 inverted() const;
+#if DEBUG
+	friend std::ostream& operator<<(std::ostream& os, const Vector3& vector);
+#endif
 };
 
 ////////////////////////////////////////////////////////////

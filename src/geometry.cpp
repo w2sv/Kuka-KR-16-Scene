@@ -1,13 +1,12 @@
 #include "geometry.h"
 
 
-using namespace TransformationAxes;
+using namespace glTransformationAxes;
 
 
-#define SLICES 20
-#define STACKS 20
-#define LOOPS 1
-
+const unsigned int SLICES = 20;
+const unsigned int STACKS = 20;
+const unsigned int LOOPS = 1;
 
 
 void drawCube() {
@@ -86,17 +85,16 @@ void drawCube() {
 }
 
 
-
 void drawQuadraticGrid(const Extrema& extrema, int tiles, Color& color) {
 	color.render();
 
 	glBegin(GL_LINES);
 		for (float v = extrema.min; v <= extrema.max; v+= extrema.spread() / tiles) {
-			v == extrema.min || v == extrema.max ? setColor(.6, .3, .3) : color.render();
+			v == extrema.min || v == extrema.max ? Color(.6f, .3f, .3f).render() : color.render();
 			glVertex3f(v, 0, extrema.min);
 			glVertex3f(v, 0, extrema.max);
 
-			v == extrema.min || v == extrema.max ? setColor(.3, .3, .6) : color.render();
+			v == extrema.min || v == extrema.max ? Color(.3f, .3f, .6f).render() : color.render();
 			glVertex3f(extrema.min, 0, v);
 			glVertex3f(extrema.max, 0, v);
 		};
@@ -104,9 +102,8 @@ void drawQuadraticGrid(const Extrema& extrema, int tiles, Color& color) {
 }
 
 
-
 void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema) {
-	const float Z_COORDINATE = -0.01;
+	static const float Z_COORDINATE = -0.01;
 	
 	glBegin(GL_QUADS);
 		glVertex3f(xExtrema.min, Z_COORDINATE, yExtrema.min);
@@ -117,9 +114,7 @@ void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema) {
 }
 
 
-
 void drawCylinder(float startRadius, float endRadius, float height) {
-
 	GLUquadricObj* q = gluNewQuadric();
 
 	gluQuadricNormals(q, true);
@@ -145,105 +140,103 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 };
 
 
+namespace OctogonalPrism {
+	Vertices draw(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
+		const float z = heigth / 2;
+		const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
 
-OctagonalPrismVertices drawOctagonalPrism(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
-	const float z = heigth / 2;
-	const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
+		const Vertices vertices = {
+			{
+				/* Subsequently denoted are the vertices in clockwise direction with respect
+				to the respectively annotated edge;
+				i.e. "left |" defines the lower vertex of the left | etc. */
 
-	OctagonalPrismVertices octagonVertices = {
-		{
-			/* Subsequently denoted are the vertices in clockwise direction with respect
-			to the respectively annotated edge;
-			i.e. "left |" defines the lower vertex of the left | etc. */
+				// positive y's
+				{-lateralLength, z, -straightEdgeLength / 2}, //  left |
+				{-straightEdgeLength / 2, z, -lateralLength}, // lower left "\"
+				{straightEdgeLength / 2, z, -lateralLength}, // -
+				{lateralLength, z, -straightEdgeLength / 2}, // lower right /
 
-			// positive y's
-			{-lateralLength, z, -straightEdgeLength / 2}, //  left |
-			{-straightEdgeLength / 2, z, -lateralLength}, // lower left "\"
-			{straightEdgeLength / 2, z, -lateralLength}, // -
-			{lateralLength, z, -straightEdgeLength / 2}, // lower right /
+				// negative y's
+				{lateralLength, z, straightEdgeLength / 2}, // right |
+				{straightEdgeLength / 2, z, lateralLength}, // upper right "\"
+				{-straightEdgeLength / 2, z, lateralLength}, // -
+				{-lateralLength, z, straightEdgeLength / 2}, // upper left /
+			},
 
-			// negative y's
-			{lateralLength, z, straightEdgeLength / 2}, // right |
-			{straightEdgeLength / 2, z, lateralLength}, // upper right "\"
-			{-straightEdgeLength / 2, z, lateralLength}, // -
-			{-lateralLength, z, straightEdgeLength / 2}, // upper left /
-		},
-		
-		// negative z
-		{
-			// positive y's
-			{-lateralLength, -z, -straightEdgeLength / 2}, //  left |
-			{-straightEdgeLength / 2, -z, -lateralLength}, // lower left "\"
-			{straightEdgeLength / 2, -z, -lateralLength}, // -
-			{lateralLength, -z, -straightEdgeLength / 2}, // lower right /
+			// negative z
+			{
+				// positive y's
+				{-lateralLength, -z, -straightEdgeLength / 2}, //  left |
+				{-straightEdgeLength / 2, -z, -lateralLength}, // lower left "\"
+				{straightEdgeLength / 2, -z, -lateralLength}, // -
+				{lateralLength, -z, -straightEdgeLength / 2}, // lower right /
 
-			// negative y's
-			{lateralLength, -z, straightEdgeLength / 2}, // right |
-			{straightEdgeLength / 2, -z, lateralLength}, // upper right "\"
-			{-straightEdgeLength / 2, -z, lateralLength}, // -
-			{-lateralLength, -z, straightEdgeLength / 2}, // upper left /
-		}
-	};
+				// negative y's
+				{lateralLength, -z, straightEdgeLength / 2}, // right |
+				{straightEdgeLength / 2, -z, lateralLength}, // upper right "\"
+				{-straightEdgeLength / 2, -z, lateralLength}, // -
+				{-lateralLength, -z, straightEdgeLength / 2}, // upper left /
+			}
+		};
 
-	// draw upper and lower plane
-	for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-		glBegin(GL_POLYGON);
+		// draw upper and lower plane
+		for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+			glBegin(GL_POLYGON);
 			for (size_t i = 0; i < 9; i++)
-				glVertex3fv(octagonVertices[zPolarityIndex][i % 8].data());
-		glEnd();
-	}
-	
-	// connect vertices opposing each other across xz-plane
-	for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
-		glBegin(GL_POLYGON);
+				glVertex3fv(vertices[zPolarityIndex][i % 8].data());
+			glEnd();
+		}
+
+		// connect vertices opposing each other across xz-plane
+		for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
+			glBegin(GL_POLYGON);
 			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
 				for (size_t i = 0; i < 2; i++) {
-					glVertex3fv(octagonVertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
+					glVertex3fv(vertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
 				}
 			}
-		glEnd();
+			glEnd();
+		}
+
+		return vertices;
 	}
 
-	return octagonVertices;
-}
-
-
-
-void drawOctagonalPrismCage(OctagonalPrismVertices vertices) {
-	glPushMatrix();
+	void drawCage(Vertices vertices) {
+		glPushMatrix();
 		glDepthFunc(GL_LEQUAL);
 		glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
 
 		glBegin(GL_LINES);
-			for (size_t i = 0; i < 8; i++) {
-				for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-					// draw edge along xz-plane
-					glVertex3fv(vertices[zPolarityIndex][i].data());
-					glVertex3fv(vertices[zPolarityIndex][(i + 1) % 8].data());
+		for (size_t i = 0; i < 8; i++) {
+			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+				// draw edge along xz-plane
+				glVertex3fv(vertices[zPolarityIndex][i].data());
+				glVertex3fv(vertices[zPolarityIndex][(i + 1) % 8].data());
 
-					// draw edge across xz-plane
-					glVertex3fv(vertices[0][(i + zPolarityIndex) % 8].data());
-					glVertex3fv(vertices[1][(i + zPolarityIndex) % 8].data());
-				}
+				// draw edge across xz-plane
+				glVertex3fv(vertices[0][(i + zPolarityIndex) % 8].data());
+				glVertex3fv(vertices[1][(i + zPolarityIndex) % 8].data());
 			}
+		}
 		glEnd();
 		glPopAttrib();
-	glPopMatrix();
+		glPopMatrix();
+	}
 }
-
 
 
 ////////////////////////////////////////////////////////////
 /// Dev functions
 ////////////////////////////////////////////////////////////
+
 void indicateCurrentPosition() {
 	glPushMatrix();
-	Color(0., 1., 0.).render();
+	Color(0.f, 1.f, 0.f).render();
 	//glScalef(0.1, 0.1, 0.1);
 	drawCube();
 	glPopMatrix();
 }
-
 
 
 void drawZVector() {
@@ -251,10 +244,10 @@ void drawZVector() {
 	glLineWidth(5);
 
 	glBegin(GL_LINES);
-	Color(0, 1, 0).render();
+	Color(0.f, 1.f, 0.f).render();
 	glVertex3f(0, 0, 0);
 
-	Color(1, 0, 0).render();
+	Color(1.f, 0.f, 0.f).render();
 	glVertex3f(0, 3, 0);
 	glEnd();
 	glPopMatrix();

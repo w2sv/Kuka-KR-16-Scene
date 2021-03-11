@@ -73,7 +73,4 @@ private:
 	static int buttons[5];	// 0 - links, 1 - mitte, 2 - rechts, 3 - mouse wheel up, 4 - mouse wheel down
 	static int pos[4];	// 0,1 - aktuelle Position, 2,3 - letzte Position
 };
-
-
-
 #endif // INPUT_H

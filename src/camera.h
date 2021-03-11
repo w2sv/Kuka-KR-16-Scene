@@ -1,14 +1,5 @@
 #pragma once
 
-#include <iostream>
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include <limits>
-
-#include "../dependencies/freeglut.h"
-
-#include "input.h"
-#include "state.h"
 #include "robot.h"
 #include "glutils.h"
 
@@ -35,7 +26,6 @@ private:
 	Vector2 position;
 	Mode mode;
 	float radius;
-
 	Robot* robot;
 
 	void resetPosition();
