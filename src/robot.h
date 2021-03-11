@@ -22,6 +22,7 @@
 struct AxisParameterState {
 public:
 	AxisParameterState(float startValue, Extrema&& limits);
+	virtual ~AxisParameterState();
 
 	float getValue() const;
 	bool limitReached() const;
@@ -64,6 +65,7 @@ struct VelocityState: public AxisParameterState {
 struct OrientationDimension {
 	public:
 		OrientationDimension(AngleState&& angle, VelocityState&& velocity);
+		virtual ~OrientationDimension();
 
 		AngleState angle;
 		VelocityState velocity;
@@ -109,8 +111,8 @@ struct UnlimitedOrientationDimension : public OrientationDimension {
 	using OrientationDimension::OrientationDimension;
 
 private:
-	void adjustAngle();
-	void determineTargetAngleApproachManner();
+	void adjustAngle() override;
+	void determineTargetAngleApproachManner() override;
 };
 
 
@@ -122,8 +124,8 @@ struct LimitedOrientationDimension : public OrientationDimension {
 	using OrientationDimension::OrientationDimension;
 
 private:
-	void adjustAngle();
-	void determineTargetAngleApproachManner();
+	void adjustAngle() override;
+	void determineTargetAngleApproachManner() override;
 };
 #pragma endregion
 
@@ -132,7 +134,7 @@ private:
 #pragma region Axis
 struct Axis {
 	Axis(OrientationDimension* orientation, glRotationFunction rotationFunction);
-	~Axis();
+	virtual ~Axis();
 
 	OrientationDimension* orientation;
 	const glRotationFunction rotate;

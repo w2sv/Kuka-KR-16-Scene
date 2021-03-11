@@ -32,6 +32,9 @@ AxisParameterState::AxisParameterState(float startValue, Extrema&& limits):
 	limitReached_b(false)
 {}
 
+AxisParameterState::~AxisParameterState()
+{}
+
 float AxisParameterState::getValue() const {
 	return value;
 }
@@ -95,6 +98,8 @@ OrientationDimension::OrientationDimension(AngleState&& angle, VelocityState&& v
 	targetAngle(UNINITIALIZED),
 	targetAngleApproachManner(UNINITIALIZED),
 	targetAngleState(TargetAngleState::Disabled)
+{}
+OrientationDimension::~OrientationDimension()
 {}
 
 void OrientationDimension::update() {
