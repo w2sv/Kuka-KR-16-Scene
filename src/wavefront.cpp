@@ -1,9 +1,7 @@
-#include "../dependencies/glew.h"
-#include "../dependencies/freeglut.h"
-
-#include "wavefront.h"  // necessary to be included after glew/glut to prevent "glut included 
-						//before glew" error emerging from glutils incorporating glut
+#include "wavefront.h"
 #include "utils.h"
+
+#include "../dependencies/freeglut.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -503,88 +501,6 @@ void cg_object3D::load(const char* filepath, bool use_vbos)
 	}
 #pragma endregion NORMALEN_BERECHNEN
 
-#pragma region VBO_Erzeugen
-	//////////////////////////////////////////////////
-	// Objekt geladen: Erzeugen und Laden nun die VBOs
-	//////////////////////////////////////////////////
-	if (use_vbos)
-	{
-		// wir müssen die Daten für Drawcalls aufbereiten, weil ein Vertex mit mehreren Normalen und TCs vorkommen kann
-		// (beim vertex split)
-
-		// wir erzeugen ein VBO mit der Struktur [points, normals, {texcoords}]
-
-		int vertexArraySize = numtris * 9;	// 3 Punkte pro Dreieck mit x,y,z
-		int normalArraySize = vertexArraySize; 	// dto.
-		int texcoordArraySize = 0;
-		if (clustertexcoords)
-			texcoordArraySize = numtris * 6; // 3 Punkte mit u,v
-		else texcoordArraySize = 0;
-
-		int vboDataSize = vertexArraySize + 2 * normalArraySize + texcoordArraySize;
-		GLfloat* vbodata = (GLfloat*)malloc(vboDataSize * sizeof(GLfloat));
-		memset(vbodata, 0, vboDataSize * sizeof(GLfloat));
-
-		int vIndex = 0;
-		int npIndex = vertexArraySize;
-		int nfIndex = 2 * vertexArraySize;
-		int tIndex = 0;
-		if (clustertexcoords)
-			tIndex = 2 * vertexArraySize + normalArraySize;
-
-		int* p = NULL;
-		int* in = NULL;
-		int* it = NULL;
-		// über alle Punkte der Dreiecke, Normalen und ggf. Texturkoordinaten ins VBO kopieren
-		for (int i = 0; i < numtris; ++i)
-		{
-			p = &tris[3 * i];
-			if (clusternormals)
-				in = &i_normals[3 * i];
-			else
-				in = &tris[3 * i];
-			if (clustertexcoords)
-				it = &i_texcoords[3 * i];
-
-			GLfloat* fn = &f_normals[3 * i];			// Zeiger auf die Flächennormale
-			for (int j = 0; j < 3; j++) {
-				GLfloat* v = &points[3 * p[j]];
-				GLfloat* n = &normals[3 * in[j]];		// der Zeiger auf die Vertexnormale
-				GLfloat* tc = NULL;
-				if (clustertexcoords)
-					tc = &texcoords[2 * it[j]];	// der Zeiger auf die TC
-
-				memcpy(&vbodata[vIndex], v, 3 * sizeof(GLfloat));
-				memcpy(&vbodata[npIndex], n, 3 * sizeof(GLfloat));
-				memcpy(&vbodata[nfIndex], fn, 3 * sizeof(GLfloat));
-				if (clustertexcoords)
-					memcpy(&vbodata[tIndex], &tc[0], 2 * sizeof(GLfloat));
-
-				vIndex += 3;
-				npIndex += 3;
-				nfIndex += 3;
-				if (clustertexcoords) tIndex += 2;
-			}
-		}
-
-		// Step 1: VBOs erzeugen
-		glGenBuffers(1, &vbo);
-
-		if (vbo) // kein Fehler beim Generieren
-		{
-			// Vertex Buffer binden
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-			// Vertexdaten übertragen (Koordinaten, dann Vertexnormalen, dann Texturkoordinaten)
-			glBufferData(GL_ARRAY_BUFFER, vboDataSize * sizeof(GLfloat), vbodata, GL_STATIC_DRAW);
-
-			::free(vbodata);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			vbo_geladen = 1;
-		}
-#pragma endregion VBO_Erzeugen
-	}
 	if (clusternormals)
 		normal_mode = 2;
 }
@@ -685,38 +601,6 @@ void cg_object3D::draw()
 				}
 			}
 			glEnd();
-		}
-		else  															// wir haben VBOs geladen
-		{
-			// VBO binden
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-			// Client State aktivieren
-			if (clustertexcoords)
-				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			if (normal_mode == 1 || normal_mode == 2)
-				glEnableClientState(GL_NORMAL_ARRAY);
-			glEnableClientState(GL_VERTEX_ARRAY);
-
-			// Pointer spezifizieren
-			int vCount = numtris * 3;  // 3 Punkte pro Dreieck
-			if (clustertexcoords)
-				glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)(9 * vCount * sizeof(GLfloat)));
-			if (normal_mode == 1)
-				glNormalPointer(GL_FLOAT, 0, (GLfloat*)(6 * vCount * sizeof(GLfloat)));
-			if (normal_mode == 2)
-				glNormalPointer(GL_FLOAT, 0, (GLfloat*)(3 * vCount * sizeof(GLfloat)));
-			glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-			// Zeichnen
-			glDrawArrays(GL_TRIANGLES, 0, vCount);
-
-			// Client State deaktivieren
-			if (clustertexcoords)
-				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			if (normal_mode == 1 || normal_mode == 2)
-				glDisableClientState(GL_NORMAL_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 		glPopMatrix();
 	}

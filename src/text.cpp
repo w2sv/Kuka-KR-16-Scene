@@ -10,13 +10,13 @@ void Text::display(const Vector2& position, const char* text, void* font) {
 }
 
 
-void Text::displayColored(const Vector2& position, const char* text, Color& color, void* font) {
+void Text::displayColored(const Vector2& position, const char* text, const Color& color, void* font) {
 	color.render(false);
 	display(position, text, font);
 }
 
 
-void Text::displayWithShadow(const Vector2& position, const char* text, Color& color, float shadow, void* font) {
+void Text::displayWithShadow(const Vector2& position, const char* text, const Color& color, float shadow, void* font) {
 	displayColored(Vector2(position.x + shadow, position.y - shadow), text, Color(COLORS::BLACK), font);
 	displayColored(position, text, color, font);
 }

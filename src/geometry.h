@@ -5,7 +5,6 @@
 
 #include "../dependencies/freeglut.h"
 
-#include <vector>
 #include <array>
 
 
