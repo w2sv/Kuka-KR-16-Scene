@@ -246,7 +246,7 @@ private:
 	static const int N_AXES = 4;
 	const static Vector3 relativeAxesStartPositionShiftVectors[N_AXES + 1];
 	
-	std::vector<Axis*> axes;
+	Axis* axes[N_AXES];
 	std::map<Axis*, std::function<const void()>> axis2DrawFunction;
 
 	void drawFirstAxis() const;

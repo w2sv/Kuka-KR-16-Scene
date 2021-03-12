@@ -263,12 +263,12 @@ const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiu
 
 
 Robot::Robot():
-	axes({
+	axes{
 		new YawAxis(AngleState(0, Extrema(0, 360), 'd', 'a', true), VelocityState(3, '1'), &Z::rotate),
 		new TiltAxis(AngleState(22.5, Extrema(-45, 60), 'w', 's'), VelocityState(2, '2'), &Y::rotate),
 		new TiltAxis(AngleState(-20, Extrema(-45, 75), 't', 'g'), VelocityState(2, '3'), &Y::rotate),
 		new YawAxis(AngleState(0, Extrema(0, 360), 'f', 'h'), VelocityState(3, '4'), &X::rotate)
-	}),
+	},
 	axis2DrawFunction({
 		{axes[0], std::bind(&Robot::drawFirstAxis, this)},
 		{axes[1], std::bind(&Robot::drawSecondAxis, this)},
