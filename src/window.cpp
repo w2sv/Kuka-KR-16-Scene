@@ -1,12 +1,11 @@
+#include "window.h"
+
 #include "input.h"
 #include "state.h"
-#include "glutils.h"
+#include "utils.h"
 
 #include "../dependencies/freeglut.h"
 #include "../dependencies/glext.h"
-
-#include "window.h"
-
 
 
 void init(int argc, char **argv){

@@ -1,15 +1,19 @@
+#include "../dependencies/glew.h"
+#include "../dependencies/freeglut.h"
+
+#include "wavefront.h"  // necessary to be included after glew/glut to prevent "glut included 
+						//before glew" error emerging from glutils incorporating glut
+#include "utils.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <math.h>
 #include <iostream>
 
-#include "../dependencies/glew.h"
-#include "../dependencies/freeglut.h"
 
 #define EXPORT_EXT
-#include "wavefront.h"
-#include "utils.h"
+
 
 /* wavefront */
 
@@ -79,7 +83,7 @@ void cg_object3D::setMaterial(GLfloat red, GLfloat green, GLfloat blue, GLfloat 
 }
 
 
-void cg_object3D::setMaterial(Color& color, GLfloat spec, GLfloat shine, GLfloat emis) {
+void cg_object3D::setMaterial(const Color& color, GLfloat spec, GLfloat shine, GLfloat emis) {
 	setMaterial(color.r, color.g, color.b, 1., spec, shine, emis);
 }
 

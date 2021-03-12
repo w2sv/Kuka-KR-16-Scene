@@ -1,10 +1,10 @@
 #pragma once
 
-#include <functional>
+#include "utils.h"
 
 #include "../dependencies/freeglut.h"
 
-#include "utils.h"
+#include <functional>
 
 
 ////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ namespace glTransformationAxes {
 
 void glScaleUniformly(float value);
 
-void glTranslatev(const Vector3& vector);
+void glTranslateByVec(const Vector3& vector);
 
 ////////////////////////////////////////////////////////////
 /// Miscellanous

@@ -79,7 +79,7 @@ namespace glTransformationAxes {
 }
 
 
-void glTranslatev(const Vector3& vector) {
+void glTranslateByVec(const Vector3& vector) {
 	glTranslatef(vector.x, vector.y, vector.z);
 }
 

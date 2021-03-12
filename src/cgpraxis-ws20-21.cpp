@@ -1,9 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#ifdef DEBUG
 #include <iostream>
-
-#include "../dependencies/freeglut.h"
-#include "../dependencies/glext.h"
+#endif
 
 #include "state.h"
 #include "help.h"
@@ -15,7 +14,10 @@
 #include "robot.h"
 #include "camera.h"
 #include "image.h"
+#include "text.h"
 
+#include "../dependencies/freeglut.h"
+#include "../dependencies/glext.h"
 
 
 const Extrema groundMeasurements(-20, 20);

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
+#include "utils.h"
+#include "glutils.h"
 
 #include "../dependencies/freeglut.h"
 
-#include "utils.h"
-#include "glutils.h"
+#include <vector>
 
 
 void drawCube();

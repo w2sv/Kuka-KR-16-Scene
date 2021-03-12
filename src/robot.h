@@ -3,13 +3,13 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#include <map>
-#include <vector>
-
 #include "wavefront.h"
 #include "glutils.h"
 #include "utils.h"
 #include "image.h"
+
+#include <map>
+#include <vector>
 
 
 #pragma region AxisParameterState

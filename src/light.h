@@ -3,6 +3,7 @@
 
 #include "../dependencies/freeglut.h"
 
+
 // Farbe setzen fuer Farb- und Beleuchtungsmodus
 void setColor(GLfloat r, GLfloat g, GLfloat b);
 

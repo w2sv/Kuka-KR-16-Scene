@@ -1,13 +1,11 @@
 ﻿#include "help.h"
 
-
-#include <vector>
-
 #include "state.h"
 #include "utils.h"
 #include "text.h"
 #include "glutils.h"
 
+#include <vector>
 
 
 void displayFps() {
@@ -15,21 +13,6 @@ void displayFps() {
 
 	sprintf(fpstext, "FPS: %.0f", GlobalState::fps);
 	Text::displayWithShadow(Vector2(-0.78f, -0.78f), fpstext, Color::fromUnnormalizedValues(214, 121, 15), 0.003f, GLUT_BITMAP_HELVETICA_18);
-}
-
-
-void displayHelp() {
-	drawBackground();
-
-	Text::displayWithShadow(Vector2(-0.05, 0.8f), "KUKA KR 16", Color::fromUnnormalizedValues(230, 80, 21), 0.003f, GLUT_BITMAP_HELVETICA_18);
-
-	Section::LeftHalf::Robot::control();
-	Section::LeftHalf::Robot::functionality();
-	Section::LeftHalf::camera();
-
-	Section::RightHalf::generic();
-	Section::RightHalf::display();
-	Section::RightHalf::graphics();
 }
 
 
@@ -177,4 +160,19 @@ namespace Section {
 			displayColumn(Vector2(DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "y", "x", "c" }, VERTICAL_COL_SPACE, KEY_COLOR);
 		}
 	}
+}
+
+
+void displayHelp() {
+	drawBackground();
+
+	Text::displayWithShadow(Vector2(-0.05, 0.8f), "KUKA KR 16", Color::fromUnnormalizedValues(230, 80, 21), 0.003f, GLUT_BITMAP_HELVETICA_18);
+
+	Section::LeftHalf::Robot::control();
+	Section::LeftHalf::Robot::functionality();
+	Section::LeftHalf::camera();
+
+	Section::RightHalf::generic();
+	Section::RightHalf::display();
+	Section::RightHalf::graphics();
 }

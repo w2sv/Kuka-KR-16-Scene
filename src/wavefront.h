@@ -1,5 +1,3 @@
-// Wavefront Loader
-// PrakCG
 #pragma once
 
 #ifndef WAVEFRONT_H
@@ -27,7 +25,7 @@ public:
 
 	// Objekt Material + Farben setzen
 	void setMaterial ( GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha, GLfloat spec, GLfloat shine, GLfloat emis );
-	void setMaterial(Color& color, GLfloat spec, GLfloat shine, GLfloat emis);
+	void setMaterial(const Color& color, GLfloat spec, GLfloat shine, GLfloat emis);
 
 	// Objekt Position setzen
 	void setPosition ( GLfloat x, GLfloat y, GLfloat z );

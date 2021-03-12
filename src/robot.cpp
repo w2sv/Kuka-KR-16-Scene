@@ -1,20 +1,19 @@
 ﻿#include "robot.h"
 
+#include "geometry.h"
+#include "input.h"
+#include "glutils.h"
+#include "state.h"
+#include "text.h"
+#include "light.h"
+
+#include "../dependencies/freeglut.h"
 
 #include <limits>
 #include <functional>
 #include <sstream>
 #include <string>
 #include <math.h>
-
-#include "../dependencies/freeglut.h"
-
-#include "geometry.h"
-#include "input.h"
-#include "glutils.h"
-#include "state.h"
-#include "text.h"
-
 
 
 using namespace glTransformationAxes;
@@ -258,7 +257,7 @@ std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 
 
 
-const Color Robot::BASE_COLOR = Color(230, 80, 21);
+const Color Robot::BASE_COLOR = Color::fromUnnormalizedValues(230, 80, 21);
 const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
 
 
@@ -416,14 +415,14 @@ void Robot::displayAxesStates() const {
 		if (axes[i]->orientation->velocity.limitReached())
 			oss << "!";
 
-		Text::displayColored(Vector2(0.75, 0.8 - (i * 0.05)), oss.str().c_str(), Color(0.8, 0.8, 0.8), GLUT_BITMAP_9_BY_15);
+		Text::displayColored(Vector2(0.75, 0.8 - (i * 0.05)), oss.str().c_str(), Color(0.8f), GLUT_BITMAP_9_BY_15);
 	}
 }
 
 
 
 void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
-	Text::displayColored(Vector2(-0.9, 0.85), "Infinite Random Configuration Approach Mode", Color(214, 15, 38), GLUT_BITMAP_9_BY_15);
+	Text::displayColored(Vector2(-0.9, 0.85), "Infinite Random Configuration Approach Mode", Color::fromUnnormalizedValues(214, 15, 38), GLUT_BITMAP_9_BY_15);
 }
 
 
@@ -454,11 +453,11 @@ void Robot::setObjectMaterials() {
 	GLfloat shine = 30;
 	GLfloat emis = 1; // 0 -> matt, 1->bright
 
-	objects[Object::YawAxis1].setMaterial(Color(BASE_COLOR), spec, shine, emis);
-	objects[Object::ScrewHead].setMaterial(Color(COLORS::GREY), 0.2, 0.5, 0);
-	objects[Object::TiltAxis1].setMaterial(Color(BASE_COLOR), spec, shine, emis);
-	objects[Object::TiltAxis2].setMaterial(Color(BASE_COLOR), spec, shine, emis);
-	objects[Object::KukaLogo].setMaterial(Color(COLORS::BLACK), spec, shine, emis);
+	objects[Object::YawAxis1].setMaterial(BASE_COLOR, spec, shine, emis);
+	objects[Object::ScrewHead].setMaterial(COLORS::GREY, 0.2, 0.5, 0);
+	objects[Object::TiltAxis1].setMaterial(BASE_COLOR, spec, shine, emis);
+	objects[Object::TiltAxis2].setMaterial(BASE_COLOR, spec, shine, emis);
+	objects[Object::KukaLogo].setMaterial(COLORS::BLACK, spec, shine, emis);
 }
 
 
@@ -503,14 +502,14 @@ void Robot::draw() const {
 
 		// axes
 		for (size_t i = 0; i < N_AXES; i++) {
-			relativeAxesStartPositionShiftVectors[i].glTranslate();
+			glTranslateByVec(relativeAxesStartPositionShiftVectors[i]);
 			axes[i]->adjustGLModelMatrixAccordingly();
 			axis2DrawFunction.at(axes[i])();
 		}
 
 		// tcp coord system if applicable
 		if (drawTCPCoordSystem_b) {
-			relativeAxesStartPositionShiftVectors[4].glTranslate();
+			glTranslateByVec(relativeAxesStartPositionShiftVectors[4]);
 			drawShrunkCoordSystem();
 		}
 	glPopMatrix();
@@ -530,7 +529,7 @@ void Robot::drawTargetAxesConfigurationCoordSystem() const {
 	glPushMatrix();
 
 		for (size_t i = 0; i < N_AXES + 1; i++) {
-			relativeAxesStartPositionShiftVectors[i].glTranslate();
+			glTranslateByVec(relativeAxesStartPositionShiftVectors[i]);
 			
 			if (i < N_AXES)
 				axes[i]->adjustGLModelMatrixTargetAngleAccordingly();
@@ -557,18 +556,18 @@ void Robot::drawAxisWeight() const {
 		// draw lower octPrism pedastel
 			COLORS::BLACK.render();
 		Z::translate(PEDASTEL_HEIGHT / 2);
-		OctagonalPrismVertices pedastelVertices = drawOctagonalPrism(PEDASTEL_HEIGHT, 0.5, 0.2);
+		OctogonalPrism::Vertices pedastelVertices = OctogonalPrism::draw(PEDASTEL_HEIGHT, 0.5, 0.2);
 
 			COLORS::GREY.render();
-		drawOctagonalPrismCage(pedastelVertices);
+			OctogonalPrism::drawCage(pedastelVertices);
 
 		// draw octPrism block
 			COLORS::BLACK.render();
 			Z::translate(BLOCK_HEIGHT / 2);
-		OctagonalPrismVertices blockVertices = drawOctagonalPrism(BLOCK_HEIGHT, 0.3, 0.3);
+			OctogonalPrism::Vertices blockVertices = OctogonalPrism::draw(BLOCK_HEIGHT, 0.3, 0.3);
 
 			COLORS::GREY.render();
-		drawOctagonalPrismCage(blockVertices);
+			OctogonalPrism::drawCage(blockVertices);
 
 		// draw upper black cylinder
 			COLORS::BLACK.render();
@@ -602,7 +601,7 @@ void Robot::drawPedestal() const {
 
 		glScalef(8, PEDASTEL_HEIGHT, 8);
 			
-		Color(.6, .6, .6).render();
+		Color(.6f).render();
 		textures[Texture::Knobs].bind();
 		
 		glEnable(GL_TEXTURE_2D);
@@ -631,7 +630,7 @@ void Robot::drawBottom() const {
 
 		// central segment
 		Z::translate(LOWER_SEGMENT_HEIGHT);
-		setColor(.4, .4, .4);
+		Color(.4f).render();
 		drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
 
 		// upper segment
@@ -738,10 +737,10 @@ void Robot::drawSecondAxis()const {
 		X::rotate(180);
 			BASE_COLOR.render();
 	
-			OctagonalPrismVertices weightPedastelVertices = drawOctagonalPrism(0.15, 0.6, 0.1);
+			OctogonalPrism::Vertices weightPedastelVertices = OctogonalPrism::draw(0.15, 0.6, 0.1);
 			
 			COLORS::BLACK.render();
-		drawOctagonalPrismCage(weightPedastelVertices);
+		OctogonalPrism::drawCage(weightPedastelVertices);
 
 		// draw weight
 		Z::translate(0.09);
@@ -873,11 +872,11 @@ void Robot::attachCameraToTCPReversely() const {
 
 
 void Robot::approachSpatialTCPConfigurationInversely() const {
-	relativeAxesStartPositionShiftVectors[N_AXES].inverted().glTranslate();
+	glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES].inverted());
 
 	for (int i = N_AXES - 1; i >= 0; i--) {
 		axes[i]->adjustGLModelMatrixInversely();
-		relativeAxesStartPositionShiftVectors[i].inverted().glTranslate();
+		glTranslateByVec(relativeAxesStartPositionShiftVectors[i].inverted());
 	}
 }
 #pragma endregion

@@ -1,8 +1,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "../dependencies/freeglut.h"
-#include "../dependencies/glext.h"
 
 /////////////////////////////////////////////////////////////////////////////////
 //	Fenster Initialisierung

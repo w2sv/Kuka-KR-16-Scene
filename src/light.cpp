@@ -1,5 +1,6 @@
 #include "light.h"
 
+
 // Farbe setzen fuer Farb- und Beleuchtungsmodus
 void setColor(GLfloat r, GLfloat g, GLfloat b) {
 	glColor3f(r, g, b);
