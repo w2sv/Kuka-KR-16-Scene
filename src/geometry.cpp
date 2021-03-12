@@ -142,43 +142,45 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 
 namespace OctogonalPrism {
 	Vertices draw(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
+		typedef std::array<GLfloat, 3> Vertex;
+
 		const float z = heigth / 2;
 		const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
 
-		const Vertices vertices = {
+		const Vertices vertices{ {
 			{
 				/* Subsequently denoted are the vertices in clockwise direction with respect
 				to the respectively annotated edge;
 				i.e. "left |" defines the lower vertex of the left | etc. */
 
 				// positive y's
-				{-lateralLength, z, -straightEdgeLength / 2}, //  left |
-				{-straightEdgeLength / 2, z, -lateralLength}, // lower left "\"
-				{straightEdgeLength / 2, z, -lateralLength}, // -
-				{lateralLength, z, -straightEdgeLength / 2}, // lower right /
+				Vertex{-lateralLength, z, -straightEdgeLength / 2}, //  left |
+				Vertex{-straightEdgeLength / 2, z, -lateralLength}, // lower left "\"
+				Vertex{straightEdgeLength / 2, z, -lateralLength}, // -
+				Vertex{lateralLength, z, -straightEdgeLength / 2}, // lower right /
 
 				// negative y's
-				{lateralLength, z, straightEdgeLength / 2}, // right |
-				{straightEdgeLength / 2, z, lateralLength}, // upper right "\"
-				{-straightEdgeLength / 2, z, lateralLength}, // -
-				{-lateralLength, z, straightEdgeLength / 2}, // upper left /
+				Vertex{lateralLength, z, straightEdgeLength / 2}, // right |
+				Vertex{straightEdgeLength / 2, z, lateralLength}, // upper right "\"
+				Vertex{-straightEdgeLength / 2, z, lateralLength}, // -
+				Vertex{-lateralLength, z, straightEdgeLength / 2}, // upper left /
 			},
 
 			// negative z
 			{
 				// positive y's
-				{-lateralLength, -z, -straightEdgeLength / 2}, //  left |
-				{-straightEdgeLength / 2, -z, -lateralLength}, // lower left "\"
-				{straightEdgeLength / 2, -z, -lateralLength}, // -
-				{lateralLength, -z, -straightEdgeLength / 2}, // lower right /
+				Vertex{-lateralLength, -z, -straightEdgeLength / 2}, //  left |
+				Vertex{-straightEdgeLength / 2, -z, -lateralLength}, // lower left "\"
+				Vertex{straightEdgeLength / 2, -z, -lateralLength}, // -
+				Vertex{lateralLength, -z, -straightEdgeLength / 2}, // lower right /
 
 				// negative y's
-				{lateralLength, -z, straightEdgeLength / 2}, // right |
-				{straightEdgeLength / 2, -z, lateralLength}, // upper right "\"
-				{-straightEdgeLength / 2, -z, lateralLength}, // -
-				{-lateralLength, -z, straightEdgeLength / 2}, // upper left /
+				Vertex{lateralLength, -z, straightEdgeLength / 2}, // right |
+				Vertex{straightEdgeLength / 2, -z, lateralLength}, // upper right "\"
+				Vertex{-straightEdgeLength / 2, -z, lateralLength}, // -
+				Vertex{-lateralLength, -z, straightEdgeLength / 2}, // upper left /
 			}
-		};
+		} };
 
 		// draw upper and lower plane
 		for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
@@ -230,6 +232,7 @@ namespace OctogonalPrism {
 /// Dev functions
 ////////////////////////////////////////////////////////////
 
+#ifdef DEBUG
 void indicateCurrentPosition() {
 	glPushMatrix();
 	Color(0.f, 1.f, 0.f).render();
@@ -252,3 +255,4 @@ void drawZVector() {
 	glEnd();
 	glPopMatrix();
 }
+#endif
