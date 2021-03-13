@@ -19,7 +19,12 @@
 using namespace glTransformationAxes;
 
 
+
 #pragma region AxisParameterState
+////////////////////////////////////////////////////////////
+/// AxisParameterState
+////////////////////////////////////////////////////////////
+
 AxisParameterState::AxisParameterState(float startValue, Extrema&& limits):
 	startValue(startValue),
 	value(startValue),
@@ -27,22 +32,31 @@ AxisParameterState::AxisParameterState(float startValue, Extrema&& limits):
 	limitReached_b(false)
 {}
 
+
 AxisParameterState::~AxisParameterState()
 {}
+
 
 float AxisParameterState::getValue() const {
 	return value;
 }
+
+
 bool AxisParameterState::limitReached() const {
 	return limitReached_b;
 }
+
+
 void AxisParameterState::reset() {
 	value = startValue;
 }
 
+
 void AxisParameterState::updateLimitReached() {
 	limitReached_b = value == limits.min || value == limits.max;
 }
+
+
 void AxisParameterState::clipValue() {
 	value = std::min<float>(std::max<float>(value, limits.min), limits.max);
 }
@@ -51,16 +65,26 @@ void AxisParameterState::clipValue() {
 void AxisParameterState::operator+=(float increment) {
 	value += increment;
 }
+
+
 void AxisParameterState::operator-=(float decrement) {
 	value -= decrement;
 }
+
+
 bool AxisParameterState::operator<=(float value) {
 	return this->value <= value;
 }
+
+
 bool AxisParameterState::operator>=(float value) {
 	return this->value >= value;
 }
 
+
+////////////////////////////////////////////////////////////
+/// AngleState
+////////////////////////////////////////////////////////////
 
 AngleState::AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey, bool invertedControl) :
 	AxisParameterState::AxisParameterState(startValue, std::move(limits)),
@@ -69,12 +93,22 @@ AngleState::AngleState(float startValue, Extrema&& limits, char incrementationKe
 	incrementationStepCoeff(invertedControl ? -1 : 1),
 	decrementationStepCoeff(invertedControl ? 1 : -1)
 {}
+
+
 void AngleState::setArbitrarily() {
 	value = drawArbitraryValue();
 }
+
+
 int AngleState::drawArbitraryValue() const {
 	return randInt(limits);
 }
+
+
+////////////////////////////////////////////////////////////
+/// VelocityState
+////////////////////////////////////////////////////////////
+
 VelocityState::VelocityState(float max, char identificationKey):
 	AxisParameterState::AxisParameterState(0.4, Extrema(0.1, max)),
 	identificationKey(identificationKey)
@@ -83,25 +117,40 @@ VelocityState::VelocityState(float max, char identificationKey):
 
 
 
-#pragma region OrientationDimension
-constexpr int UNINITIALIZED = -1;
+#pragma region Axis
+////////////////////////////////////////////////////////////
+/// Axis
+////////////////////////////////////////////////////////////
 
-OrientationDimension::OrientationDimension(AngleState&& angle, VelocityState&& velocity):
-	angle(std::move(angle)),
-	velocity(std::move(velocity)),
+constexpr int UNINITIALIZED = -1;
+Axis::Axis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction):
+	angle(angle),
+	velocity(velocity),
+	rotate(rotationFunction),
 
 	targetAngle(UNINITIALIZED),
 	targetAngleApproachManner(UNINITIALIZED),
 	targetAngleState(TargetAngleState::Disabled)
 {}
-OrientationDimension::~OrientationDimension()
+
+
+Axis::~Axis() 
 {}
 
-void OrientationDimension::update() {
+
+void Axis::update() {
 	updateVelocity();
 	updateAngle();
 }
-void OrientationDimension::updateVelocity() {
+
+
+void Axis::reset() {
+	angle.reset();
+	velocity.reset();
+}
+
+
+void Axis::updateVelocity() {
 	static const float INCREMENT = 0.01;
 
 	if (cg_key::keyState(velocity.identificationKey) == 2) {
@@ -116,45 +165,48 @@ void OrientationDimension::updateVelocity() {
 		velocity.updateLimitReached();
 	}
 }
-void OrientationDimension::updateAngle() {
-	switch (targetAngleState) {
-		case (TargetAngleState::YetToBeReached):
-				approachTargetAngle();
-				adjustAngle();
-				break;
-		case (TargetAngleState::Disabled):
-			if (cg_key::keyState(angle.decrementationKey) != 0)
-				angle += angle.incrementationStepCoeff * velocity.getValue();
-			else if (cg_key::keyState(angle.incrementationKey) != 0)
-				angle += angle.decrementationStepCoeff * velocity.getValue();
-			else
-				return;
 
-			adjustAngle();
-			angle.updateLimitReached();
+
+void Axis::updateAngle() {
+	switch (targetAngleState) {
+	case (TargetAngleState::YetToBeReached):
+		approachTargetAngle();
+		adjustAngle();
+		break;
+	case (TargetAngleState::Disabled):
+		if (cg_key::keyState(angle.decrementationKey) != 0)
+			angle += angle.incrementationStepCoeff * velocity.getValue();
+		else if (cg_key::keyState(angle.incrementationKey) != 0)
+			angle += angle.decrementationStepCoeff * velocity.getValue();
+		else
+			return;
+
+		adjustAngle();
+		angle.updateLimitReached();
 	}
 }
-void UnlimitedOrientationDimension::adjustAngle() {
-	if (angle >= 360)
-		angle -= 360;
-	else if (angle <= 0)
-		angle += 360;
-}
-void LimitedOrientationDimension::adjustAngle() {
-	angle.clipValue();
+
+
+void Axis::adjustGLModelMatrixAccordingly() const {
+	rotate(angle.incrementationStepCoeff * angle.getValue()); 
 }
 
-void OrientationDimension::reset() {
-	angle.reset();
-	velocity.reset();
+
+void Axis::adjustGLModelMatrixInversely() const {
+	rotate(angle.decrementationStepCoeff * angle.getValue());
 }
 
+
+void Axis::adjustGLModelMatrixTargetAngleAccordingly() const {
+	rotate(angle.incrementationStepCoeff * getTargetAngle());
+}
 
 
 ////////////////////////////////////////////////////////////
 /// Target Angle
 ////////////////////////////////////////////////////////////
-void OrientationDimension::setTargetAngleParameters() {
+
+void Axis::setTargetAngleParameters() {
 	targetAngle = angle.drawArbitraryValue();
 	if (targetAngle == angle.getValue()) {
 		targetAngleState = TargetAngleState::Reached;
@@ -164,17 +216,9 @@ void OrientationDimension::setTargetAngleParameters() {
 	determineTargetAngleApproachManner();
 	targetAngleState = TargetAngleState::YetToBeReached;
 }
-void UnlimitedOrientationDimension::determineTargetAngleApproachManner() {
-	float decrementalDifference = targetAngle > angle.getValue() ? angle.getValue() + 360 - targetAngle : angle.getValue() - targetAngle;
-	float incrementalDifference = targetAngle < angle.getValue() ? 360 - angle.getValue() + targetAngle : targetAngle - angle.getValue();
 
-	targetAngleApproachManner = incrementalDifference < decrementalDifference;
-}
-void LimitedOrientationDimension::determineTargetAngleApproachManner() {
-	targetAngleApproachManner = targetAngle > angle.getValue();
-}
 
-void OrientationDimension::approachTargetAngle() {
+void Axis::approachTargetAngle() {
 	float step = std::min<float>(velocity.getValue(), abs(targetAngle - angle.getValue()));
 	if (targetAngleApproachManner == 1)
 		angle += step;
@@ -186,59 +230,46 @@ void OrientationDimension::approachTargetAngle() {
 		targetAngleState = TargetAngleState::Reached;
 }
 
-OrientationDimension::TargetAngleState OrientationDimension::getTargetAngleState() const {
+Axis::TargetAngleState Axis::getTargetAngleState() const {
 	return targetAngleState;
 }
 
-void OrientationDimension::resetTargetAngleParameters() {
+void Axis::resetTargetAngleParameters() {
 	targetAngle = UNINITIALIZED;
 	targetAngleApproachManner = UNINITIALIZED;
 	targetAngleState = TargetAngleState::Disabled;
 }
 
-int OrientationDimension::getTargetAngle() const{
+int Axis::getTargetAngle() const {
 	return targetAngle;
 }
 #pragma endregion
 
 
-
-#pragma region Axis
-////////////////////////////////////////////////////////////
-/// Axis
-////////////////////////////////////////////////////////////
-Axis::Axis(OrientationDimension* orientation, glRotationFunction rotationFunction):
-	orientation(orientation),
-	rotate(rotationFunction)
-{}
-Axis::~Axis() {
-	delete orientation;
+void YawAxis::adjustAngle() {
+	if (angle >= 360)
+		angle -= 360;
+	else if (angle <= 0)
+		angle += 360;
 }
 
 
+void YawAxis::determineTargetAngleApproachManner() {
+	float decrementalDifference = targetAngle > angle.getValue() ? angle.getValue() + 360 - targetAngle : angle.getValue() - targetAngle;
+	float incrementalDifference = targetAngle < angle.getValue() ? 360 - angle.getValue() + targetAngle : targetAngle - angle.getValue();
 
-void Axis::adjustGLModelMatrixAccordingly() const {
-	rotate(orientation->angle.incrementationStepCoeff * orientation->angle.getValue()); 
-}
-void Axis::adjustGLModelMatrixInversely() const {
-	rotate(orientation->angle.decrementationStepCoeff * orientation->angle.getValue());
-}
-
-
-
-void Axis::adjustGLModelMatrixTargetAngleAccordingly() const {
-	rotate(orientation->angle.incrementationStepCoeff * orientation->getTargetAngle());
+	targetAngleApproachManner = incrementalDifference < decrementalDifference;
 }
 
 
+void TiltAxis::adjustAngle() {
+	angle.clipValue();
+}
 
-YawAxis::YawAxis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction):
-	Axis::Axis(new UnlimitedOrientationDimension(std::move(angle), std::move(velocity)), rotationFunction)
-{}
-TiltAxis::TiltAxis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction) :
-	Axis::Axis(new LimitedOrientationDimension(std::move(angle), std::move(velocity)), rotationFunction)
-{}
-#pragma endregion
+
+void TiltAxis::determineTargetAngleApproachManner() {
+	targetAngleApproachManner = targetAngle > angle.getValue();
+}
 
 
 
@@ -297,12 +328,12 @@ Robot::~Robot() {
 void Robot::update() {
 	// update axes states
 	for (Axis* axisPointer : axes)
-		axisPointer->orientation->update();
+		axisPointer->update();
 
 	// check whether all axes have reached target angles
 	if (approachArbitraryAxisConfiguration_b) {
 		for (Axis* axisPointer : axes) {
-			if (axisPointer->orientation->getTargetAngleState() == OrientationDimension::TargetAngleState::YetToBeReached)
+			if (axisPointer->getTargetAngleState() == Axis::TargetAngleState::YetToBeReached)
 				return;
 		}
 		
@@ -311,7 +342,7 @@ void Robot::update() {
 			approachArbitraryAxisConfiguration_b = false;
 			drawTCPCoordSystem_b = drawTCPCoordSystemPrevious_b;
 			for (Axis* axisPointer : axes)
-				axisPointer->orientation->resetTargetAngleParameters();
+				axisPointer->resetTargetAngleParameters();
 		}
 		// otherwise initialize new approach cycle
 		else
@@ -320,19 +351,16 @@ void Robot::update() {
 }
 
 
-
 void Robot::reset() {
 	for (Axis* axisPointer : axes)
-		axisPointer->orientation->reset();
+		axisPointer->reset();
 }
-
 
 
 void Robot::setArbitraryAxesConfiguration() {
 	for (Axis* axisPointer : axes)
-		axisPointer->orientation->angle.setArbitrarily();
+		axisPointer->angle.setArbitrarily();
 }
-
 
 
 void Robot::initializeArbitraryAxisConfigurationApproach() {
@@ -343,9 +371,8 @@ void Robot::initializeArbitraryAxisConfigurationApproach() {
 	drawTCPCoordSystem_b = true;
 
 	for (Axis* axisPointer : axes)
-		axisPointer->orientation->setTargetAngleParameters();
+		axisPointer->setTargetAngleParameters();
 }
-
 
 
 ////////////////////////////////////////////////////////////
@@ -400,8 +427,8 @@ void Robot::displayAxesStates() const {
 		std::ostringstream oss;
 
 		// add angle state
-		oss << roundf(axes[i]->orientation->angle.getValue() * 100.) / 100. << 'o';  // '°' not renderable by bitmap font
-		if (axes[i]->orientation->angle.limitReached())
+		oss << roundf(axes[i]->angle.getValue() * 100.) / 100. << 'o';  // '°' not renderable by bitmap font
+		if (axes[i]->angle.limitReached())
 			oss << "!";
 
 		// pad to uniform length
@@ -411,8 +438,8 @@ void Robot::displayAxesStates() const {
 		oss << " ";
 
 		// add velocity
-		oss << axes[i]->orientation->velocity.getValue() << "m/s";
-		if (axes[i]->orientation->velocity.limitReached())
+		oss << axes[i]->velocity.getValue() << "m/s";
+		if (axes[i]->velocity.limitReached())
 			oss << "!";
 
 		Text::displayColored(Vector2(0.75, 0.8 - (i * 0.05)), oss.str().c_str(), Color(0.8f), GLUT_BITMAP_9_BY_15);
@@ -647,7 +674,7 @@ void Robot::drawBottom() const {
 
 #pragma region Axes
 ////////////////////////////////////////////////////////////
-/// ...glTransformationAxes
+/// ...Axes
 ////////////////////////////////////////////////////////////
 const Vector3 Robot::relativeAxesStartPositionShiftVectors[Robot::N_AXES + 1] = {
 	Vector3(0, 4.6, 0),

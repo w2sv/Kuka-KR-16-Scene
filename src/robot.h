@@ -56,92 +56,64 @@ struct VelocityState: public AxisParameterState {
 
 
 
-#pragma region OrientationDimension
-struct OrientationDimension {
-	public:
-		AngleState angle;
-		VelocityState velocity;
-		OrientationDimension(AngleState&& angle, VelocityState&& velocity);
-		virtual ~OrientationDimension();
-
-		void update();
-		void reset();
-
-		// ---------------TargetAngleAttributes-------------------
-
-		enum TargetAngleState {
-			Disabled,
-			YetToBeReached,
-			Reached
-		};
-
-		void setTargetAngleParameters();
-		TargetAngleState getTargetAngleState() const;
-		void resetTargetAngleParameters();
-		int getTargetAngle() const;
-	protected:
-		void updateVelocity();
-		void updateAngle();
-		/// Adjusts angle state wrt specific OrientationDimension kind, i.e. subclass
-		/// post update
-		virtual void adjustAngle() = 0;
-
-		// ---------------TargetAngleAttributes-------------------
-
-		int targetAngle;
-		bool targetAngleApproachManner;  // 0=decrementally, 1=incrementally
-		TargetAngleState targetAngleState;
-
-		/// Determines targetAngleApproachManner granting the quickest attainment
-		virtual void determineTargetAngleApproachManner() = 0;
-		void approachTargetAngle();
-};
-
-
-/**
-* Orientation Dimension of unlimited range of motion
-*/
-struct UnlimitedOrientationDimension : public OrientationDimension {
-	using OrientationDimension::OrientationDimension;
-private:
-	void adjustAngle() override;
-	void determineTargetAngleApproachManner() override;
-};
-
-
-
-/**
-* Orientation Dimension of limited range of motion
-*/
-struct LimitedOrientationDimension : public OrientationDimension {
-	using OrientationDimension::OrientationDimension;
-private:
-	void adjustAngle() override;
-	void determineTargetAngleApproachManner() override;
-};
-#pragma endregion
-
-
-
 #pragma region Axis
 struct Axis {
-	Axis(OrientationDimension* orientation, glRotationFunction rotationFunction);
+	AngleState angle;
+	VelocityState velocity;
+	const glRotationFunction rotate;
+
+	Axis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction);
 	virtual ~Axis();
 
-	OrientationDimension* orientation;
-	const glRotationFunction rotate;
+	void update();
+	void reset();
 
 	void adjustGLModelMatrixAccordingly() const;
 	void adjustGLModelMatrixInversely() const;
-	
+
 	void adjustGLModelMatrixTargetAngleAccordingly() const;
+
+	// ---------------TargetAngleAttributes-------------------
+
+	enum TargetAngleState {
+		Disabled,
+		YetToBeReached,
+		Reached
+	};
+
+	void setTargetAngleParameters();
+	TargetAngleState getTargetAngleState() const;
+	void resetTargetAngleParameters();
+	int getTargetAngle() const;
+protected:
+	void updateVelocity();
+	void updateAngle();
+	/// Adjusts angle state wrt specific OrientationDimension kind, i.e. subclass
+	/// post update
+	virtual void adjustAngle() = 0;
+
+	// ---------------TargetAngleAttributes-------------------
+
+	int targetAngle;
+	bool targetAngleApproachManner;  // 0=decrementally, 1=incrementally
+	TargetAngleState targetAngleState;
+
+	/// Determines targetAngleApproachManner granting the quickest attainment
+	virtual void determineTargetAngleApproachManner() = 0;
+	void approachTargetAngle();
 };
 
 struct YawAxis : public Axis {
-	YawAxis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction);
+	using Axis::Axis;
+private:
+	void determineTargetAngleApproachManner();
+	void adjustAngle();
 };
 struct TiltAxis : public Axis {
-	TiltAxis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction);
+	using Axis::Axis;
+private:
+	void determineTargetAngleApproachManner();
+	void adjustAngle();
 };
 #pragma endregion
 
