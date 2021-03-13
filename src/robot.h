@@ -17,7 +17,7 @@
 struct AxisParameterState: public ValueAbstraction<float> {
 public:
 	AxisParameterState(float startValue, Extrema&& limits);
-	virtual ~AxisParameterState();
+	~AxisParameterState();
 
 	bool limitReached() const;
 	void reset();
@@ -201,10 +201,10 @@ private:
 	/* ------------------Components------------------- */
 
 	void drawPedestal() const;
-	const float PEDASTEL_HEIGHT = 3;
+	static const float PEDASTEL_HEIGHT;
 
 	void drawBottom() const;
-	const float LOWER_STEEL_CYLINDER_HEIGHT = 1.6;
+	static const float LOWER_STEEL_CYLINDER_HEIGHT;
 
 		/* --------------AXES------------------ */
 

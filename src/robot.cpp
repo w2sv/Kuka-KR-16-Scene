@@ -212,10 +212,14 @@ void Axis::TargetAngle::reset() {
 
 
 void Axis::TargetAngle::updateState(float currentAngle) {
-	currentAngle == value ? State::Reached : State::YetToBeReached;
+	state = currentAngle == value ? State::Reached : State::YetToBeReached;
 }
 #pragma endregion
 
+
+////////////////////////////////////////////////////////////
+/// YawAxis(Axis)
+////////////////////////////////////////////////////////////
 
 void YawAxis::adjustAngle() {
 	if (angle >= 360)
@@ -232,6 +236,10 @@ void YawAxis::determineTargetAngleApproachManner() {
 	targetAngle.approachManner = incrementalDifference < decrementalDifference;
 }
 
+
+////////////////////////////////////////////////////////////
+/// TiltAxis(Axis)
+////////////////////////////////////////////////////////////
 
 void TiltAxis::adjustAngle() {
 	angle.clipValue();
@@ -355,11 +363,9 @@ void Robot::toggleTCPCoordSystem() {
 }
 
 
-
 void Robot::toggleAxesStatesDisplay() {
 	displayAxesStates_b = !displayAxesStates_b;
 }
-
 
 
 void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
@@ -372,7 +378,6 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 }
 
 
-
 ////////////////////////////////////////////////////////////
 /// .Text
 ////////////////////////////////////////////////////////////
@@ -381,14 +386,12 @@ bool Robot::textToBeDisplayed() const {
 }
 
 
-
 void Robot::displayText() const {
 	if (displayAxesStates_b)
 		displayAxesStates();
 	if (approachArbitraryAxisConfigurationInfinitely_b)
 		displayInfiniteAutomaticConfigurationApproachModeText();
 }
-
 
 
 void Robot::displayAxesStates() const {
@@ -418,11 +421,9 @@ void Robot::displayAxesStates() const {
 }
 
 
-
 void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
 	Text::displayColored(Vector2(-0.9, 0.85), "Infinite Random Configuration Approach Mode", Color::fromUnnormalizedValues(214, 15, 38), GLUT_BITMAP_9_BY_15);
 }
-
 
 
 ////////////////////////////////////////////////////////////
@@ -443,7 +444,6 @@ void Robot::loadObjects() {
 		Robot::objects[i].load(joinPath(DIR_PATH, FILE_NAMES[i]), false);
 	}
 }
-
  
 
 void Robot::setObjectMaterials() {
@@ -457,7 +457,6 @@ void Robot::setObjectMaterials() {
 	objects[Object::TiltAxis2].setMaterial(BASE_COLOR, spec, shine, emis);
 	objects[Object::KukaLogo].setMaterial(COLORS::BLACK, spec, shine, emis);
 }
-
 
 
 ////////////////////////////////////////////////////////////
@@ -480,7 +479,6 @@ void Robot::loadTextures() {
 		textures[i].setEnvMode(GL_MODULATE);
 	}
 }
-
 
 
 ////////////////////////////////////////////////////////////
@@ -514,13 +512,11 @@ void Robot::draw() const {
 }
 
 
-
 void Robot::drawShrunkCoordSystem() {
 	static Extrema TCP_COORD_SYSTEM_EXTREMA(-1, 1);
 
 	drawCoordSystem(TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, 0.3);
 }
-
 
 
 void Robot::drawTargetAxesConfigurationCoordSystem() const {
@@ -536,7 +532,6 @@ void Robot::drawTargetAxesConfigurationCoordSystem() const {
 		drawShrunkCoordSystem();
 	glPopMatrix();
 }
-
 
 
 #pragma region Parts
@@ -588,7 +583,6 @@ void Robot::drawScrewCircle() const {
 #pragma endregion
 
 
-
 #pragma region Components
 ////////////////////////////////////////////////////////////
 /// ..Components
@@ -608,7 +602,6 @@ void Robot::drawPedestal() const {
 
 	glPopMatrix();
 }
-
 
 
 void Robot::drawBottom() const {
@@ -642,19 +635,19 @@ void Robot::drawBottom() const {
 #pragma endregion
 
 
-
 #pragma region Axes
 ////////////////////////////////////////////////////////////
 /// ...Axes
 ////////////////////////////////////////////////////////////
 const Vector3 Robot::relativeAxesStartPositionShiftVectors[Robot::N_AXES + 1] = {
-	Vector3(0, 4.6, 0),
+	Vector3(0, Robot::PEDASTEL_HEIGHT + Robot::LOWER_STEEL_CYLINDER_HEIGHT, 0),
 	Vector3(1.65, 1.63, 0.5),
 	Vector3(0, 4.4, 0),
 	Vector3(3.7635, 0, -0.25),
 	Vector3(1.03, 0, 0),
 };
-
+const float Robot::PEDASTEL_HEIGHT = 3.f;
+const float Robot::LOWER_STEEL_CYLINDER_HEIGHT = 1.6f;
 
 
 void Robot::drawFirstAxis() const {
@@ -690,7 +683,6 @@ void Robot::drawFirstAxis() const {
 		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
-
 
 
 void Robot::drawSecondAxis()const {
@@ -745,7 +737,6 @@ void Robot::drawSecondAxis()const {
 		this->drawAxisWeight();
 	glPopMatrix();
 }
-
 
 
 void Robot::drawThirdAxis() const {
@@ -804,7 +795,6 @@ void Robot::drawThirdAxis() const {
 }
 
 
-
 void Robot::drawFourthAxis() const {
 	glPushMatrix();
 		Y::rotate(-90);
@@ -849,7 +839,6 @@ void Robot::drawFourthAxis() const {
 #pragma endregion
 
 
-
 ////////////////////////////////////////////////////////////
 /// .Camera
 ////////////////////////////////////////////////////////////
@@ -859,14 +848,12 @@ void Robot::attachCameraToTCP() const {
 }
 
 
-
 void Robot::attachCameraToTCPReversely() const {
 	Z::rotate(-90);
 	X::translate(-1);
 
 	approachSpatialTCPConfigurationInversely();
 }
-
 
 
 void Robot::approachSpatialTCPConfigurationInversely() const {
