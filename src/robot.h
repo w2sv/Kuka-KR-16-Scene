@@ -14,24 +14,17 @@
 *	Interface for structs encapsulating singular robot axis parameter modifyable by
 *	user at runtime and the entirety of inherent attributes
 */
-struct AxisParameterState {
+struct AxisParameterState: public ValueAbstraction<float> {
 public:
 	AxisParameterState(float startValue, Extrema&& limits);
 	virtual ~AxisParameterState();
 
-	float getValue() const;
 	bool limitReached() const;
 	void reset();
 
 	void updateLimitReached();
 	void clipValue();
-
-	void operator+=(float increment);
-	void operator-=(float decrement);
-	bool operator<=(float value);
-	bool operator>=(float value);
 protected:
-	float value;
 	bool limitReached_b;
 
 	const float startValue;
@@ -60,7 +53,6 @@ struct VelocityState: public AxisParameterState {
 struct Axis {
 	AngleState angle;
 	VelocityState velocity;
-	const glRotationFunction rotate;
 
 	Axis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction);
 	virtual ~Axis();
@@ -70,21 +62,25 @@ struct Axis {
 
 	void adjustGLModelMatrixAccordingly() const;
 	void adjustGLModelMatrixInversely() const;
-
 	void adjustGLModelMatrixTargetAngleAccordingly() const;
 
-	// ---------------TargetAngleAttributes-------------------
+	struct TargetAngle : public ValueAbstraction<float> {
+		enum State {
+			Disabled,
+			YetToBeReached,
+			Reached
+		};
 
-	enum TargetAngleState {
-		Disabled,
-		YetToBeReached,
-		Reached
+		bool approachManner;  // 0=decrementally, 1=incrementally
+		State state;
+		TargetAngle();
+
+		void reset();
+		void updateState(float currentAngle);
 	};
 
+	TargetAngle targetAngle;
 	void setTargetAngleParameters();
-	TargetAngleState getTargetAngleState() const;
-	void resetTargetAngleParameters();
-	int getTargetAngle() const;
 protected:
 	void updateVelocity();
 	void updateAngle();
@@ -94,14 +90,13 @@ protected:
 
 	// ---------------TargetAngleAttributes-------------------
 
-	int targetAngle;
-	bool targetAngleApproachManner;  // 0=decrementally, 1=incrementally
-	TargetAngleState targetAngleState;
-
 	/// Determines targetAngleApproachManner granting the quickest attainment
 	virtual void determineTargetAngleApproachManner() = 0;
 	void approachTargetAngle();
+private:
+	const glRotationFunction rotate;
 };
+
 
 struct YawAxis : public Axis {
 	using Axis::Axis;
@@ -109,6 +104,8 @@ private:
 	void determineTargetAngleApproachManner();
 	void adjustAngle();
 };
+
+
 struct TiltAxis : public Axis {
 	using Axis::Axis;
 private:

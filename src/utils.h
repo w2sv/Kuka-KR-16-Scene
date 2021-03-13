@@ -15,6 +15,33 @@
 #endif
 
 
+template <typename T> struct ValueAbstraction {
+	T value;
+	ValueAbstraction(T value): value(value) {}
+	~ValueAbstraction(){}
+
+	bool operator<(const ValueAbstraction& other) { return value < other.value; }
+	bool operator>(const ValueAbstraction& other) { return value > other.value; }
+	bool operator<=(const ValueAbstraction& other) { return value <= other.value; }
+	bool operator>=(const ValueAbstraction& other) { return value >= other.value; }
+	bool operator==(const ValueAbstraction& other) { return value == other.value; }
+	bool operator!=(const ValueAbstraction& other) { return value != other.value; }
+	
+	void operator+=(const ValueAbstraction<T>& other) { value += other.value; }
+	void operator-=(const ValueAbstraction<T>& other) { value -= other.value; }
+	friend T operator+(const ValueAbstraction<T>& inst, const ValueAbstraction<T>& other) { return inst.value + other.value; }
+	friend T operator-(const ValueAbstraction<T>& inst, const ValueAbstraction<T>& other) { return inst.value - other.value; }
+
+	void operator*=(const ValueAbstraction& other) { inst.value *= other.value; }
+	void operator/=(const ValueAbstraction& other) { inst.value /= other.value; }
+	friend T operator*(const ValueAbstraction<T>& inst, const ValueAbstraction<T>& other) { return inst.value * other.value; }
+	friend T operator/(const ValueAbstraction<T>& inst, const ValueAbstraction<T>& other) { return inst.value / other.value; }
+#if DEBUG
+	virtual friend std::ostream& operator<<(std::ostream& os, const ValueAbstraction<T>& inst) { os << value; return os; }
+#endif
+};
+
+
 ////////////////////////////////////////////////////////////
 /// File System
 ////////////////////////////////////////////////////////////
