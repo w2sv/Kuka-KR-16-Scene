@@ -72,7 +72,7 @@ void processInput(Robot& robot, Camera& camera) {
 
 	// toggle tcp coord system
 	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1)
-		robot.toggleDrawTCPCoordSystem();
+		robot.toggleTCPCoordSystem();
 
 	// approach random configuration
 	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
@@ -127,7 +127,7 @@ void processInput(Robot& robot, Camera& camera) {
 
 	// display axes states text
 	else if (cg_key::keyState('m') == 1)
-		robot.toggleDisplayAxesStates();
+		robot.toggleAxesStatesDisplay();
 
 	/// ---------------------Graphics----------------------
 

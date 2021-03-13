@@ -351,14 +351,14 @@ void Robot::initializeArbitraryAxisConfigurationApproach() {
 ////////////////////////////////////////////////////////////
 /// ..Toggling
 ////////////////////////////////////////////////////////////
-void Robot::toggleDrawTCPCoordSystem() {
+void Robot::toggleTCPCoordSystem() {
 	if (!approachArbitraryAxisConfiguration_b)
 		drawTCPCoordSystem_b = !drawTCPCoordSystem_b;
 }
 
 
 
-void Robot::toggleDisplayAxesStates() {
+void Robot::toggleAxesStatesDisplay() {
 	displayAxesStates_b = !displayAxesStates_b;
 }
 

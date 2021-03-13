@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef ROBOT_H
-#define ROBOT_H
-
 #include "wavefront.h"
 #include "glutils.h"
 #include "utils.h"
@@ -43,9 +40,9 @@ protected:
 
 
 struct AngleState : public AxisParameterState {
-	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey, bool invertedControl = false);
 	const char incrementationKey, decrementationKey;
 	const int incrementationStepCoeff, decrementationStepCoeff;
+	AngleState(float startValue, Extrema&& limits, char incrementationKey, char decrementationKey, bool invertedControl = false);
 
 	/// Samples hardware randomized value within value limits
 	int drawArbitraryValue() const;
@@ -62,11 +59,10 @@ struct VelocityState: public AxisParameterState {
 #pragma region OrientationDimension
 struct OrientationDimension {
 	public:
-		OrientationDimension(AngleState&& angle, VelocityState&& velocity);
-		virtual ~OrientationDimension();
-
 		AngleState angle;
 		VelocityState velocity;
+		OrientationDimension(AngleState&& angle, VelocityState&& velocity);
+		virtual ~OrientationDimension();
 
 		void update();
 		void reset();
@@ -107,7 +103,6 @@ struct OrientationDimension {
 */
 struct UnlimitedOrientationDimension : public OrientationDimension {
 	using OrientationDimension::OrientationDimension;
-
 private:
 	void adjustAngle() override;
 	void determineTargetAngleApproachManner() override;
@@ -120,7 +115,6 @@ private:
 */
 struct LimitedOrientationDimension : public OrientationDimension {
 	using OrientationDimension::OrientationDimension;
-
 private:
 	void adjustAngle() override;
 	void determineTargetAngleApproachManner() override;
@@ -174,14 +168,16 @@ public:
 
 	/* ------------Toggling----------------- */
 
-	void toggleDrawTCPCoordSystem();
-	void toggleDisplayAxesStates();
+	void toggleTCPCoordSystem();
+	void toggleAxesStatesDisplay();
 	void toggleInfiniteArbitraryAxisConfigurationApproachMode();
 
 	/* ------------Camera----------------- */
 
 	void attachCameraToTCP() const;
 	void attachCameraToTCPReversely() const;
+
+	/* -------------Text----------------- */
 
 	bool textToBeDisplayed() const;
 	void displayText() const;
@@ -258,4 +254,3 @@ private:
 
 	void approachSpatialTCPConfigurationInversely() const;
 };
-#endif
