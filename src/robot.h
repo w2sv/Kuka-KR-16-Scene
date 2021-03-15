@@ -16,6 +16,7 @@
 */
 struct AxisParameterState: public ValueAbstraction<float> {
 public:
+	const float startValue;
 	AxisParameterState(float startValue, Extrema&& limits);
 
 	bool limitReached() const;
@@ -25,8 +26,7 @@ public:
 	void clipValue();
 protected:
 	bool limitReached_b;
-
-	const float startValue;
+	
 	const Extrema limits;
 };
 
@@ -81,7 +81,7 @@ struct Axis {
 	};
 
 	TargetAngle targetAngle;
-	void setTargetAngleParameters();
+	void setTargetAngleParameters(bool targetHomePosition = false);
 protected:
 	void updateVelocity();
 	void updateAngle();
@@ -132,6 +132,7 @@ public:
 	void reset();
 	void setArbitraryAxesConfiguration();
 
+	void initializeHomePositionApproach();
 	void initializeArbitraryAxisConfigurationApproach();
 
 	/* ------------Toggling----------------- */
@@ -154,6 +155,7 @@ private:
 
 	bool approachArbitraryAxisConfigurationInfinitely_b;
 	bool approachArbitraryAxisConfiguration_b;
+	bool approachHomePosition_b;
 
 	bool drawTCPCoordSystem_b, drawTCPCoordSystemPrevious_b;
 	bool displayAxesStates_b;

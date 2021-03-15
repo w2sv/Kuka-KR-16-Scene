@@ -154,11 +154,13 @@ void Axis::updateAngle() {
 
 
 float Axis::fpsNormalizedAngleStep(float unnormalizedStep) {
-	static const float REFERENCE_FPS = 160.f;
-
-	return unnormalizedStep * REFERENCE_FPS / GlobalState::fps;
+	return unnormalizedStep;
 }
 
+
+////////////////////////////////////////////////////////////
+/// glModelMatrix Manipulation
+////////////////////////////////////////////////////////////
 
 void Axis::adjustGLModelMatrixAccordingly() const {
 	rotate(angle.incrementationStepCoeff * angle); 
@@ -175,12 +177,28 @@ void Axis::adjustGLModelMatrixTargetAngleAccordingly() const {
 }
 
 
+////////////////////////////////////////////////////////////
+/// TargetAngle
+////////////////////////////////////////////////////////////
+
+void Axis::setTargetAngleParameters(bool targetHomePosition) {
+	targetAngle.value = targetHomePosition ? angle.startValue : angle.drawArbitraryValue();
+	targetAngle.updateState(angle.value);
+
+	if (targetAngle.state == TargetAngle::State::Reached)
+		return;
+
+	determineTargetAngleApproachManner();
+}
+
+
 void Axis::approachTargetAngle() {
-	float step = std::min<float>(velocity.value, abs(targetAngle - angle));
-	if (targetAngle.approachManner)
-		angle += fpsNormalizedAngleStep(step);
-	else
-		angle -= fpsNormalizedAngleStep(step);
+	float angleDifferenceAbs = abs(targetAngle - angle);
+	if (angleDifferenceAbs > 180)
+		angleDifferenceAbs = abs(angleDifferenceAbs - 360);
+
+	float step = std::min<float>(velocity.value, angleDifferenceAbs);
+	targetAngle.approachManner ? angle += fpsNormalizedAngleStep(step): angle -= fpsNormalizedAngleStep(step);
 
 	targetAngle.updateState(angle.value);
 }
@@ -194,17 +212,6 @@ Axis::TargetAngle::TargetAngle():
 	ValueAbstraction<float>(NULL)
 { 
 	reset(); 
-}
-
-
-void Axis::setTargetAngleParameters() {
-	targetAngle.value = angle.drawArbitraryValue();
-	targetAngle.updateState(angle.value);
-
-	if (targetAngle.state == TargetAngle::State::Reached)
-		return;
-	
-	determineTargetAngleApproachManner();
 }
 
 
@@ -292,7 +299,8 @@ Robot::Robot():
 	drawTCPCoordSystemPrevious_b(false),
 	displayAxesStates_b(true),
 	approachArbitraryAxisConfiguration_b(false),
-	approachArbitraryAxisConfigurationInfinitely_b(false)
+	approachArbitraryAxisConfigurationInfinitely_b(false),
+	approachHomePosition_b(false)
 {}
 
 
@@ -317,9 +325,14 @@ void Robot::update() {
 		// reset target angle parameters if so and infinite approach == false
 		if (!approachArbitraryAxisConfigurationInfinitely_b) {
 			approachArbitraryAxisConfiguration_b = false;
-			drawTCPCoordSystem_b = drawTCPCoordSystemPrevious_b;
+			
 			for (Axis* axisPointer : axes)
 				axisPointer->targetAngle.reset();
+			
+			if (approachHomePosition_b)
+				approachHomePosition_b = false;
+			else
+				drawTCPCoordSystem_b = drawTCPCoordSystemPrevious_b;
 		}
 		// otherwise initialize new approach cycle
 		else
@@ -350,6 +363,15 @@ void Robot::initializeArbitraryAxisConfigurationApproach() {
 	for (Axis* axisPointer : axes)
 		axisPointer->setTargetAngleParameters();
 }
+
+
+void Robot::initializeHomePositionApproach() {
+	approachArbitraryAxisConfiguration_b = approachHomePosition_b = true;
+
+	for (Axis* axisPointer : axes)
+		axisPointer->setTargetAngleParameters(true);
+}
+
 
 
 ////////////////////////////////////////////////////////////
@@ -489,10 +511,11 @@ void Robot::loadTextures() {
 
 void Robot::draw() const {
 	// draw target axis configuration coord system if applicable
-	if (approachArbitraryAxisConfiguration_b)
+	if (approachArbitraryAxisConfiguration_b && !approachHomePosition_b)
 		drawTargetAxesConfigurationCoordSystem();
 
 	// draw robot
+
 	glPushMatrix();
 		
 		// base

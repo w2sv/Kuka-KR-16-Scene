@@ -1,8 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#ifdef DEBUG
 #include <iostream>
-#endif
 
 #include "state.h"
 #include "help.h"
@@ -23,7 +21,6 @@
 const Extrema groundMeasurements(-20, 20);
 
 
-
 int main(int argc, char** argv) {
 	init(argc, argv);
 
@@ -41,7 +38,6 @@ int main(int argc, char** argv) {
 }
 
 
-
 void drawScene(const Robot& robot){
 
 	// draw ground
@@ -54,7 +50,6 @@ void drawScene(const Robot& robot){
 }
 
 
-
 void processInput(Robot& robot, Camera& camera) {
 
 	/// ---------------------Robot----------------------
@@ -62,24 +57,27 @@ void processInput(Robot& robot, Camera& camera) {
 	// axes angle/velocity
 	robot.update();
 
-	// reset
-	if (cg_key::specialKeyState(GLUT_KEY_F1) == 1)
-		robot.reset();
-
-	// set arbitrary configuration
-	else if (cg_key::specialKeyState(GLUT_KEY_F2) == 1)
-		robot.setArbitraryAxesConfiguration();
-
 	// toggle tcp coord system
-	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1)
+	if (cg_key::specialKeyState(GLUT_KEY_F1) == 1)
 		robot.toggleTCPCoordSystem();
 
-	// approach random configuration
-	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
-		robot.initializeArbitraryAxisConfigurationApproach();
+	// home position
+	if (cg_key::specialKeyState(GLUT_KEY_F2) == 1) {
+		if (cg_key::specialKeyState(GLUT_KEY_SHIFT_L) != 0)
+			robot.reset();
+		else
+			robot.initializeHomePositionApproach();
+	}
+
+	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1) {
+		if (cg_key::specialKeyState(GLUT_KEY_SHIFT_L) != 0)
+			robot.setArbitraryAxesConfiguration();
+		else
+			robot.initializeArbitraryAxisConfigurationApproach();
+	}
 
 	// approach random configuration infinitely
-	else if (cg_key::specialKeyState(GLUT_KEY_F5) == 1)
+	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
 		robot.toggleInfiniteArbitraryAxisConfigurationApproachMode();
 
 	/// ---------------------Camera----------------------
@@ -143,7 +141,6 @@ void processInput(Robot& robot, Camera& camera) {
 	else if (1 == cg_key::keyState('c'))
 		GlobalState::cullMode = !GlobalState::cullMode;
 }
-
 
 
 void displayFunc(){

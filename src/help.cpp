@@ -110,23 +110,24 @@ namespace Section {
 				static const float START_Y = 0.1;
 
 				displayColumn(Vector2(KEY_DESCRIPTION_COL_X, START_Y), {
-					"»Reset",
-					"»Snap to random configuration",
 					"»Toggle tcp coord system",
+					"»Approach home position",
+					"»Snap to home position",
 					"»Approach random configuration",
+					"»Snap to random configuration",
 					"»Toggle infinite random config-"
 					}, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
-				Text::display(Vector2(-0.785, -0.2), "uration approach mode");
+				Text::display(Vector2(-0.785, -0.26), "uration approach mode");
 
-				displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, START_Y + 0.005), { "F1", "F2", "F3", "F4", "F5" }, VERTICAL_COL_SPACE, KEY_COLOR);
+				displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, START_Y + 0.005), { "F1", "F2", "F2 Shift", "F3", "F3 Shift", "F4" }, VERTICAL_COL_SPACE, KEY_COLOR);
 			}
 		}
 
 		void camera() {
-			displaySectionTitle(Vector2(-0.53, -0.3), "Camera");
+			displaySectionTitle(Vector2(-0.53, -0.36), "Camera");
 
-			displayColumn(Vector2(KEY_DESCRIPTION_COL_X, -0.4), { "»Reset", "»Toggle orbit mode", "»Toggle tcp mode", "»Toggle reverse tcp mode" }, 0.06, KEY_DESCRIPTION_COLOR);
-			displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, -0.4), { "Left", "Right", "Up", "Down" }, 0.06, KEY_COLOR);
+			displayColumn(Vector2(KEY_DESCRIPTION_COL_X, -0.46), { "»Reset", "»Toggle orbit mode", "»Toggle tcp mode", "»Toggle reverse tcp mode" }, 0.06, KEY_DESCRIPTION_COLOR);
+			displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, -0.46), { "Left", "Right", "Up", "Down" }, 0.06, KEY_COLOR);
 		}
 	}
 

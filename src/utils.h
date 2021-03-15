@@ -9,7 +9,7 @@ template <typename T> struct ValueAbstraction {
 	T value;
 	ValueAbstraction(T value): value(value) {}
 	~ValueAbstraction(){}
-
+	
 	bool operator<(const ValueAbstraction& other) { return value < other.value; }
 	bool operator>(const ValueAbstraction& other) { return value > other.value; }
 	bool operator<=(const ValueAbstraction& other) { return value <= other.value; }
