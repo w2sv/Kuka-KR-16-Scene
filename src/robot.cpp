@@ -379,7 +379,7 @@ void Robot::initializeHomePositionApproach() {
 ////////////////////////////////////////////////////////////
 
 void Robot::toggleTCPCoordSystem() {
-	if (!approachArbitraryAxisConfiguration_b)
+	if (!approachArbitraryAxisConfiguration_b || approachHomePosition_b)
 		drawTCPCoordSystem_b = !drawTCPCoordSystem_b;
 }
 
