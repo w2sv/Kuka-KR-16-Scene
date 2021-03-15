@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <direct.h>
 #include <string>
 #include <random>

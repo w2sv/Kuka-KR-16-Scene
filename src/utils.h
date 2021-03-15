@@ -1,19 +1,9 @@
 #pragma once
 
 
-#ifndef	M_PI				// Pi
-#define M_PI 3.14159265358979323846
-#endif
-#ifndef SGN					// Vorzeichen bestimmen
-#define SGN(y) (((y) < 0) ? -1 : ((y) > 0))
-#endif
-#ifndef MIN					// Minimum bestimmen
-#define MIN(a,b) ((a) > (b))? (b) : (a)
-#endif
-#ifndef MAX					// Maximum bestimmen
-#define MAX(a,b) ((a) > (b))? (a) : (b)
-#endif
-
+////////////////////////////////////////////////////////////
+/// ValueAbstraction Baseclass
+////////////////////////////////////////////////////////////
 
 template <typename T> struct ValueAbstraction {
 	T value;
@@ -40,7 +30,6 @@ template <typename T> struct ValueAbstraction {
 	virtual friend std::ostream& operator<<(std::ostream& os, const ValueAbstraction<T>& inst) { os << value; return os; }
 #endif
 };
-
 
 ////////////////////////////////////////////////////////////
 /// File System

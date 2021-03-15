@@ -13,11 +13,11 @@
 #include <functional>
 #include <sstream>
 #include <string>
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 
 using namespace glTransformationAxes;
-
 
 
 #pragma region AxisParameterState
@@ -30,10 +30,6 @@ AxisParameterState::AxisParameterState(float startValue, Extrema&& limits):
 	startValue(startValue),
 	limits(limits),
 	limitReached_b(false)
-{}
-
-
-AxisParameterState::~AxisParameterState()
 {}
 
 
@@ -96,6 +92,7 @@ VelocityState::VelocityState(float max, char identificationKey):
 ////////////////////////////////////////////////////////////
 /// Axis
 ////////////////////////////////////////////////////////////
+
 Axis::Axis(AngleState&& angle, VelocityState&& velocity, glRotationFunction rotationFunction):
 	angle(angle),
 	velocity(velocity),
@@ -144,15 +141,22 @@ void Axis::updateAngle() {
 			break;
 		case (TargetAngle::State::Disabled):
 			if (cg_key::keyState(angle.decrementationKey) != 0)
-				angle += angle.incrementationStepCoeff * velocity;
+				angle += fpsNormalizedAngleStep(angle.incrementationStepCoeff * velocity);
 			else if (cg_key::keyState(angle.incrementationKey) != 0)
-				angle += angle.decrementationStepCoeff * velocity;
+				angle += fpsNormalizedAngleStep(angle.decrementationStepCoeff * velocity);
 			else
 				return;
 
-		adjustAngle();
-		angle.updateLimitReached();
+			adjustAngle();
+			angle.updateLimitReached();
 	}
+}
+
+
+float Axis::fpsNormalizedAngleStep(float unnormalizedStep) {
+	static const float REFERENCE_FPS = 160.f;
+
+	return unnormalizedStep * REFERENCE_FPS / GlobalState::fps;
 }
 
 
@@ -174,9 +178,9 @@ void Axis::adjustGLModelMatrixTargetAngleAccordingly() const {
 void Axis::approachTargetAngle() {
 	float step = std::min<float>(velocity.value, abs(targetAngle - angle));
 	if (targetAngle.approachManner)
-		angle += step;
+		angle += fpsNormalizedAngleStep(step);
 	else
-		angle -= step;
+		angle -= fpsNormalizedAngleStep(step);
 
 	targetAngle.updateState(angle.value);
 }
@@ -256,6 +260,7 @@ void TiltAxis::determineTargetAngleApproachManner() {
 ////////////////////////////////////////////////////////////
 /// Robot
 ////////////////////////////////////////////////////////////
+
 std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 	std::vector<Vector2> circlePoints;
 
@@ -266,10 +271,8 @@ std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 }
 
 
-
 const Color Robot::BASE_COLOR = Color::fromUnnormalizedValues(230, 80, 21);
 const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
-
 
 
 Robot::Robot():
@@ -293,17 +296,12 @@ Robot::Robot():
 {}
 
 
-
 Robot::~Robot() {
 	for (size_t i = 0; i < N_AXES; i++)
 		delete axes[i];
 }
 
 
-
-////////////////////////////////////////////////////////////
-/// .Publics
-////////////////////////////////////////////////////////////
 void Robot::update() {
 	// update axes states
 	for (Axis* axisPointer : axes)
@@ -316,7 +314,7 @@ void Robot::update() {
 				return;
 		}
 		
-		// reset target angle parameters if so and infinite approach mode false
+		// reset target angle parameters if so and infinite approach == false
 		if (!approachArbitraryAxisConfigurationInfinitely_b) {
 			approachArbitraryAxisConfiguration_b = false;
 			drawTCPCoordSystem_b = drawTCPCoordSystemPrevious_b;
@@ -357,6 +355,7 @@ void Robot::initializeArbitraryAxisConfigurationApproach() {
 ////////////////////////////////////////////////////////////
 /// ..Toggling
 ////////////////////////////////////////////////////////////
+
 void Robot::toggleTCPCoordSystem() {
 	if (!approachArbitraryAxisConfiguration_b)
 		drawTCPCoordSystem_b = !drawTCPCoordSystem_b;
@@ -381,6 +380,7 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 ////////////////////////////////////////////////////////////
 /// .Text
 ////////////////////////////////////////////////////////////
+
 bool Robot::textToBeDisplayed() const {
 	return approachArbitraryAxisConfigurationInfinitely_b || displayAxesStates_b;
 }
@@ -429,6 +429,7 @@ void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
 ////////////////////////////////////////////////////////////
 /// .Objects
 ////////////////////////////////////////////////////////////
+
 cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 void Robot::loadObjects() {
 	const static char* DIR_PATH = getResourceSubDirPath("objects");
@@ -462,6 +463,7 @@ void Robot::setObjectMaterials() {
 ////////////////////////////////////////////////////////////
 /// .Textures
 ////////////////////////////////////////////////////////////
+
 cg_image Robot::textures[Robot::N_TEXTURES] = {};
 void Robot::loadTextures() {
 	const static char* DIR_PATH = getResourceSubDirPath("textures");
@@ -484,6 +486,7 @@ void Robot::loadTextures() {
 ////////////////////////////////////////////////////////////
 /// .Drawing
 ////////////////////////////////////////////////////////////
+
 void Robot::draw() const {
 	// draw target axis configuration coord system if applicable
 	if (approachArbitraryAxisConfiguration_b)
@@ -513,7 +516,7 @@ void Robot::draw() const {
 
 
 void Robot::drawShrunkCoordSystem() {
-	static Extrema TCP_COORD_SYSTEM_EXTREMA(-1, 1);
+	static const Extrema TCP_COORD_SYSTEM_EXTREMA(-1, 1);
 
 	drawCoordSystem(TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, TCP_COORD_SYSTEM_EXTREMA, 0.3);
 }
@@ -538,6 +541,7 @@ void Robot::drawTargetAxesConfigurationCoordSystem() const {
 ////////////////////////////////////////////////////////////
 /// ..Repeatedly Used Parts
 ////////////////////////////////////////////////////////////
+
 void Robot::drawAxisWeight() const {
 	const static float PEDASTEL_HEIGHT = 0.1;
 	const static float BLOCK_HEIGHT = 1;
@@ -547,28 +551,27 @@ void Robot::drawAxisWeight() const {
 		setDefaultLightAndMaterial(GlobalState::lightMode);
 
 		// draw lower octPrism pedastel
-			COLORS::BLACK.render();
+		COLORS::BLACK.render();
 		Z::translate(PEDASTEL_HEIGHT / 2);
-		OctogonalPrism::Vertices pedastelVertices = OctogonalPrism::draw(PEDASTEL_HEIGHT, 0.5, 0.2);
+			OctogonalPrism::Vertices pedastelVertices = OctogonalPrism::draw(PEDASTEL_HEIGHT, 0.5, 0.2);
 
-			COLORS::GREY.render();
+		COLORS::GREY.render();
 			OctogonalPrism::drawCage(pedastelVertices);
 
 		// draw octPrism block
-			COLORS::BLACK.render();
-			Z::translate(BLOCK_HEIGHT / 2);
+		COLORS::BLACK.render();
+		Z::translate(BLOCK_HEIGHT / 2);
 			OctogonalPrism::Vertices blockVertices = OctogonalPrism::draw(BLOCK_HEIGHT, 0.3, 0.3);
 
-			COLORS::GREY.render();
+		COLORS::GREY.render();
 			OctogonalPrism::drawCage(blockVertices);
 
 		// draw upper black cylinder
-			COLORS::BLACK.render();
-			Z::translate(BLOCK_HEIGHT / 2);
-		drawCylinder(0.1, 0.1, UPPER_CYLINDER_HEIGTH);
+		COLORS::BLACK.render();
+		Z::translate(BLOCK_HEIGHT / 2);
+			drawCylinder(0.1, 0.1, UPPER_CYLINDER_HEIGTH);
 	glPopMatrix();
 }
-
 
 
 void Robot::drawScrewCircle() const {
@@ -576,7 +579,7 @@ void Robot::drawScrewCircle() const {
 		glPushMatrix();
 			glTranslatef(SCREW_CIRCLE_POSITIONS[i].x, 0, SCREW_CIRCLE_POSITIONS[i].y);
 			glScaleUniformly(0.2);
-			objects[ScrewHead].draw();
+				objects[ScrewHead].draw();
 		glPopMatrix();
 	}
 }
@@ -587,15 +590,14 @@ void Robot::drawScrewCircle() const {
 ////////////////////////////////////////////////////////////
 /// ..Components
 ////////////////////////////////////////////////////////////
+
 void Robot::drawPedestal() const {
 	glPushMatrix();
 		Z::translate(PEDASTEL_HEIGHT / 2);
-
 		glScalef(8, PEDASTEL_HEIGHT, 8);
 			
 		Color(.6f).render();
 		textures[Texture::Knobs].bind();
-		
 		glEnable(GL_TEXTURE_2D);
 			drawCube();
 		glDisable(GL_TEXTURE_2D);
@@ -615,19 +617,19 @@ void Robot::drawBottom() const {
 		textures[Texture::Steel].bind();
 		glEnable(GL_TEXTURE_2D);
 
-		// lower segment
-		BASE_COLOR.render();
-		drawCylinder(1.4, 1, LOWER_SEGMENT_HEIGHT);
+			// lower segment
+			BASE_COLOR.render();
+				drawCylinder(1.4, 1, LOWER_SEGMENT_HEIGHT);
 
-		// central segment
-		Z::translate(LOWER_SEGMENT_HEIGHT);
-		Color(.4f).render();
-		drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
+			// central segment
+			Z::translate(LOWER_SEGMENT_HEIGHT);
+			Color(.4f).render();
+				drawCylinder(1, 1, CENTRAL_SEGMENT_HEIGHT);
 
-		// upper segment
-		Z::translate(CENTRAL_SEGMENT_HEIGHT);
-		BASE_COLOR.render();
-		drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
+			// upper segment
+			Z::translate(CENTRAL_SEGMENT_HEIGHT);
+			BASE_COLOR.render();
+				drawCylinder(1.3, 1.3, UPPER_SEGMENT_HEIGHT);
 
 		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
@@ -639,6 +641,7 @@ void Robot::drawBottom() const {
 ////////////////////////////////////////////////////////////
 /// ...Axes
 ////////////////////////////////////////////////////////////
+
 const Vector3 Robot::relativeAxesStartPositionShiftVectors[Robot::N_AXES + 1] = {
 	Vector3(0, Robot::PEDASTEL_HEIGHT + Robot::LOWER_STEEL_CYLINDER_HEIGHT, 0),
 	Vector3(1.65, 1.63, 0.5),
@@ -662,25 +665,27 @@ void Robot::drawFirstAxis() const {
 		glEnable(GL_TEXTURE_2D);
 			objects[YawAxis1].draw();
 		glDisable(GL_TEXTURE_2D);
+
 	glPopMatrix();
 
 	// draw axis weigth
 	glPushMatrix();
 		Z::translate(0.35);  // height of cylinder bottom disk
 		glScaleUniformly(1.3);
-		drawAxisWeight();
+			drawAxisWeight();
 	glPopMatrix();
 
 	glPushMatrix();
 		// draw second axis mount disk
-			BASE_COLOR.render();
 		glTranslatef(1.65, 1.63, 0.2);
 		X::rotate(90);
 		
+		BASE_COLOR.render();
 		textures[Texture::Steel].bind();
 		glEnable(GL_TEXTURE_2D);
 			drawCylinder(0.5, 0.5, AXIS_MOUNT_DISK_HEIGHT);
 		glDisable(GL_TEXTURE_2D);
+
 	glPopMatrix();
 }
 
@@ -707,34 +712,34 @@ void Robot::drawSecondAxis()const {
 						objects[TiltAxis1].draw();
 					glDisable(GL_TEXTURE_2D);
 
-					objects[KukaLogo].draw();
+						objects[KukaLogo].draw();
 				glPopMatrix();
 
 				// draw upper screw circle
 				glPushMatrix();
 					glTranslatef(0, 0, -LENGTH / 2);
-					this->drawScrewCircle();
+						drawScrewCircle();
 				glPopMatrix();
 			glPopMatrix();
 
-			// draw lower screw circle
-			this->drawScrewCircle();
+				// draw lower screw circle
+				drawScrewCircle();
 
 		glPopMatrix();
 
 		// draw orange axes weight pedastel octPrism
 		glTranslatef(0, -0.5, 0);
 		X::rotate(180);
-			BASE_COLOR.render();
-	
+
+		BASE_COLOR.render();
 			OctogonalPrism::Vertices weightPedastelVertices = OctogonalPrism::draw(0.15, 0.6, 0.1);
 			
-			COLORS::BLACK.render();
-		OctogonalPrism::drawCage(weightPedastelVertices);
+		COLORS::BLACK.render();
+			OctogonalPrism::drawCage(weightPedastelVertices);
 
 		// draw weight
 		Z::translate(0.09);
-		this->drawAxisWeight();
+			drawAxisWeight();
 	glPopMatrix();
 }
 
@@ -751,17 +756,19 @@ void Robot::drawThirdAxis() const {
 		
 		glPushMatrix();
 			glScaleUniformly(5);
-				textures[Texture::Steel].bind();
+
+			textures[Texture::Steel].bind();
 			glEnable(GL_TEXTURE_2D);
 				objects[TiltAxis2].draw();
 			glDisable(GL_TEXTURE_2D);
-		glPopMatrix();
+		
+			glPopMatrix();
 
 		// Z::translate(WIDTH * 0.1);
 		glScaleUniformly(1.4);
 		Z::rotate(180);
 		Y::rotate(90);
-		objects[KukaLogo].draw();
+			objects[KukaLogo].draw();
 	glPopMatrix();
 
 	// draw weight block at axis beginning along respective x-axes
@@ -777,8 +784,7 @@ void Robot::drawThirdAxis() const {
 				glTranslatef(0, 0, zTranslation);
 				glScalef(1, LATERAL_SCALING_FACTOR, LATERAL_SCALING_FACTOR);
 				Y::rotate(90);
-
-				this->drawAxisWeight();
+					drawAxisWeight();
 			glPopMatrix();
 		}
 	glPopMatrix();
@@ -789,8 +795,7 @@ void Robot::drawThirdAxis() const {
 		glScaleUniformly(0.8);
 		X::rotate(-90);
 		Z::rotate(45);
-
-		this->drawAxisWeight();
+			drawAxisWeight();
 	glPopMatrix();
 }
 
@@ -800,15 +805,15 @@ void Robot::drawFourthAxis() const {
 		Y::rotate(-90);
 
 		// partial cone
-		drawCylinder(0.2, 0.3, 0.15);
+			drawCylinder(0.2, 0.3, 0.15);
 
 		// short disk
 		glTranslatef(0, 0.15, 0);
-		drawCylinder(0.3, 0.3, 0.08);
+			drawCylinder(0.3, 0.3, 0.08);
 
 		// long disk
 		glTranslatef(0, 0.08, 0);
-		drawCylinder(0.27, 0.27, 0.3);
+			drawCylinder(0.27, 0.27, 0.3);
 
 		glTranslatef(0, 0.3, 0);
 
@@ -816,21 +821,21 @@ void Robot::drawFourthAxis() const {
 		glPushMatrix();
 			static const float XY_SCALE_FACTOR = 0.86;
 			glScalef(XY_SCALE_FACTOR, 1, XY_SCALE_FACTOR);
-			this->drawScrewCircle();
+				drawScrewCircle();
 		glPopMatrix();
 
 		BASE_COLOR.render();
 		
 		// disk
-		drawCylinder(0.13, 0.13, 0.1);
+			drawCylinder(0.13, 0.13, 0.1);
 
 		// disk
 		glTranslatef(0, 0.1, 0);
-		drawCylinder(0.15, 0.15, 0.15);
+			drawCylinder(0.15, 0.15, 0.15);
 
 		// cone
 		glTranslatef(0, 0.15, 0);
-		drawCylinder(0.15, 0.1, 0.25);
+			drawCylinder(0.15, 0.1, 0.25);
 
 		// translate to top of cone
 		glTranslatef(0, 0.25, 0);
@@ -842,6 +847,7 @@ void Robot::drawFourthAxis() const {
 ////////////////////////////////////////////////////////////
 /// .Camera
 ////////////////////////////////////////////////////////////
+
 void Robot::attachCameraToTCP() const {
 	Z::rotate(90);
 	approachSpatialTCPConfigurationInversely();

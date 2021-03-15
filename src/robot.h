@@ -17,7 +17,6 @@
 struct AxisParameterState: public ValueAbstraction<float> {
 public:
 	AxisParameterState(float startValue, Extrema&& limits);
-	~AxisParameterState();
 
 	bool limitReached() const;
 	void reset();
@@ -41,6 +40,8 @@ struct AngleState : public AxisParameterState {
 	int drawArbitraryValue() const;
 	void setArbitrarily();
 };
+
+
 struct VelocityState: public AxisParameterState {
 	VelocityState(float max, char identificationKey);
 	const char identificationKey;
@@ -84,17 +85,15 @@ struct Axis {
 protected:
 	void updateVelocity();
 	void updateAngle();
-	/// Adjusts angle state wrt specific OrientationDimension kind, i.e. subclass
-	/// post update
+	/// Adjusts angle state wrt specific Axis kind, i.e. subclass, post update
 	virtual void adjustAngle() = 0;
-
-	// ---------------TargetAngleAttributes-------------------
 
 	/// Determines targetAngleApproachManner granting the quickest attainment
 	virtual void determineTargetAngleApproachManner() = 0;
 	void approachTargetAngle();
 private:
 	const glRotationFunction rotate;
+	float fpsNormalizedAngleStep(float unnormalizedStep);
 };
 
 
