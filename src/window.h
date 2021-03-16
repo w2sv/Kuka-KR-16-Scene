@@ -1,5 +1,6 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
+
+#include <chrono>
 
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -75,4 +76,17 @@ void init ( int argc, char **argv );
 //	Fullscreen toggling
 /////////////////////////////////////////////////////////////////////////////////
 void toggleFullScreenMode();
-#endif // WINDOW_H
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//	FPS independent velocity
+/////////////////////////////////////////////////////////////////////////////////
+class VelocityFpsRegularizer {
+public:
+	VelocityFpsRegularizer(unsigned long microsecondsThreshold);
+	
+	bool sufficientAmountOfTimePassed();
+private:
+	const unsigned long microsecondsThreshold;
+	std::chrono::steady_clock::time_point lastTimeCheckpoint;
+};

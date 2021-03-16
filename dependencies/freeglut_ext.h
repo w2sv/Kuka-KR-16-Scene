@@ -256,7 +256,7 @@ FGAPI void    FGAPIENTRY glutAppStatusFunc(void (* callback)(int));
 #define GLUT_APPSTATUS_RESUME               0x0002
 
 /*
- * GLUT API macro definitions -- the display mode definitions
+ * GLUT API macro definitions -- the sufficientAmountOfTimePassed mode definitions
  */
 #define  GLUT_CAPTIONLESS                   0x0400
 #define  GLUT_BORDERLESS                    0x0800

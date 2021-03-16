@@ -167,7 +167,7 @@
 #define  GLUT_ENTERED                       0x0001
 
 /*
- * GLUT API macro definitions -- the display mode definitions
+ * GLUT API macro definitions -- the sufficientAmountOfTimePassed mode definitions
  */
 #define  GLUT_RGB                           0x0000
 #define  GLUT_RGBA                          0x0000

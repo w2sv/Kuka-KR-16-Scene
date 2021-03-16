@@ -85,7 +85,7 @@ void drawCube() {
 }
 
 
-void drawQuadraticGrid(const Extrema& extrema, int tiles, Color& color) {
+void drawQuadraticGrid(const Extrema& extrema, int tiles, const Color& color) {
 	color.render();
 
 	glBegin(GL_LINES);
@@ -141,9 +141,9 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 
 
 namespace OctogonalPrism {
-	Vertices draw(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
-		typedef std::array<GLfloat, 3> Vertex;
+	typedef std::array<GLfloat, 3> Vertex;
 
+	Vertices draw(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
 		const float z = heigth / 2;
 		const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
 
@@ -210,20 +210,28 @@ namespace OctogonalPrism {
 		glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
 
 		glBegin(GL_LINES);
-		for (size_t i = 0; i < 8; i++) {
-			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-				// draw edge along xz-plane
-				glVertex3fv(vertices[zPolarityIndex][i].data());
-				glVertex3fv(vertices[zPolarityIndex][(i + 1) % 8].data());
+			for (size_t i = 0; i < 8; i++) {
+				for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+					// draw edge along xz-plane
+					glVertex3fv(vertices[zPolarityIndex][i].data());
+					glVertex3fv(vertices[zPolarityIndex][(i + 1) % 8].data());
 
-				// draw edge across xz-plane
-				glVertex3fv(vertices[0][(i + zPolarityIndex) % 8].data());
-				glVertex3fv(vertices[1][(i + zPolarityIndex) % 8].data());
+					// draw edge across xz-plane
+					glVertex3fv(vertices[0][(i + zPolarityIndex) % 8].data());
+					glVertex3fv(vertices[1][(i + zPolarityIndex) % 8].data());
+				}
 			}
-		}
 		glEnd();
 		glPopAttrib();
 		glPopMatrix();
+	}
+
+	void drawWithCage(float height, float straightEdgeLength, float diagonalEdgeLength, const Color& corpusColor, const Color& cageColor) {
+		corpusColor.render();
+			Vertices vertices = draw(height, straightEdgeLength, diagonalEdgeLength);
+
+		cageColor.render();
+			drawCage(vertices);
 	}
 }
 

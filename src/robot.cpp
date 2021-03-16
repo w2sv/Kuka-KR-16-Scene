@@ -2,7 +2,6 @@
 
 #include "geometry.h"
 #include "input.h"
-#include "glutils.h"
 #include "state.h"
 #include "text.h"
 #include "light.h"
@@ -117,13 +116,13 @@ void Axis::reset() {
 
 
 void Axis::updateVelocity() {
-	static const float INCREMENT = 0.01;
+	static const float STEP = 0.01;
 
 	if (cg_key::keyState(velocity.identificationKey) == 2) {
 		if (cg_key::keyState('+') != 0)
-			velocity += INCREMENT;
+			velocity += STEP;
 		else if (cg_key::keyState('-') != 0)
-			velocity -= INCREMENT;
+			velocity -= STEP;
 		else
 			return;
 
@@ -141,20 +140,15 @@ void Axis::updateAngle() {
 			break;
 		case (TargetAngle::State::Disabled):
 			if (cg_key::keyState(angle.decrementationKey) != 0)
-				angle += fpsNormalizedAngleStep(angle.incrementationStepCoeff * velocity);
+				angle += angle.incrementationStepCoeff * velocity;
 			else if (cg_key::keyState(angle.incrementationKey) != 0)
-				angle += fpsNormalizedAngleStep(angle.decrementationStepCoeff * velocity);
+				angle += angle.decrementationStepCoeff * velocity;
 			else
 				return;
 
 			adjustAngle();
 			angle.updateLimitReached();
 	}
-}
-
-
-float Axis::fpsNormalizedAngleStep(float unnormalizedStep) {
-	return unnormalizedStep;
 }
 
 
@@ -198,7 +192,7 @@ void Axis::approachTargetAngle() {
 		angleDifferenceAbs = abs(angleDifferenceAbs - 360);
 
 	float step = std::min<float>(velocity.value, angleDifferenceAbs);
-	targetAngle.approachManner ? angle += fpsNormalizedAngleStep(step): angle -= fpsNormalizedAngleStep(step);
+	targetAngle.approachManner ? angle += step: angle -= step;
 
 	targetAngle.updateState(angle.value);
 }
@@ -321,14 +315,14 @@ void Robot::update() {
 			if (axisPointer->targetAngle.state == Axis::TargetAngle::State::YetToBeReached)
 				return;
 		}
-		
+
 		// reset target angle parameters if so and infinite approach == false
 		if (!approachArbitraryAxisConfigurationInfinitely_b) {
 			approachArbitraryAxisConfiguration_b = false;
-			
+
 			for (Axis* axisPointer : axes)
 				axisPointer->targetAngle.reset();
-			
+
 			if (approachHomePosition_b)
 				approachHomePosition_b = false;
 			else
@@ -574,20 +568,12 @@ void Robot::drawAxisWeight() const {
 		setDefaultLightAndMaterial(GlobalState::lightMode);
 
 		// draw lower octPrism pedastel
-		COLORS::BLACK.render();
 		Z::translate(PEDASTEL_HEIGHT / 2);
-			OctogonalPrism::Vertices pedastelVertices = OctogonalPrism::draw(PEDASTEL_HEIGHT, 0.5, 0.2);
-
-		COLORS::GREY.render();
-			OctogonalPrism::drawCage(pedastelVertices);
+			OctogonalPrism::drawWithCage(PEDASTEL_HEIGHT, 0.5, 0.2, COLORS::BLACK, COLORS::GREY);
 
 		// draw octPrism block
-		COLORS::BLACK.render();
 		Z::translate(BLOCK_HEIGHT / 2);
-			OctogonalPrism::Vertices blockVertices = OctogonalPrism::draw(BLOCK_HEIGHT, 0.3, 0.3);
-
-		COLORS::GREY.render();
-			OctogonalPrism::drawCage(blockVertices);
+			OctogonalPrism::drawWithCage(BLOCK_HEIGHT, 0.3, 0.3, COLORS::BLACK, COLORS::GREY);
 
 		// draw upper black cylinder
 		COLORS::BLACK.render();
@@ -753,12 +739,7 @@ void Robot::drawSecondAxis()const {
 		// draw orange axes weight pedastel octPrism
 		glTranslatef(0, -0.5, 0);
 		X::rotate(180);
-
-		BASE_COLOR.render();
-			OctogonalPrism::Vertices weightPedastelVertices = OctogonalPrism::draw(0.15, 0.6, 0.1);
-			
-		COLORS::BLACK.render();
-			OctogonalPrism::drawCage(weightPedastelVertices);
+			OctogonalPrism::drawWithCage(0.15, 0.6, 0.1, BASE_COLOR, COLORS::BLACK);
 
 		// draw weight
 		Z::translate(0.09);

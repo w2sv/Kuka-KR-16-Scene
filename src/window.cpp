@@ -77,7 +77,6 @@ void reshapeFunc(int w, int h){
 }
 
 
-
 /////////////////////////////////////////////////////////////////////////////////
 //	Menu CALLBACK Funktion
 /////////////////////////////////////////////////////////////////////////////////
@@ -105,7 +104,6 @@ void menuFunc(int item){
 }
 
 
-
 /////////////////////////////////////////////////////////////////////////////////
 //	Fullscreen toggling
 /////////////////////////////////////////////////////////////////////////////////
@@ -126,4 +124,22 @@ void toggleFullScreenMode() {
 		previousWindowSize.clear();
 		previousWindowPosition.clear();
 	}
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//	FPS independent velocity
+/////////////////////////////////////////////////////////////////////////////////
+VelocityFpsRegularizer::VelocityFpsRegularizer(unsigned long microsecondsThreshold):
+	microsecondsThreshold(microsecondsThreshold),
+	lastTimeCheckpoint(std::chrono::steady_clock::now())
+{}
+
+
+bool VelocityFpsRegularizer::sufficientAmountOfTimePassed() {
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	bool display_b = std::chrono::duration_cast<std::chrono::microseconds>(now - lastTimeCheckpoint).count() > microsecondsThreshold;
+	lastTimeCheckpoint = now;
+	
+	return display_b;
 }

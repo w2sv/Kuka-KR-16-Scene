@@ -105,7 +105,7 @@ void processInput(Robot& robot, Camera& camera) {
 	else if (cg_key::keyState('q'))
 		exit(0); // Escape -> Programm beenden
 
-	// display help
+	// sufficientAmountOfTimePassed help
 	else if (1 == cg_key::keyState(27))
 		GlobalState::displayHelp = !GlobalState::displayHelp;
 
@@ -115,7 +115,7 @@ void processInput(Robot& robot, Camera& camera) {
 	
 	/// ---------------------Display----------------------
 
-	// display fps
+	// sufficientAmountOfTimePassed fps
 	else if (1 == cg_key::keyState('b'))
 		GlobalState::displayFps = !GlobalState::displayFps;
 
@@ -123,7 +123,7 @@ void processInput(Robot& robot, Camera& camera) {
 	else if (1 == cg_key::keyState('n'))
 		GlobalState::drawCoordSystem = !GlobalState::drawCoordSystem;
 
-	// display axes states text
+	// sufficientAmountOfTimePassed axes states text
 	else if (cg_key::keyState('m') == 1)
 		robot.toggleAxesStatesDisplay();
 

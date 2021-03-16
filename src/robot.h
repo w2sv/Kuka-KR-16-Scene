@@ -93,7 +93,6 @@ protected:
 	void approachTargetAngle();
 private:
 	const glRotationFunction rotate;
-	float fpsNormalizedAngleStep(float unnormalizedStep);
 };
 
 

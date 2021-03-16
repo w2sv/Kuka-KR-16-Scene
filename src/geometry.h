@@ -15,11 +15,11 @@ void drawCylinder(float startRadius, float endRadius, float height);
 namespace OctogonalPrism {
 	typedef std::array<std::array<std::array<GLfloat, 3>, 8>, 2> Vertices;	
 	Vertices draw(float heigth, float straightEdgeLength, float diagonalEdgeLength);
-	
 	void drawCage(Vertices vertices);
+	void drawWithCage(float height, float straightEdgeLength, float diagonalEdgeLength, const Color& corpusColor, const Color& cageColor);
 }
 
-void drawQuadraticGrid(const Extrema& limits, int tiles, Color& color);
+void drawQuadraticGrid(const Extrema& limits, int tiles, const Color& color);
 
 void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema);
 
