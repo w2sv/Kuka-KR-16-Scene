@@ -757,12 +757,11 @@ void Robot::drawSecondAxis()const {
 void Robot::drawThirdAxis() const {
 	static const float LENGTH = 3.9;
 	static const float WIDTH = 0.5;
-	static const float MOUNT_PART_HEIGHT = 1.7;
 
 	// draw axis
 	glPushMatrix();
 		Z::rotate(-90);
-		glTranslatef(-WIDTH * 0.5, 0, -LENGTH * 0.41);  // translate slightly to the right, up, forward 
+		glTranslatef(-WIDTH / 2, 0, -LENGTH * 0.41);  // translate slightly to the right, up, forward 
 		
 		glPushMatrix();
 			glScaleUniformly(5);
