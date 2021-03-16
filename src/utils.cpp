@@ -5,6 +5,7 @@
 #include <direct.h>
 #include <string>
 #include <random>
+#include <limits>
 
 
 ////////////////////////////////////////////////////////////
@@ -60,6 +61,11 @@ Extrema::Extrema(float min, float max) :
 
 float Extrema::spread() const {
 	return abs(max - min);
+}
+
+
+float Extrema::clippedValue(float value) const {
+	return std::max<float>(std::min<float>(max, value), min);
 }
 
 

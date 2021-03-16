@@ -13,7 +13,7 @@
 
 
 const float Camera::START_RADIUS = 40;
-const float Camera::RADIUS_MIN = 7.4;
+const Extrema Camera::RADIUS_LIMITS(7.4, 500);
 
 
 Camera::Camera(Robot* robot) :
@@ -79,7 +79,7 @@ void Camera::updateRadiusViaScroll() {
 
 	if (cg_mouse::buttonState(GLUT_MOUSE_WHEEL_UP)) {
 		radius -= DELTA_RADIUS;
-		floorRadius();
+		clipRadius();
 	}
 	else if (cg_mouse::buttonState(GLUT_MOUSE_WHEEL_DOWN))
 		radius += DELTA_RADIUS;
@@ -89,13 +89,13 @@ void Camera::updateRadiusViaScroll() {
 void Camera::updateRadiusViaWheelPressing() {
 	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON)) {
 		radius = std::max<float>(radius + 0.1 * cg_mouse::moveY(), 1.0);
-		floorRadius();
+		clipRadius();
 	}
 }
 
 
-void Camera::floorRadius() {
-	radius = std::max<float>(radius, RADIUS_MIN);
+void Camera::clipRadius() {
+	radius = RADIUS_LIMITS.clippedValue(radius);
 }
 
 

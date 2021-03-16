@@ -10,44 +10,62 @@ const unsigned int SLICES = 20;
 const unsigned int STACKS = 20;
 const unsigned int LOOPS = 1;
 
+const float PSEUDO_NULL = -0.01;
+const float SQUARE_VERTEX_COORD = 0.5;
 
-void drawCube() {
-	static const float COORD = 0.5;
-	static const GLfloat VERTICES[2][4][3] = {
-		{
-			{COORD, COORD, COORD},
-			{COORD, COORD, -COORD},
-			{-COORD, COORD, -COORD},
-			{-COORD, COORD, COORD}
-		},
-		{
-			{COORD, -COORD, COORD},
-			{ COORD, -COORD, -COORD },
-			{ -COORD, -COORD, -COORD },
-			{ -COORD, -COORD, COORD }
-		}
-	};
+const GLfloat SQUARE_TEXTURE_COORDINATES[4][2] = {
+	{1., 0.},
+	{1., 1.},
+	{0., 1.},
+	{0., 0.}
+};
 
-	static const GLfloat TEXTURE_COORDINATES[4][2] = {
-			{1., 0.},
-			{1., 1.},
-			{0., 1.},
-			{0., 0.}
+
+void drawSquare() {
+	static const GLfloat VERTICES[4][3] = {
+		{SQUARE_VERTEX_COORD, PSEUDO_NULL, SQUARE_VERTEX_COORD},
+		{SQUARE_VERTEX_COORD, PSEUDO_NULL, -SQUARE_VERTEX_COORD},
+		{-SQUARE_VERTEX_COORD, PSEUDO_NULL, -SQUARE_VERTEX_COORD},
+		{-SQUARE_VERTEX_COORD, PSEUDO_NULL, SQUARE_VERTEX_COORD}
 	};
 
 	glBegin(GL_QUADS);
+		for (size_t i = 0; i < 4; i++) {
+			glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
+			glVertex3fv(VERTICES[i]);
+		}
+	glEnd();
+}
 
+
+void drawCube() {
+	static const GLfloat VERTICES[2][4][3] = {
+		{
+			{SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD},
+			{SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD},
+			{-SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD},
+			{-SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD}
+		},
+		{
+			{SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD},
+			{ SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD },
+			{ -SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD },
+			{ -SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD }
+		}
+	};
+
+	glBegin(GL_QUADS);
 		// lower face
 		glNormal3f(0, 0, 1);
 		for (size_t i = 0; i < 4; i++) {
-			glTexCoord2fv(TEXTURE_COORDINATES[i]);
+			glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
 			glVertex3fv(VERTICES[0][i]);
 		}
 
 		// upper face
 		glNormal3f(0, 0, -1);
 		for (size_t i = 0; i < 4; i++) {
-			glTexCoord2fv(TEXTURE_COORDINATES[i]);
+			glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
 			glVertex3fv(VERTICES[1][i]);
 		}
 
@@ -55,7 +73,7 @@ void drawCube() {
 		glNormal3f(0, -1, 0);
 		for (size_t i = 0; i < 2; i++)
 			for (size_t j = 0; j < 2; j++) {
-				glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
+				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
 				glVertex3fv(VERTICES[i][i != j]);
 			}
 
@@ -63,7 +81,7 @@ void drawCube() {
 		glNormal3f(0, 1, 0);
 		for (size_t i = 0; i < 2; i++)
 			for (size_t j = 0; j < 2; j++) {
-				glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
+				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
 				glVertex3fv(VERTICES[i][(i != j) + 2]);
 			}
 
@@ -71,7 +89,7 @@ void drawCube() {
 		glNormal3f(-1, 0, 0);
 		for (size_t i = 0; i < 2; i++)
 			for (size_t j = 0; j < 2; j++) {
-				glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
+				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
 				glVertex3fv(VERTICES[i][(i != j) + 1]);
 			}
 
@@ -79,10 +97,9 @@ void drawCube() {
 		glNormal3f(1, 0, 0);
 		for (size_t i = 0; i < 2; i++)
 			for (size_t j = 0; j < 2; j++) {
-				glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
+				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
 				glVertex3fv(VERTICES[i][(i != j) * 3]);
 			}
-
 	glEnd();
 }
 
@@ -105,13 +122,11 @@ void drawQuadraticGrid(const Extrema& extrema, int tiles, const Color& color) {
 
 
 void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema) {
-	static const float Z_COORDINATE = -0.01;
-	
 	glBegin(GL_QUADS);
-		glVertex3f(xExtrema.min, Z_COORDINATE, yExtrema.min);
-		glVertex3f(xExtrema.max, Z_COORDINATE, yExtrema.min);
-		glVertex3f(xExtrema.max, Z_COORDINATE, yExtrema.max);
-		glVertex3f(xExtrema.min, Z_COORDINATE, yExtrema.max);
+		glVertex3f(xExtrema.min, PSEUDO_NULL, yExtrema.min);
+		glVertex3f(xExtrema.max, PSEUDO_NULL, yExtrema.min);
+		glVertex3f(xExtrema.max, PSEUDO_NULL, yExtrema.max);
+		glVertex3f(xExtrema.min, PSEUDO_NULL, yExtrema.max);
 	glEnd();
 }
 

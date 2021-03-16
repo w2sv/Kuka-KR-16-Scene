@@ -58,6 +58,7 @@ struct Extrema {
 	Extrema(float min, float max);
 
 	float spread() const;
+	float clippedValue(float value) const;
 };
 
 struct Measurements {

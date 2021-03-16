@@ -38,7 +38,51 @@ int main(int argc, char** argv) {
 }
 
 
+void drawSkyBox() {
+	static const float SCALE_COEFF = 1000.f;
+	static const float SHIFT_VALUE = SCALE_COEFF / 2;
+
+	glPushMatrix();
+		glEnable(GL_TEXTURE_2D);
+		Robot::textures[Robot::Texture::Noise].bind();
+
+		Color(0, 0, 0.5).render();
+			
+		glPushMatrix();
+			glTranslatef(0, 0, SHIFT_VALUE);
+			glScaleUniformly(SCALE_COEFF);
+			glTransformationAxes::X::rotate(90);
+				drawSquare();
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(0, 0, -SHIFT_VALUE);
+			glScaleUniformly(SCALE_COEFF);
+			glTransformationAxes::X::rotate(-90);
+				drawSquare();
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(SHIFT_VALUE, 0, 0);
+			glScaleUniformly(SCALE_COEFF);
+			glTransformationAxes::Y::rotate(90);
+				drawSquare();
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(-SHIFT_VALUE, 0, 0);
+			glScaleUniformly(SCALE_COEFF);
+			glTransformationAxes::Y::rotate(-90);
+				drawSquare();
+		glPopMatrix();
+
+		glDisable(GL_TEXTURE_2D);
+	glPopMatrix();
+}
+
+
 void drawScene(const Robot& robot){
+	drawSkyBox();
 
 	// draw ground
 	setColor(.1, .1, .1);

@@ -149,6 +149,16 @@ public:
 
 	bool textToBeDisplayed() const;
 	void displayText() const;
+
+
+	static const int N_TEXTURES = 3;
+	static cg_image textures[N_TEXTURES];
+
+	enum Texture {
+		Knobs,
+		Steel,
+		Noise
+	};
 private:
 	static const Color BASE_COLOR;
 
@@ -171,13 +181,7 @@ private:
 
 	/* ------------Textures----------------- */
 
-	static const int N_TEXTURES = 2;
-	static cg_image textures[N_TEXTURES];
-
-	enum Texture {
-		Knobs,
-		Steel
-	};
+	
 
 	/* ------------Objects----------------- */
 

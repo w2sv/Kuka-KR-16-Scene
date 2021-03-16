@@ -48,7 +48,7 @@ void AxisParameterState::updateLimitReached() {
 
 
 void AxisParameterState::clipValue() {
-	value = std::min<float>(std::max<float>(value, limits.min), limits.max);
+	value = limits.clippedValue(value);
 }
 
 
@@ -485,7 +485,8 @@ void Robot::loadTextures() {
 	const static char* DIR_PATH = getResourceSubDirPath("textures");
 	const static char* FILE_NAMES[Robot::N_TEXTURES] = {
 		"smoothed-square-textured-metal.bmp",
-		"warped-sheet-metal_roughness.bmp"
+		"warped-sheet-metal_roughness.bmp",
+		"perlin-noise.bmp"
 	};
 
 	for (size_t i = 0; i < Robot::N_TEXTURES; i++) {

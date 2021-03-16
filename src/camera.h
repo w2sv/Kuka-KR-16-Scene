@@ -2,6 +2,7 @@
 
 #include "robot.h"
 #include "glutils.h"
+#include "utils.h"
 
 
 class Camera{
@@ -21,7 +22,7 @@ public:
 	void toggleMode(Mode mode);
 private:
 	static const float START_RADIUS;
-	static const float RADIUS_MIN;
+	static const Extrema RADIUS_LIMITS;
 
 	Vector2 position;
 	Mode mode;
@@ -39,5 +40,5 @@ private:
 
 	void updateRadiusViaScroll();
 	void updateRadiusViaWheelPressing();
-	void floorRadius();
+	void clipRadius();
 };

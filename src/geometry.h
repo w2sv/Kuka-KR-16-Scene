@@ -10,6 +10,8 @@
 
 void drawCube();
 
+void drawSquare();
+
 void drawCylinder(float startRadius, float endRadius, float height);
 
 class OctogonalPrism {
