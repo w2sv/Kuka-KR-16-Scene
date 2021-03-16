@@ -13,7 +13,8 @@ void drawCube();
 void drawCylinder(float startRadius, float endRadius, float height);
 
 namespace OctogonalPrism {
-	typedef std::array<std::array<std::array<GLfloat, 3>, 8>, 2> Vertices;	
+	typedef std::array<GLfloat, 3> Vertex;
+	typedef std::array<std::array<Vertex, 8>, 2> Vertices;	
 	Vertices draw(float heigth, float straightEdgeLength, float diagonalEdgeLength);
 	void drawCage(Vertices vertices);
 	void drawWithCage(float height, float straightEdgeLength, float diagonalEdgeLength, const Color& corpusColor, const Color& cageColor);

@@ -1,5 +1,7 @@
 #include "geometry.h"
 
+#include <limits>
+
 
 using namespace glTransformationAxes;
 
@@ -141,11 +143,12 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 
 
 namespace OctogonalPrism {
-	typedef std::array<GLfloat, 3> Vertex;
+	typedef std::array<GLfloat, 2> TextureVertex;
 
 	Vertices draw(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
 		const float z = heigth / 2;
 		const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
+		const float intermediateCoordinate = straightEdgeLength / 2;
 
 		const Vertices vertices{ {
 			{
@@ -154,47 +157,78 @@ namespace OctogonalPrism {
 				i.e. "left |" defines the lower vertex of the left | etc. */
 
 				// positive y's
-				Vertex{-lateralLength, z, -straightEdgeLength / 2}, //  left |
-				Vertex{-straightEdgeLength / 2, z, -lateralLength}, // lower left "\"
-				Vertex{straightEdgeLength / 2, z, -lateralLength}, // -
-				Vertex{lateralLength, z, -straightEdgeLength / 2}, // lower right /
+				Vertex{-lateralLength, z, -intermediateCoordinate}, //  left |
+				Vertex{-intermediateCoordinate, z, -lateralLength}, // lower left "\"
+				Vertex{intermediateCoordinate, z, -lateralLength}, // -
+				Vertex{lateralLength, z, -intermediateCoordinate}, // lower right /
 
 				// negative y's
-				Vertex{lateralLength, z, straightEdgeLength / 2}, // right |
-				Vertex{straightEdgeLength / 2, z, lateralLength}, // upper right "\"
-				Vertex{-straightEdgeLength / 2, z, lateralLength}, // -
-				Vertex{-lateralLength, z, straightEdgeLength / 2}, // upper left /
+				Vertex{lateralLength, z, intermediateCoordinate}, // right |
+				Vertex{intermediateCoordinate, z, lateralLength}, // upper right "\"
+				Vertex{-intermediateCoordinate, z, lateralLength}, // -
+				Vertex{-lateralLength, z, intermediateCoordinate}, // upper left /
 			},
 
 			// negative z
 			{
 				// positive y's
-				Vertex{-lateralLength, -z, -straightEdgeLength / 2}, //  left |
-				Vertex{-straightEdgeLength / 2, -z, -lateralLength}, // lower left "\"
-				Vertex{straightEdgeLength / 2, -z, -lateralLength}, // -
-				Vertex{lateralLength, -z, -straightEdgeLength / 2}, // lower right /
+				Vertex{-lateralLength, -z, -intermediateCoordinate}, //  left |
+				Vertex{-intermediateCoordinate, -z, -lateralLength}, // lower left "\"
+				Vertex{intermediateCoordinate, -z, -lateralLength}, // -
+				Vertex{lateralLength, -z, -intermediateCoordinate}, // lower right /
 
 				// negative y's
-				Vertex{lateralLength, -z, straightEdgeLength / 2}, // right |
-				Vertex{straightEdgeLength / 2, -z, lateralLength}, // upper right "\"
-				Vertex{-straightEdgeLength / 2, -z, lateralLength}, // -
-				Vertex{-lateralLength, -z, straightEdgeLength / 2}, // upper left /
+				Vertex{lateralLength, -z, intermediateCoordinate}, // right |
+				Vertex{intermediateCoordinate, -z, lateralLength}, // upper right "\"
+				Vertex{-intermediateCoordinate, -z, lateralLength}, // -
+				Vertex{-lateralLength, -z, intermediateCoordinate}, // upper left /
 			}
 		} };
+
+		float positiveNormalizedIntermediateCoordinate = 0.5 + intermediateCoordinate / lateralLength;
+		float negativeNormalizedIntermediateCoordinate = 0.5 - intermediateCoordinate / lateralLength;
+
+		const std::array<TextureVertex, 8> textureVertices{
+			{
+				// positive y's
+				TextureVertex{0, positiveNormalizedIntermediateCoordinate}, //  left |
+				TextureVertex{negativeNormalizedIntermediateCoordinate, 0}, // lower left "\"
+				TextureVertex{positiveNormalizedIntermediateCoordinate, 0}, // -
+				TextureVertex{1, negativeNormalizedIntermediateCoordinate}, // lower right /
+
+				// negative y's
+				TextureVertex{1, positiveNormalizedIntermediateCoordinate}, // right |
+				TextureVertex{positiveNormalizedIntermediateCoordinate, 1}, // upper right "\"
+				TextureVertex{negativeNormalizedIntermediateCoordinate, 1}, // -
+				TextureVertex{0, positiveNormalizedIntermediateCoordinate}, // upper left /
+			}
+		};
 
 		// draw upper and lower plane
 		for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
 			glBegin(GL_POLYGON);
-			for (size_t i = 0; i < 9; i++)
+			for (size_t i = 0; i < 9; i++) {
+				glTexCoord2fv(textureVertices[i % 8].data());
 				glVertex3fv(vertices[zPolarityIndex][i % 8].data());
+			}
 			glEnd();
 		}
+
+		const std::array<TextureVertex, 4> straightEdgeFaceTextureVertices{
+			{
+				TextureVertex{0, 0},
+				TextureVertex{1, 0},
+				TextureVertex{1, 1},
+				TextureVertex{0, 1},
+			}
+		};
 
 		// connect vertices opposing each other across xz-plane
 		for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
 			glBegin(GL_POLYGON);
 			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
 				for (size_t i = 0; i < 2; i++) {
+					glTexCoord2fv(straightEdgeFaceTextureVertices[zPolarityIndex * 2 + i].data());
 					glVertex3fv(vertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
 				}
 			}

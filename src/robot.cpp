@@ -739,7 +739,10 @@ void Robot::drawSecondAxis()const {
 		// draw orange axes weight pedastel octPrism
 		glTranslatef(0, -0.5, 0);
 		X::rotate(180);
-			OctogonalPrism::drawWithCage(0.15, 0.6, 0.1, BASE_COLOR, COLORS::BLACK);
+			textures[Texture::Steel].bind();
+			glEnable(GL_TEXTURE_2D);
+				OctogonalPrism::drawWithCage(0.15, 0.6, 0.1, BASE_COLOR, COLORS::BLACK);
+			glDisable(GL_TEXTURE_2D);
 
 		// draw weight
 		Z::translate(0.09);
