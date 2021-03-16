@@ -569,11 +569,13 @@ void Robot::drawAxisWeight() const {
 
 		// draw lower octPrism pedastel
 		Z::translate(PEDASTEL_HEIGHT / 2);
-			OctogonalPrism::drawWithCage(PEDASTEL_HEIGHT, 0.5, 0.2, COLORS::BLACK, COLORS::GREY);
+		static const OctogonalPrism pedastel(PEDASTEL_HEIGHT, 0.5, 0.2);
+			pedastel.draw(COLORS::BLACK, &COLORS::GREY);
 
 		// draw octPrism block
 		Z::translate(BLOCK_HEIGHT / 2);
-			OctogonalPrism::drawWithCage(BLOCK_HEIGHT, 0.3, 0.3, COLORS::BLACK, COLORS::GREY);
+		static const OctogonalPrism block(BLOCK_HEIGHT, 0.3, 0.3);
+			block.draw(COLORS::BLACK, &COLORS::GREY);
 
 		// draw upper black cylinder
 		COLORS::BLACK.render();
@@ -741,7 +743,8 @@ void Robot::drawSecondAxis()const {
 		X::rotate(180);
 			textures[Texture::Steel].bind();
 			glEnable(GL_TEXTURE_2D);
-				OctogonalPrism::drawWithCage(0.15, 0.6, 0.1, BASE_COLOR, COLORS::BLACK);
+				static const OctogonalPrism weightPedastel(0.15, 0.6, 0.1);
+					weightPedastel.draw(BASE_COLOR, &COLORS::BLACK);
 			glDisable(GL_TEXTURE_2D);
 
 		// draw weight

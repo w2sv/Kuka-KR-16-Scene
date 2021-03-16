@@ -37,51 +37,51 @@ void drawCube() {
 
 	glBegin(GL_QUADS);
 
-	// lower face
-	glNormal3f(0, 0, 1);
-	for (size_t i = 0; i < 4; i++) {
-		glTexCoord2fv(TEXTURE_COORDINATES[i]);
-		glVertex3fv(VERTICES[0][i]);
-	}
-
-	// upper face
-	glNormal3f(0, 0, -1);
-	for (size_t i = 0; i < 4; i++) {
-		glTexCoord2fv(TEXTURE_COORDINATES[i]);
-		glVertex3fv(VERTICES[1][i]);
-	}
-
-	// front face
-	glNormal3f(0, -1, 0);
-	for (size_t i = 0; i < 2; i++)
-		for (size_t j = 0; j < 2; j++) {
-			glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
-			glVertex3fv(VERTICES[i][i != j]);
+		// lower face
+		glNormal3f(0, 0, 1);
+		for (size_t i = 0; i < 4; i++) {
+			glTexCoord2fv(TEXTURE_COORDINATES[i]);
+			glVertex3fv(VERTICES[0][i]);
 		}
 
-	// back face
-	glNormal3f(0, 1, 0);
-	for (size_t i = 0; i < 2; i++)
-		for (size_t j = 0; j < 2; j++) {
-			glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
-			glVertex3fv(VERTICES[i][(i != j) + 2]);
+		// upper face
+		glNormal3f(0, 0, -1);
+		for (size_t i = 0; i < 4; i++) {
+			glTexCoord2fv(TEXTURE_COORDINATES[i]);
+			glVertex3fv(VERTICES[1][i]);
 		}
 
-	// left face
-	glNormal3f(-1, 0, 0);
-	for (size_t i = 0; i < 2; i++)
-		for (size_t j = 0; j < 2; j++) {
-			glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
-			glVertex3fv(VERTICES[i][(i != j) + 1]);
-		}
+		// front face
+		glNormal3f(0, -1, 0);
+		for (size_t i = 0; i < 2; i++)
+			for (size_t j = 0; j < 2; j++) {
+				glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
+				glVertex3fv(VERTICES[i][i != j]);
+			}
 
-	// right face
-	glNormal3f(1, 0, 0);
-	for (size_t i = 0; i < 2; i++)
-		for (size_t j = 0; j < 2; j++) {
-			glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
-			glVertex3fv(VERTICES[i][(i != j) * 3]);
-		}
+		// back face
+		glNormal3f(0, 1, 0);
+		for (size_t i = 0; i < 2; i++)
+			for (size_t j = 0; j < 2; j++) {
+				glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
+				glVertex3fv(VERTICES[i][(i != j) + 2]);
+			}
+
+		// left face
+		glNormal3f(-1, 0, 0);
+		for (size_t i = 0; i < 2; i++)
+			for (size_t j = 0; j < 2; j++) {
+				glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
+				glVertex3fv(VERTICES[i][(i != j) + 1]);
+			}
+
+		// right face
+		glNormal3f(1, 0, 0);
+		for (size_t i = 0; i < 2; i++)
+			for (size_t j = 0; j < 2; j++) {
+				glTexCoord2fv(TEXTURE_COORDINATES[i * 2 + j]);
+				glVertex3fv(VERTICES[i][(i != j) * 3]);
+			}
 
 	glEnd();
 }
@@ -139,133 +139,136 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 	glPopMatrix();
 
 	gluDeleteQuadric(q);
+}
+
+
+const std::array<OctogonalPrism::TextureVertex, 4> OctogonalPrism::UPRIGHT_FACES_TEXTURE_VERTICES{
+	{
+		OctogonalPrism::TextureVertex{0, 0},
+		OctogonalPrism::TextureVertex{1, 0},
+		OctogonalPrism::TextureVertex{1, 1},
+		OctogonalPrism::TextureVertex{0, 1},
+	}
 };
 
 
-namespace OctogonalPrism {
-	typedef std::array<GLfloat, 2> TextureVertex;
+OctogonalPrism::OctogonalPrism(float heigth, float straightEdgeLength, float diagonalEdgeLength){
+	const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
+	const float intermediateCoordinate = straightEdgeLength / 2;
+	const float z = heigth / 2;
+	
+	vertices = calculateVertices(lateralLength, intermediateCoordinate, z);
+	flatFaceTextureVertices = calculateFlatFaceTextureVertices(lateralLength, intermediateCoordinate);
+}
 
-	Vertices draw(float heigth, float straightEdgeLength, float diagonalEdgeLength) {
-		const float z = heigth / 2;
-		const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
-		const float intermediateCoordinate = straightEdgeLength / 2;
 
-		const Vertices vertices{ {
-			{
-				/* Subsequently denoted are the vertices in clockwise direction with respect
-				to the respectively annotated edge;
-				i.e. "left |" defines the lower vertex of the left | etc. */
+OctogonalPrism::Vertices OctogonalPrism::calculateVertices(float lateralLength, float intermediateCoordinate, float z) {
+	return Vertices{ {
+		{
+			/* Subsequently denoted are the vertices in clockwise direction with respect
+			to the respectively annotated edge;
+			i.e. "left |" defines the lower vertex of the left | etc. */
 
-				// positive y's
-				Vertex{-lateralLength, z, -intermediateCoordinate}, //  left |
-				Vertex{-intermediateCoordinate, z, -lateralLength}, // lower left "\"
-				Vertex{intermediateCoordinate, z, -lateralLength}, // -
-				Vertex{lateralLength, z, -intermediateCoordinate}, // lower right /
+			// positive y's
+			Vertex{-lateralLength, z, -intermediateCoordinate}, //  left |
+			Vertex{-intermediateCoordinate, z, -lateralLength}, // lower left "\"
+			Vertex{intermediateCoordinate, z, -lateralLength}, // -
+			Vertex{lateralLength, z, -intermediateCoordinate}, // lower right /
 
-				// negative y's
-				Vertex{lateralLength, z, intermediateCoordinate}, // right |
-				Vertex{intermediateCoordinate, z, lateralLength}, // upper right "\"
-				Vertex{-intermediateCoordinate, z, lateralLength}, // -
-				Vertex{-lateralLength, z, intermediateCoordinate}, // upper left /
-			},
+			// negative y's
+			Vertex{lateralLength, z, intermediateCoordinate}, // right |
+			Vertex{intermediateCoordinate, z, lateralLength}, // upper right "\"
+			Vertex{-intermediateCoordinate, z, lateralLength}, // -
+			Vertex{-lateralLength, z, intermediateCoordinate}, // upper left /
+		},
 
-			// negative z
-			{
-				// positive y's
-				Vertex{-lateralLength, -z, -intermediateCoordinate}, //  left |
-				Vertex{-intermediateCoordinate, -z, -lateralLength}, // lower left "\"
-				Vertex{intermediateCoordinate, -z, -lateralLength}, // -
-				Vertex{lateralLength, -z, -intermediateCoordinate}, // lower right /
+		// negative z
+		{
+			// positive y's
+			Vertex{-lateralLength, -z, -intermediateCoordinate}, //  left |
+			Vertex{-intermediateCoordinate, -z, -lateralLength}, // lower left "\"
+			Vertex{intermediateCoordinate, -z, -lateralLength}, // -
+			Vertex{lateralLength, -z, -intermediateCoordinate}, // lower right /
 
-				// negative y's
-				Vertex{lateralLength, -z, intermediateCoordinate}, // right |
-				Vertex{intermediateCoordinate, -z, lateralLength}, // upper right "\"
-				Vertex{-intermediateCoordinate, -z, lateralLength}, // -
-				Vertex{-lateralLength, -z, intermediateCoordinate}, // upper left /
-			}
-		} };
-
-		float positiveNormalizedIntermediateCoordinate = 0.5 + intermediateCoordinate / lateralLength;
-		float negativeNormalizedIntermediateCoordinate = 0.5 - intermediateCoordinate / lateralLength;
-
-		const std::array<TextureVertex, 8> textureVertices{
-			{
-				// positive y's
-				TextureVertex{0, positiveNormalizedIntermediateCoordinate}, //  left |
-				TextureVertex{negativeNormalizedIntermediateCoordinate, 0}, // lower left "\"
-				TextureVertex{positiveNormalizedIntermediateCoordinate, 0}, // -
-				TextureVertex{1, negativeNormalizedIntermediateCoordinate}, // lower right /
-
-				// negative y's
-				TextureVertex{1, positiveNormalizedIntermediateCoordinate}, // right |
-				TextureVertex{positiveNormalizedIntermediateCoordinate, 1}, // upper right "\"
-				TextureVertex{negativeNormalizedIntermediateCoordinate, 1}, // -
-				TextureVertex{0, positiveNormalizedIntermediateCoordinate}, // upper left /
-			}
-		};
-
-		// draw upper and lower plane
-		for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-			glBegin(GL_POLYGON);
-			for (size_t i = 0; i < 9; i++) {
-				glTexCoord2fv(textureVertices[i % 8].data());
-				glVertex3fv(vertices[zPolarityIndex][i % 8].data());
-			}
-			glEnd();
+			// negative y's
+			Vertex{lateralLength, -z, intermediateCoordinate}, // right |
+			Vertex{intermediateCoordinate, -z, lateralLength}, // upper right "\"
+			Vertex{-intermediateCoordinate, -z, lateralLength}, // -
+			Vertex{-lateralLength, -z, intermediateCoordinate}, // upper left /
 		}
+	} };
+}
 
-		const std::array<TextureVertex, 4> straightEdgeFaceTextureVertices{
-			{
-				TextureVertex{0, 0},
-				TextureVertex{1, 0},
-				TextureVertex{1, 1},
-				TextureVertex{0, 1},
-			}
-		};
 
-		// connect vertices opposing each other across xz-plane
-		for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
-			glBegin(GL_POLYGON);
-			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-				for (size_t i = 0; i < 2; i++) {
-					glTexCoord2fv(straightEdgeFaceTextureVertices[zPolarityIndex * 2 + i].data());
-					glVertex3fv(vertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
-				}
-			}
-			glEnd();
+OctogonalPrism::FlatFaceTextureVertices OctogonalPrism::calculateFlatFaceTextureVertices(float lateralLength, float intermediateCoordinate) {
+	const float positiveNormalizedIntermediateCoordinate = 0.5 + intermediateCoordinate / lateralLength;
+	const float negativeNormalizedIntermediateCoordinate = 0.5 - intermediateCoordinate / lateralLength;
+	
+	return FlatFaceTextureVertices{
+		{
+			// positive y's
+			TextureVertex{0, positiveNormalizedIntermediateCoordinate}, //  left |
+			TextureVertex{negativeNormalizedIntermediateCoordinate, 0}, // lower left "\"
+			TextureVertex{positiveNormalizedIntermediateCoordinate, 0}, // -
+			TextureVertex{1, negativeNormalizedIntermediateCoordinate}, // lower right /
+	
+			// negative y's
+			TextureVertex{1, positiveNormalizedIntermediateCoordinate}, // right |
+			TextureVertex{positiveNormalizedIntermediateCoordinate, 1}, // upper right "\"
+			TextureVertex{negativeNormalizedIntermediateCoordinate, 1}, // -
+			TextureVertex{0, positiveNormalizedIntermediateCoordinate}, // upper left /
 		}
+	};
+}
 
-		return vertices;
-	}
 
-	void drawCage(Vertices vertices) {
-		glPushMatrix();
-		glDepthFunc(GL_LEQUAL);
-		glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
+void OctogonalPrism::draw(const Color& corpusColor, const Color* cageColor) const {
+	corpusColor.render();
 
-		glBegin(GL_LINES);
-			for (size_t i = 0; i < 8; i++) {
-				for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-					// draw edge along xz-plane
-					glVertex3fv(vertices[zPolarityIndex][i].data());
-					glVertex3fv(vertices[zPolarityIndex][(i + 1) % 8].data());
-
-					// draw edge across xz-plane
-					glVertex3fv(vertices[0][(i + zPolarityIndex) % 8].data());
-					glVertex3fv(vertices[1][(i + zPolarityIndex) % 8].data());
-				}
-			}
+	 //draw upper and lower plane
+	for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+		glBegin(GL_POLYGON);
+		for (size_t i = 0; i < 9; i++) {
+			glTexCoord2fv(flatFaceTextureVertices[i % 8].data());
+			glVertex3fv(vertices[zPolarityIndex][i % 8].data());
+		}
 		glEnd();
-		glPopAttrib();
-		glPopMatrix();
 	}
 
-	void drawWithCage(float height, float straightEdgeLength, float diagonalEdgeLength, const Color& corpusColor, const Color& cageColor) {
-		corpusColor.render();
-			Vertices vertices = draw(height, straightEdgeLength, diagonalEdgeLength);
+	// connect vertices opposing each other across xz-plane
+	for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
+		glBegin(GL_POLYGON);
+		for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+			for (size_t i = 0; i < 2; i++) {
+				glTexCoord2fv(UPRIGHT_FACES_TEXTURE_VERTICES[zPolarityIndex * 2 + i].data());
+				glVertex3fv(vertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
+			}
+		}
+		glEnd();
+	}
 
-		cageColor.render();
-			drawCage(vertices);
+	if (cageColor) {
+		cageColor->render();
+
+		glPushMatrix();
+			glDepthFunc(GL_LEQUAL);
+			glPushAttrib(GL_CURRENT_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT);
+		
+			glBegin(GL_LINES);
+				for (size_t i = 0; i < 8; i++) {
+					for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+						// draw edge along xz-plane
+						glVertex3fv(vertices[zPolarityIndex][i].data());
+						glVertex3fv(vertices[zPolarityIndex][(i + 1) % 8].data());
+		
+						// draw edge across xz-plane
+						glVertex3fv(vertices[0][(i + zPolarityIndex) % 8].data());
+						glVertex3fv(vertices[1][(i + zPolarityIndex) % 8].data());
+					}
+				}
+			glEnd();
+			glPopAttrib();
+		glPopMatrix();
 	}
 }
 
