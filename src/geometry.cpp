@@ -1,5 +1,8 @@
 #include "geometry.h"
 
+#include "../dependencies/freeglut.h"
+#include "../dependencies/glext.h"
+
 #include <limits>
 
 
@@ -77,8 +80,7 @@ void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema) {
 /// 3D
 ////////////////////////////////////////////////////////////
 
-void drawCube() {
-	static const GLfloat VERTICES[2][4][3] = {
+const GLfloat CUBE_VERTICES[2][4][3] = {
 		{
 			{SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD},
 			{SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD},
@@ -91,55 +93,65 @@ void drawCube() {
 			{ -SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD },
 			{ -SQUARE_VERTEX_COORD, -SQUARE_VERTEX_COORD, SQUARE_VERTEX_COORD }
 		}
-	};
+};
 
+void Cube::drawFace(Face face) {
 	glBegin(GL_QUADS);
-		// lower face
-		glNormal3f(0, 0, 1);
-		for (size_t i = 0; i < 4; i++) {
-			glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
-			glVertex3fv(VERTICES[0][i]);
+
+	switch (face) {
+		case Front:
+			glNormal3f(0, -1, 0);
+			for (size_t i = 0; i < 2; i++)
+				for (size_t j = 0; j < 2; j++) {
+					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
+					glVertex3fv(CUBE_VERTICES[i][i != j]);
+				} break;
+
+		case Back:
+			glNormal3f(0, 1, 0);
+			for (size_t i = 0; i < 2; i++)
+				for (size_t j = 0; j < 2; j++) {
+					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
+					glVertex3fv(CUBE_VERTICES[i][(i != j) + 2]);
+				} break;
+
+		case Left:
+			glNormal3f(-1, 0, 0);
+			for (size_t i = 0; i < 2; i++)
+				for (size_t j = 0; j < 2; j++) {
+					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
+					glVertex3fv(CUBE_VERTICES[i][(i != j) + 1]);
+				} break;
+
+		case Right:
+			glNormal3f(1, 0, 0);
+			for (size_t i = 0; i < 2; i++)
+				for (size_t j = 0; j < 2; j++) {
+					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
+					glVertex3fv(CUBE_VERTICES[i][(i != j) * 3]);
+				} break;
+
+		case Top:
+			glNormal3f(0, 0, 1);
+			for (size_t i = 0; i < 4; i++) {
+				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
+				glVertex3fv(CUBE_VERTICES[0][i]);
+			} break;
+
+		case Bottom:
+			glNormal3f(0, 0, -1);
+			for (size_t i = 0; i < 4; i++) {
+				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
+				glVertex3fv(CUBE_VERTICES[1][i]);
+			} break;
 		}
 
-		// upper face
-		glNormal3f(0, 0, -1);
-		for (size_t i = 0; i < 4; i++) {
-			glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
-			glVertex3fv(VERTICES[1][i]);
-		}
-
-		// front face
-		glNormal3f(0, -1, 0);
-		for (size_t i = 0; i < 2; i++)
-			for (size_t j = 0; j < 2; j++) {
-				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
-				glVertex3fv(VERTICES[i][i != j]);
-			}
-
-		// back face
-		glNormal3f(0, 1, 0);
-		for (size_t i = 0; i < 2; i++)
-			for (size_t j = 0; j < 2; j++) {
-				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
-				glVertex3fv(VERTICES[i][(i != j) + 2]);
-			}
-
-		// left face
-		glNormal3f(-1, 0, 0);
-		for (size_t i = 0; i < 2; i++)
-			for (size_t j = 0; j < 2; j++) {
-				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
-				glVertex3fv(VERTICES[i][(i != j) + 1]);
-			}
-
-		// right face
-		glNormal3f(1, 0, 0);
-		for (size_t i = 0; i < 2; i++)
-			for (size_t j = 0; j < 2; j++) {
-				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
-				glVertex3fv(VERTICES[i][(i != j) * 3]);
-			}
 	glEnd();
+}
+
+void Cube::draw() {
+	for (size_t i = 0; i < 6; i++)
+		drawFace(Face(i));
 }
 
 
@@ -340,7 +352,7 @@ void indicateCurrentPosition() {
 	glPushMatrix();
 	Color(0.f, 1.f, 0.f).render();
 	//glScalef(0.1, 0.1, 0.1);
-	drawCube();
+	Cube::draw();
 	glPopMatrix();
 }
 

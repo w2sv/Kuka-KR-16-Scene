@@ -39,6 +39,8 @@ public:
 	// Destruktor
 	~cg_image ();
 
+	const char* fileName;
+
 	// Funktion zum Einlesen einer Textur. Rueckgabewert signalisiert, ob das Laden erfolgreich war.
 	// Nach Aufruf der Funktion ist die Textur gebunden, kann also sofort modifiziert (glTexParameter etc.) und/oder verwendet werden
 	bool load ( const char * fileName, bool generateMipmaps = false );

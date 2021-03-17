@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "image.h"
 #include "text.h"
+#include "skybox.h"
 
 #include "../dependencies/freeglut.h"
 #include "../dependencies/glext.h"
@@ -23,13 +24,14 @@ const Extrema groundMeasurements(-20, 20);
 
 int main(int argc, char** argv) {
 	init(argc, argv);
-
+	
 	// load objects
 	Robot::loadObjects();
 	Robot::setObjectMaterials();
 
 	// load textures
 	Robot::loadTextures();
+	Skybox::loadTextures();
 
 	// start main loop
 	glutMainLoop();
@@ -39,44 +41,10 @@ int main(int argc, char** argv) {
 
 
 void drawSkyBox() {
-	static const float SCALE_COEFF = 1000.f;
-	static const float SHIFT_VALUE = SCALE_COEFF / 2;
-
 	glPushMatrix();
-		glEnable(GL_TEXTURE_2D);
-		Robot::textures[Robot::Texture::Noise].bind();
-
-		Color(0, 0, 0.5).render();
-			
-		glPushMatrix();
-			glTranslatef(0, 0, SHIFT_VALUE);
-			glScaleUniformly(SCALE_COEFF);
-			glTransformationAxes::X::rotate(90);
-				drawSquare();
-		glPopMatrix();
-
-		glPushMatrix();
-			glTranslatef(0, 0, -SHIFT_VALUE);
-			glScaleUniformly(SCALE_COEFF);
-			glTransformationAxes::X::rotate(-90);
-				drawSquare();
-		glPopMatrix();
-
-		glPushMatrix();
-			glTranslatef(SHIFT_VALUE, 0, 0);
-			glScaleUniformly(SCALE_COEFF);
-			glTransformationAxes::Y::rotate(90);
-				drawSquare();
-		glPopMatrix();
-
-		glPushMatrix();
-			glTranslatef(-SHIFT_VALUE, 0, 0);
-			glScaleUniformly(SCALE_COEFF);
-			glTransformationAxes::Y::rotate(-90);
-				drawSquare();
-		glPopMatrix();
-
-		glDisable(GL_TEXTURE_2D);
+		glScaleUniformly(200);
+		glTransformationAxes::Y::rotate(-90);
+		Skybox::draw();
 	glPopMatrix();
 }
 
@@ -88,7 +56,7 @@ void drawScene(const Robot& robot){
 	setColor(.1, .1, .1);
 	drawPlane(groundMeasurements, groundMeasurements);
 	drawQuadraticGrid(groundMeasurements, 40, Color(.8, .0, .0));
-
+	
 	// draw robot
 	robot.draw();
 }

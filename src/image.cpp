@@ -59,6 +59,8 @@ bool cg_image::load ( const char * fileName, bool generateMipmaps )
 		std::exit(1);
 	};
 
+	this->fileName = fileName;
+
 	// Datei in Zwischenspeicher lesen
 	if ( !loadBMP ( fileName, false ) )
 		if ( !loadTGA ( fileName, false ) )

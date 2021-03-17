@@ -2,13 +2,24 @@
 
 #include "utils.h"
 #include "glutils.h"
-
-#include "../dependencies/freeglut.h"
+#include "image.h"
 
 #include <array>
 
 
-void drawCube();
+namespace Cube {
+	enum Face {
+		Front = 0,
+		Back = 1,
+		Left = 2,
+		Right = 3,
+		Top = 4,
+		Bottom = 5,
+	};
+
+	void draw();
+	void drawFace(Face face);
+}
 
 void drawSquare();
 

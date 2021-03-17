@@ -485,8 +485,7 @@ void Robot::loadTextures() {
 	const static char* DIR_PATH = getResourceSubDirPath("textures");
 	const static char* FILE_NAMES[Robot::N_TEXTURES] = {
 		"smoothed-square-textured-metal.bmp",
-		"warped-sheet-metal_roughness.bmp",
-		"perlin-noise.bmp"
+		"warped-sheet-metal_roughness.bmp"
 	};
 
 	for (size_t i = 0; i < Robot::N_TEXTURES; i++) {
@@ -510,7 +509,6 @@ void Robot::draw() const {
 		drawTargetAxesConfigurationCoordSystem();
 
 	// draw robot
-
 	glPushMatrix();
 		
 		// base
@@ -526,7 +524,7 @@ void Robot::draw() const {
 
 		// tcp coord system if applicable
 		if (drawTCPCoordSystem_b) {
-			glTranslateByVec(relativeAxesStartPositionShiftVectors[4]);
+			glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES]);
 			drawShrunkCoordSystem();
 		}
 	glPopMatrix();
@@ -611,7 +609,7 @@ void Robot::drawPedestal() const {
 		Color(.6f).render();
 		textures[Texture::Knobs].bind();
 		glEnable(GL_TEXTURE_2D);
-			drawCube();
+			Cube::draw();
 		glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
