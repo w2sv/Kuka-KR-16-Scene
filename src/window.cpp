@@ -138,8 +138,9 @@ VelocityFpsRegularizer::VelocityFpsRegularizer(unsigned long microsecondsThresho
 
 bool VelocityFpsRegularizer::sufficientAmountOfTimePassed() {
 	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-	bool display_b = std::chrono::duration_cast<std::chrono::microseconds>(now - lastTimeCheckpoint).count() > microsecondsThreshold;
-	lastTimeCheckpoint = now;
-	
-	return display_b;
+	if (std::chrono::duration_cast<std::chrono::microseconds>(now - lastTimeCheckpoint).count() > microsecondsThreshold) {
+		lastTimeCheckpoint = now;
+		return true;
+	}
+	return false;
 }

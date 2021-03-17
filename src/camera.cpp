@@ -77,12 +77,14 @@ void Camera::setCameraParameterAccordingly() {
 void Camera::updateRadiusViaScroll() {
 	static const float DELTA_RADIUS = 1.5;
 
-	if (cg_mouse::buttonState(GLUT_MOUSE_WHEEL_UP)) {
+	if (cg_mouse::buttonState(GLUT_MOUSE_WHEEL_UP))
 		radius -= DELTA_RADIUS;
-		clipRadius();
-	}
 	else if (cg_mouse::buttonState(GLUT_MOUSE_WHEEL_DOWN))
 		radius += DELTA_RADIUS;
+	else
+		return;
+
+	clipRadius();
 }
 
 

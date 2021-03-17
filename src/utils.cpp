@@ -69,13 +69,6 @@ float Extrema::clippedValue(float value) const {
 }
 
 
-Measurements::Measurements(float height, float width, float depth) :
-	height(height),
-	width(width),
-	depth(depth)
-{}
-
-
 Vector2::Vector2(float x, float y) :
 	x(x), y(y)
 {}
@@ -103,12 +96,10 @@ bool Vector2::isEmpty() const {
 }
 
 
-#if DEBUG
 std::ostream& operator<<(std::ostream& os, const Vector2& vec) {
 	os << vec.x << '/' << vec.y << '/' << std::endl;
 	return os;
 }
-#endif
 
 
 Vector3::Vector3(float x, float y, float z) :
@@ -118,17 +109,75 @@ Vector3::Vector3(float x, float y, float z) :
 {}
 
 
+Vector3::Vector3():
+	x(NULL),
+	y(NULL),
+	z(NULL)
+{}
+
+
+Vector3 Vector3::fromArray(std::array<GLfloat, 3> arr){
+	return Vector3(arr[0], arr[1], arr[2]);
+}
+
+
 Vector3 Vector3::inverted() const {
 	return Vector3(-x, -y, z);
 }
 
 
-#if DEBUG
+const float* Vector3::data() const {
+	return &x;
+}
+
+
+Vector3 Vector3::unit() const {
+	return (*this) / (this->norm() + 1e-6);
+}
+
+
+Vector3 Vector3::operator-(const Vector3& other) const {
+	return Vector3(
+		x - other.x,
+		y - other.y,
+		z - other.z
+	);
+}
+
+
+Vector3 Vector3::operator/(float divisor) const {
+	return Vector3(
+		x / divisor,
+		y / divisor,
+		z / divisor
+	);
+}
+
+
+
+float Vector3::norm() const {
+	return sqrt(x * x + y * y + z * z);
+}
+
+
 std::ostream& operator<<(std::ostream& os, const Vector3& vec) {
-	os << vec.x << '/' << vec.y << '/' << vec.z << std::endl;
+	os << vec.x << '/' << vec.y << '/' << vec.z;
 	return os;
 }
-#endif
+
+
+Vector3 crossProduct(const Vector3& a, const Vector3& b) {
+	return Vector3(
+		a.y * b.z - a.z * b.y,
+		a.z * b.x - a.x * b.z,
+		a.x * b.y - a.y * b.x
+	);
+}
+
+
+Vector3 normalVector(const Vector3& a, const Vector3& b, const Vector3& c) {
+	return crossProduct(b - a, b - c).unit();
+}
 
 
 ////////////////////////////////////////////////////////////

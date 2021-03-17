@@ -6,6 +6,10 @@
 using namespace glTransformationAxes;
 
 
+////////////////////////////////////////////////////////////
+/// Constants
+////////////////////////////////////////////////////////////
+
 const unsigned int SLICES = 20;
 const unsigned int STACKS = 20;
 const unsigned int LOOPS = 1;
@@ -21,6 +25,10 @@ const GLfloat SQUARE_TEXTURE_COORDINATES[4][2] = {
 };
 
 
+////////////////////////////////////////////////////////////
+/// Pseudo 2D
+////////////////////////////////////////////////////////////
+
 void drawSquare() {
 	static const GLfloat VERTICES[4][3] = {
 		{SQUARE_VERTEX_COORD, PSEUDO_NULL, SQUARE_VERTEX_COORD},
@@ -30,13 +38,44 @@ void drawSquare() {
 	};
 
 	glBegin(GL_QUADS);
-		for (size_t i = 0; i < 4; i++) {
-			glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
-			glVertex3fv(VERTICES[i]);
-		}
+	for (size_t i = 0; i < 4; i++) {
+		glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
+		glVertex3fv(VERTICES[i]);
+	}
 	glEnd();
 }
 
+
+void drawQuadraticGrid(const Extrema& extrema, int tiles, const Color& color) {
+	color.render();
+
+	glBegin(GL_LINES);
+	for (float v = extrema.min; v <= extrema.max; v += extrema.spread() / tiles) {
+		v == extrema.min || v == extrema.max ? Color(.6f, .3f, .3f).render() : color.render();
+		glVertex3f(v, 0, extrema.min);
+		glVertex3f(v, 0, extrema.max);
+
+		v == extrema.min || v == extrema.max ? Color(.3f, .3f, .6f).render() : color.render();
+		glVertex3f(extrema.min, 0, v);
+		glVertex3f(extrema.max, 0, v);
+	};
+	glEnd();
+}
+
+
+void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema) {
+	glBegin(GL_QUADS);
+		glVertex3f(xExtrema.min, PSEUDO_NULL, yExtrema.min);
+		glVertex3f(xExtrema.max, PSEUDO_NULL, yExtrema.min);
+		glVertex3f(xExtrema.max, PSEUDO_NULL, yExtrema.max);
+		glVertex3f(xExtrema.min, PSEUDO_NULL, yExtrema.max);
+	glEnd();
+}
+
+
+////////////////////////////////////////////////////////////
+/// 3D
+////////////////////////////////////////////////////////////
 
 void drawCube() {
 	static const GLfloat VERTICES[2][4][3] = {
@@ -104,33 +143,6 @@ void drawCube() {
 }
 
 
-void drawQuadraticGrid(const Extrema& extrema, int tiles, const Color& color) {
-	color.render();
-
-	glBegin(GL_LINES);
-		for (float v = extrema.min; v <= extrema.max; v+= extrema.spread() / tiles) {
-			v == extrema.min || v == extrema.max ? Color(.6f, .3f, .3f).render() : color.render();
-			glVertex3f(v, 0, extrema.min);
-			glVertex3f(v, 0, extrema.max);
-
-			v == extrema.min || v == extrema.max ? Color(.3f, .3f, .6f).render() : color.render();
-			glVertex3f(extrema.min, 0, v);
-			glVertex3f(extrema.max, 0, v);
-		};
-	glEnd();
-}
-
-
-void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema) {
-	glBegin(GL_QUADS);
-		glVertex3f(xExtrema.min, PSEUDO_NULL, yExtrema.min);
-		glVertex3f(xExtrema.max, PSEUDO_NULL, yExtrema.min);
-		glVertex3f(xExtrema.max, PSEUDO_NULL, yExtrema.max);
-		glVertex3f(xExtrema.min, PSEUDO_NULL, yExtrema.max);
-	glEnd();
-}
-
-
 void drawCylinder(float startRadius, float endRadius, float height) {
 	GLUquadricObj* q = gluNewQuadric();
 
@@ -157,15 +169,9 @@ void drawCylinder(float startRadius, float endRadius, float height) {
 }
 
 
-const std::array<OctogonalPrism::TextureVertex, 4> OctogonalPrism::UPRIGHT_FACES_TEXTURE_VERTICES{
-	{
-		OctogonalPrism::TextureVertex{0, 0},
-		OctogonalPrism::TextureVertex{1, 0},
-		OctogonalPrism::TextureVertex{1, 1},
-		OctogonalPrism::TextureVertex{0, 1},
-	}
-};
-
+////////////////////////////////////////////////////////////
+/// OctagonalPrism
+////////////////////////////////////////////////////////////
 
 OctogonalPrism::OctogonalPrism(float heigth, float straightEdgeLength, float diagonalEdgeLength){
 	const float lateralLength = (straightEdgeLength + diagonalEdgeLength) / 2;
@@ -237,31 +243,69 @@ OctogonalPrism::FlatFaceTextureVertices OctogonalPrism::calculateFlatFaceTexture
 }
 
 
+OctogonalPrism::UprightFaceNormalVectors OctogonalPrism::calculateUprightFacesNormalVectors() const {
+	UprightFaceNormalVectors vectors;
+
+	for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
+		vectors[faceIndex] = normalVector(
+			Vector3::fromArray(vertices[0][faceIndex]),
+			Vector3::fromArray(vertices[0][(faceIndex + 1) % 8]),
+			Vector3::fromArray(vertices[1][(faceIndex + 1) % 8])
+		);
+	}
+
+	return vectors;
+}
+
+
 void OctogonalPrism::draw(const Color& corpusColor, const Color* cageColor) const {
 	corpusColor.render();
 
-	 //draw upper and lower plane
-	for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-		glBegin(GL_POLYGON);
-		for (size_t i = 0; i < 9; i++) {
-			glTexCoord2fv(flatFaceTextureVertices[i % 8].data());
-			glVertex3fv(vertices[zPolarityIndex][i % 8].data());
-		}
-		glEnd();
-	}
+	// Flat Faces
+	{
+		const static GLdouble NORMAL_VECTORS[2][3] = {
+			{0, -1, 0},
+			{0, 1, 0}
+		};
 
-	// connect vertices opposing each other across xz-plane
-	for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
-		glBegin(GL_POLYGON);
+		//draw upper and lower plane
 		for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-			for (size_t i = 0; i < 2; i++) {
-				glTexCoord2fv(UPRIGHT_FACES_TEXTURE_VERTICES[zPolarityIndex * 2 + i].data());
-				glVertex3fv(vertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
+			glBegin(GL_POLYGON);
+			glNormal3dv(NORMAL_VECTORS[zPolarityIndex]);
+			for (size_t i = 0; i < 9; i++) {
+				glTexCoord2fv(flatFaceTextureVertices[i % 8].data());
+				glVertex3fv(vertices[zPolarityIndex][i % 8].data());
 			}
+			glEnd();
 		}
-		glEnd();
 	}
 
+	// Upright Faces
+	{
+		const static std::array<TextureVertex, 4> TEXTURE_VERTICES{
+			{
+				TextureVertex{0, 0},
+				TextureVertex{1, 0},
+				TextureVertex{1, 1},
+				TextureVertex{0, 1},
+			}
+		};
+
+		// connect vertices opposing each other across xz-plane
+		for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
+			glBegin(GL_POLYGON);
+			glNormal3dv((GLdouble*)uprightFacesNormalVectors[faceIndex].data());
+			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+				for (size_t i = 0; i < 2; i++) {
+					glTexCoord2fv(TEXTURE_VERTICES[zPolarityIndex * 2 + i].data());
+					glVertex3fv(vertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
+				}
+			}
+			glEnd();
+		}
+	}
+
+	// Cage
 	if (cageColor) {
 		cageColor->render();
 
@@ -292,7 +336,6 @@ void OctogonalPrism::draw(const Color& corpusColor, const Color* cageColor) cons
 /// Dev functions
 ////////////////////////////////////////////////////////////
 
-#ifdef DEBUG
 void indicateCurrentPosition() {
 	glPushMatrix();
 	Color(0.f, 1.f, 0.f).render();
@@ -315,4 +358,3 @@ void drawZVector() {
 	glEnd();
 	glPopMatrix();
 }
-#endif

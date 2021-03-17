@@ -1,5 +1,9 @@
 #pragma once
 
+#include <iostream>
+#include <array>
+#include "../dependencies/freeglut.h"
+
 
 ////////////////////////////////////////////////////////////
 /// ValueAbstraction Baseclass
@@ -26,9 +30,6 @@ template <typename T> struct ValueAbstraction {
 	void operator/=(const ValueAbstraction& other) { inst.value /= other.value; }
 	friend T operator*(const ValueAbstraction<T>& inst, const ValueAbstraction<T>& other) { return inst.value * other.value; }
 	friend T operator/(const ValueAbstraction<T>& inst, const ValueAbstraction<T>& other) { return inst.value / other.value; }
-#if DEBUG
-	virtual friend std::ostream& operator<<(std::ostream& os, const ValueAbstraction<T>& inst) { os << value; return os; }
-#endif
 };
 
 ////////////////////////////////////////////////////////////
@@ -61,11 +62,6 @@ struct Extrema {
 	float clippedValue(float value) const;
 };
 
-struct Measurements {
-	float height, width, depth;
-	Measurements(float height, float width, float depth);
-};
-
 struct Vector2 {
 	float x, y;
 	Vector2(float x, float y);
@@ -74,20 +70,27 @@ struct Vector2 {
 	void set(float x, float y);
 	void clear();
 	bool isEmpty() const;
-#if DEBUG
 	friend std::ostream& operator<<(std::ostream& os, const Vector2& vector);
-#endif
 };
 
 struct Vector3 {
 	float x, y, z;
 	Vector3(float x, float y, float z);
+	Vector3();
+	static Vector3 fromArray(std::array<GLfloat, 3> arr);
 
+	const float* data() const;
 	Vector3 inverted() const;
-#if DEBUG
+	float norm() const;
+	Vector3 unit() const;
+
+	Vector3 operator-(const Vector3& other) const;
+	Vector3 operator/(float divisor) const;
 	friend std::ostream& operator<<(std::ostream& os, const Vector3& vector);
-#endif
 };
+
+Vector3 crossProduct(const Vector3& a, const Vector3& b);
+Vector3 normalVector(const Vector3& a, const Vector3& b, const Vector3& c);
 
 ////////////////////////////////////////////////////////////
 /// Random
