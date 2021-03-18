@@ -5,9 +5,11 @@
 #include "../dependencies/freeglut.h"
 #include "../dependencies/glext.h"
 
+#include <array>
+
 
 const int N_SKYBOX_TEXTURES = 6;
-static cg_image skyboxTextures[N_SKYBOX_TEXTURES];
+CubeMap cubeMap;
 
 
 void Skybox::loadTextures() {
@@ -21,41 +23,41 @@ void Skybox::loadTextures() {
 		"bottom.bmp"
 	};
 
-	/*const GLenum sideTarget[N_SKYBOX_TEXTURES] = {
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-	};*/
+	CubeMap::SideFilePaths sideFilePaths;
+	for (size_t i = 0; i < 6; i++)
+		sideFilePaths[i] = joinPath(DIR_PATH, FILE_NAMES[i]);
 
-	for (size_t i = 0; i < N_SKYBOX_TEXTURES; i++) {
-		skyboxTextures[i].load(joinPath(DIR_PATH, FILE_NAMES[i]), false);
+	cubeMap.load(sideFilePaths);
 
-		skyboxTextures[i].setMinFilter(GL_NEAREST);
-		skyboxTextures[i].setMagFilter(GL_LINEAR);
-		skyboxTextures[i].setWrapMode(GL_CLAMP);
-		skyboxTextures[i].setEnvMode(GL_MODULATE);
-
-		std::cout << skyboxTextures[i].fileName << std::endl;
-	}
+	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP);
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP);
+	glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP);
 }
 
 
 void Skybox::draw() {
-	glEnable(GL_TEXTURE_2D);
+	glPushMatrix();
+		glDepthMask(GL_FALSE);
+		glScaleUniformly(100);
+		// glTransformationAxes::Y::rotate(-90);
+	
+		glEnable(GL_TEXTURE_CUBE_MAP);
+			/*glDisable(GL_TEXTURE_GEN_S);
+			glDisable(GL_TEXTURE_GEN_T);
+			glDisable(GL_TEXTURE_GEN_R);*/
 
-	for (size_t i = 0; i < 6; i++) {
-		skyboxTextures[i].bind();
-		Cube::drawFace(Cube::Face(i));
-	}
+			// glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+			cubeMap.bind();
 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			for (size_t i = 0; i < 6; i++) {
+				Cube::drawFace(Cube::Face(i));
+			}
 
-	glDisable(GL_TEXTURE_2D);
+			/*glEnable(GL_TEXTURE_GEN_S);
+			glEnable(GL_TEXTURE_GEN_T);
+			glEnable(GL_TEXTURE_GEN_R);*/
+
+		glDisable(GL_TEXTURE_CUBE_MAP);
+		glDepthMask(GL_TRUE);
+	glPopMatrix();
 }

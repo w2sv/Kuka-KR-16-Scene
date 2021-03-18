@@ -4,7 +4,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <iostream>
 
 #ifdef _WIN32
 	#include <io.h>
@@ -13,6 +12,7 @@
 #endif
 
 #include "image.h"
+#include "../dependencies/glext.h"
 
 #ifndef SEEK_SET
 	#define SEEK_SET 0
@@ -51,35 +51,14 @@ cg_image::~cg_image ()
 	free();
 }
 
-bool cg_image::load ( const char * fileName, bool generateMipmaps )
+void cg_image::load ( const char * fileName, bool generateMipmaps )
 {
-	if (!fopen(fileName, "r")) {
-		std::cerr << fileName << "does not exist" << std::endl;
-		std::getchar();
-		std::exit(1);
-	};
+	loadData(fileName);
 
-	this->fileName = fileName;
-
-	// Datei in Zwischenspeicher lesen
-	if ( !loadBMP ( fileName, false ) )
-		if ( !loadTGA ( fileName, false ) )
-			if ( !loadRGB ( fileName, false ) )
-			{
-				free();
-				printf( "Unsupported image format!\n" );
-				return false;
-			}
-
-	// OpenGL-Textur erzeugen
 	GLuint tex;
-	// 1 Texturelement wird in GL erzeugt
 	glGenTextures( 1, &tex );
-
-	// ... und gebunden
 	glBindTexture( GL_TEXTURE_2D, tex );
 
-	// MipMap JA/NEIN
 	if (generateMipmaps) {
 		gluBuild2DMipmaps(GL_TEXTURE_2D,
 			BPP >> 3,						// Textur enthaelt 3 Komponenten pro Texel
@@ -100,11 +79,30 @@ bool cg_image::load ( const char * fileName, bool generateMipmaps )
 		hasMipMap = false;
 	}
 
-	// Zwischenspeicher freigeben
 	free();
 	glTex = tex;
+}
 
-	return true;
+void cg_image::loadData(const char* fileName) {
+	if (!fopen(fileName, "r")) {
+		printf("Couldn't find %s\n", fileName);
+	}
+
+	// Datei in Zwischenspeicher lesen
+	else if (!loadBMP(fileName, false)) {
+		if (!loadTGA(fileName, false)) {
+			if (!loadRGB(fileName, false)) {
+				printf("Unsupported image format!\n");
+			}
+		}
+	}
+	else {
+		this->fileName = fileName;
+		return;
+	}
+
+	std::getchar();
+	std::exit(1);
 }
 
 void cg_image::setMagFilter(GLint filter) 
@@ -715,6 +713,57 @@ bool cg_image::loadBMP ( const char *fileName, bool verbose )
 	}
 	return false;
 }
+
+
+/******************************************************************************/
+//		Cube Map
+/******************************************************************************/
+
+
+void CubeMap::load(SideFilePaths sideFilePaths) {
+	static const GLenum sideTarget[6] = {
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+	};
+	
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+	for (size_t i = 0; i < 6; i++) {
+		loadData(sideFilePaths[i]);
+
+		glTexImage2D(
+			sideTarget[i],
+			0,
+			GL_RGBA,
+			sizeX, sizeY,
+			0,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			data
+		);
+
+		free();
+	}
+	glTex = tex;
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+
+void CubeMap::bind() const {
+	glBindTexture(GL_TEXTURE_CUBE_MAP, glTex);
+}
+
 
 /******************************************************************************/
 //		TGA Funktionen

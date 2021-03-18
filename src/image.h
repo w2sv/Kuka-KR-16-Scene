@@ -22,6 +22,8 @@ typedef unsigned int UINT;
 #endif
 
 #include <string>
+#include <array>
+
 
 struct rawImageRec;
 
@@ -43,7 +45,7 @@ public:
 
 	// Funktion zum Einlesen einer Textur. Rueckgabewert signalisiert, ob das Laden erfolgreich war.
 	// Nach Aufruf der Funktion ist die Textur gebunden, kann also sofort modifiziert (glTexParameter etc.) und/oder verwendet werden
-	bool load ( const char * fileName, bool generateMipmaps = false );
+	void load ( const char * fileName, bool generateMipmaps = false );
 
 	// Funktionen zum Spezifizieren der Texturfilterung und Texturanwendung
 	void setMagFilter(GLint filter);	// MAG-Filter (GL_NEAREST, GL_LINEAR)
@@ -61,10 +63,10 @@ public:
 	// Hier wird der OpenGL Code entsprechend der Einstellungen erzeugt.
 	void bind ();
 
-	// Freigeben des belgten Speichers
+	// Freigeben des belegten Speichers
 	void free ();
 
-private:
+protected:
 	GLuint glTex;				// OpenGL-Textur
 	int BPP;					// Bits Per Pixel
 	int sizeX;					// Breite
@@ -78,6 +80,8 @@ private:
 	GLenum envMode;				// Environment mode
 
 	bool hasMipMap;				// true, wenn die Textur als MipMap geladen wurde.
+
+	void loadData(const char* fileName);
 
 	// Datei-Lader
 	bool loadBMP ( const char * fileName, bool verbose = true );
@@ -112,8 +116,13 @@ private:
 	static int getFileSize ( int fileDes );
 };
 
-// für alle, die lieber mit dem Namem cg_texture arbeiten wollen:
-class cg_texture : public cg_image {};
+class CubeMap : public cg_image {
+public:
+	typedef std::array<const char*, 6> SideFilePaths;
+
+	void load(SideFilePaths sideFilePaths);
+	void bind() const;
+};
 
 /******************************************************************************/
 //

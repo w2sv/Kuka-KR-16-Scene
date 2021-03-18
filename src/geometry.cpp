@@ -95,12 +95,13 @@ const GLfloat CUBE_VERTICES[2][4][3] = {
 		}
 };
 
+
 void Cube::drawFace(Face face) {
 	glBegin(GL_QUADS);
 
 	switch (face) {
 		case Front:
-			glNormal3f(0, -1, 0);
+			// glNormal3f(0, -1, 0);
 			for (size_t i = 0; i < 2; i++)
 				for (size_t j = 0; j < 2; j++) {
 					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
@@ -108,7 +109,7 @@ void Cube::drawFace(Face face) {
 				} break;
 
 		case Back:
-			glNormal3f(0, 1, 0);
+			// glNormal3f(0, 1, 0);
 			for (size_t i = 0; i < 2; i++)
 				for (size_t j = 0; j < 2; j++) {
 					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
@@ -116,7 +117,7 @@ void Cube::drawFace(Face face) {
 				} break;
 
 		case Left:
-			glNormal3f(-1, 0, 0);
+			// glNormal3f(-1, 0, 0);
 			for (size_t i = 0; i < 2; i++)
 				for (size_t j = 0; j < 2; j++) {
 					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
@@ -124,7 +125,7 @@ void Cube::drawFace(Face face) {
 				} break;
 
 		case Right:
-			glNormal3f(1, 0, 0);
+			// glNormal3f(1, 0, 0);
 			for (size_t i = 0; i < 2; i++)
 				for (size_t j = 0; j < 2; j++) {
 					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
@@ -132,14 +133,14 @@ void Cube::drawFace(Face face) {
 				} break;
 
 		case Top:
-			glNormal3f(0, 0, 1);
+			// glNormal3f(0, 0, 1);
 			for (size_t i = 0; i < 4; i++) {
 				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
 				glVertex3fv(CUBE_VERTICES[0][i]);
 			} break;
 
 		case Bottom:
-			glNormal3f(0, 0, -1);
+			// glNormal3f(0, 0, -1);
 			for (size_t i = 0; i < 4; i++) {
 				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
 				glVertex3fv(CUBE_VERTICES[1][i]);
@@ -148,6 +149,7 @@ void Cube::drawFace(Face face) {
 
 	glEnd();
 }
+
 
 void Cube::draw() {
 	for (size_t i = 0; i < 6; i++)

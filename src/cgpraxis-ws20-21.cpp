@@ -40,25 +40,16 @@ int main(int argc, char** argv) {
 }
 
 
-void drawSkyBox() {
-	glPushMatrix();
-		glScaleUniformly(200);
-		glTransformationAxes::Y::rotate(-90);
-		Skybox::draw();
-	glPopMatrix();
-}
-
-
 void drawScene(const Robot& robot){
-	drawSkyBox();
+	Skybox::draw();
 
-	// draw ground
-	setColor(.1, .1, .1);
-	drawPlane(groundMeasurements, groundMeasurements);
-	drawQuadraticGrid(groundMeasurements, 40, Color(.8, .0, .0));
-	
-	// draw robot
-	robot.draw();
+	//// draw ground
+	//setColor(.1, .1, .1);
+	//drawPlane(groundMeasurements, groundMeasurements);
+	//drawQuadraticGrid(groundMeasurements, 40, Color(.8, .0, .0));
+	//
+	//// draw robot
+	//robot.draw();
 }
 
 
