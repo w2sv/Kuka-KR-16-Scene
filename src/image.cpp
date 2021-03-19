@@ -89,9 +89,9 @@ void cg_image::loadData(const char* fileName) {
 	}
 
 	// Datei in Zwischenspeicher lesen
-	else if (!loadBMP(fileName, false)) {
-		if (!loadTGA(fileName, false)) {
-			if (!loadRGB(fileName, false)) {
+	else if (!loadBMP(fileName, true)) {
+		if (!loadTGA(fileName, true)) {
+			if (!loadRGB(fileName, true)) {
 				printf("Unsupported image format!\n");
 			}
 		}
@@ -162,9 +162,6 @@ void cg_image::bind ()
 
 	// set env mode
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, this->envMode);
-
-	// bind the texture
-	// glBindTexture( GL_TEXTURE_2D, glTex );
 }
 
 void cg_image::free ()
@@ -721,21 +718,22 @@ bool cg_image::loadBMP ( const char *fileName, bool verbose )
 
 
 void CubeMap::load(SideFilePaths sideFilePaths) {
-	static const GLenum sideTarget[6] = {
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+	static const GLenum sideTarget[N_FACES] = {
 		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
 		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 	};
 	
 	GLuint tex;
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 
-	for (size_t i = 0; i < 6; i++) {
+	for (size_t i = 0; i < N_FACES; i++) {
 		loadData(sideFilePaths[i]);
+		horizontalFlip();
 
 		glTexImage2D(
 			sideTarget[i],
@@ -754,6 +752,7 @@ void CubeMap::load(SideFilePaths sideFilePaths) {
 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -762,6 +761,8 @@ void CubeMap::load(SideFilePaths sideFilePaths) {
 
 void CubeMap::bind() const {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, glTex);
+	
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 }
 
 

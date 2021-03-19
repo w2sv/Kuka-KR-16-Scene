@@ -118,7 +118,8 @@ protected:
 
 class CubeMap : public cg_image {
 public:
-	typedef std::array<const char*, 6> SideFilePaths;
+	static const int N_FACES = 6;
+	typedef std::array<const char*, N_FACES> SideFilePaths;
 
 	void load(SideFilePaths sideFilePaths);
 	void bind() const;

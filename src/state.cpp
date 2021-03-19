@@ -5,7 +5,7 @@
 
 double GlobalState::screenSize[2] = { NULL };
 GLenum GlobalState::drawMode = GL_FILL;
-bool GlobalState::lightMode = true;
+bool GlobalState::lightMode = false;
 int GlobalState::normalMode = 0;
 bool GlobalState::cullMode = false;
 bool GlobalState::drawCoordSystem = false;

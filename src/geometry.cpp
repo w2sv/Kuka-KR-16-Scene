@@ -20,11 +20,11 @@ const unsigned int LOOPS = 1;
 const float PSEUDO_NULL = -0.01;
 const float SQUARE_VERTEX_COORD = 0.5;
 
-const GLfloat SQUARE_TEXTURE_COORDINATES[4][2] = {
-	{1., 0.},
-	{1., 1.},
-	{0., 1.},
-	{0., 0.}
+const GLfloat SQUARE_TEXTURE_COORDINATES[4][3] = {
+	{1., 0., 1.},
+	{1., 1., 1.},
+	{0., 1., 1.},
+	{0., 0., 1.}
 };
 
 
@@ -104,7 +104,7 @@ void Cube::drawFace(Face face) {
 			// glNormal3f(0, -1, 0);
 			for (size_t i = 0; i < 2; i++)
 				for (size_t j = 0; j < 2; j++) {
-					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
+					glTexCoord3fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
 					glVertex3fv(CUBE_VERTICES[i][i != j]);
 				} break;
 
@@ -112,7 +112,7 @@ void Cube::drawFace(Face face) {
 			// glNormal3f(0, 1, 0);
 			for (size_t i = 0; i < 2; i++)
 				for (size_t j = 0; j < 2; j++) {
-					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
+					glTexCoord3fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
 					glVertex3fv(CUBE_VERTICES[i][(i != j) + 2]);
 				} break;
 
@@ -120,7 +120,7 @@ void Cube::drawFace(Face face) {
 			// glNormal3f(-1, 0, 0);
 			for (size_t i = 0; i < 2; i++)
 				for (size_t j = 0; j < 2; j++) {
-					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
+					glTexCoord3fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
 					glVertex3fv(CUBE_VERTICES[i][(i != j) + 1]);
 				} break;
 
@@ -128,21 +128,21 @@ void Cube::drawFace(Face face) {
 			// glNormal3f(1, 0, 0);
 			for (size_t i = 0; i < 2; i++)
 				for (size_t j = 0; j < 2; j++) {
-					glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
+					glTexCoord3fv(SQUARE_TEXTURE_COORDINATES[i * 2 + j]);
 					glVertex3fv(CUBE_VERTICES[i][(i != j) * 3]);
 				} break;
 
 		case Top:
 			// glNormal3f(0, 0, 1);
 			for (size_t i = 0; i < 4; i++) {
-				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
+				glTexCoord3fv(SQUARE_TEXTURE_COORDINATES[i]);
 				glVertex3fv(CUBE_VERTICES[0][i]);
 			} break;
 
 		case Bottom:
 			// glNormal3f(0, 0, -1);
 			for (size_t i = 0; i < 4; i++) {
-				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[i]);
+				glTexCoord3fv(SQUARE_TEXTURE_COORDINATES[i]);
 				glVertex3fv(CUBE_VERTICES[1][i]);
 			} break;
 		}
@@ -152,8 +152,98 @@ void Cube::drawFace(Face face) {
 
 
 void Cube::draw() {
-	for (size_t i = 0; i < 6; i++)
-		drawFace(Face(i));
+	GLfloat fExtent = 15.0f;
+
+	glBegin(GL_QUADS);
+	//////////////////////////////////////////////
+	// Negative X
+	glTexCoord3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(-fExtent, -fExtent, fExtent);
+
+	glTexCoord3f(-1.0f, 1.0f, -1.0f);
+	glVertex3f(-fExtent, -fExtent, -fExtent);
+
+	glTexCoord3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(-fExtent, fExtent, -fExtent);
+
+	glTexCoord3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(-fExtent, fExtent, fExtent);
+
+
+	///////////////////////////////////////////////
+	//  Postive X
+	glTexCoord3f(1.0f, 1.0f, -1.0f);
+	glVertex3f(fExtent, -fExtent, -fExtent);
+
+	glTexCoord3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(fExtent, -fExtent, fExtent);
+
+	glTexCoord3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(fExtent, fExtent, fExtent);
+
+	glTexCoord3f(1.0f, -1.0f, -1.0f);
+	glVertex3f(fExtent, fExtent, -fExtent);
+
+
+	////////////////////////////////////////////////
+	// Negative Z 
+	glTexCoord3f(-1.0f, 1.0f, -1.0f);
+	glVertex3f(-fExtent, -fExtent, -fExtent);
+
+	glTexCoord3f(1.0f, 1.0f, -1.0f);
+	glVertex3f(fExtent, -fExtent, -fExtent);
+
+	glTexCoord3f(1.0f, -1.0f, -1.0f);
+	glVertex3f(fExtent, fExtent, -fExtent);
+
+	glTexCoord3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(-fExtent, fExtent, -fExtent);
+
+
+	////////////////////////////////////////////////
+	// Positive Z 
+	glTexCoord3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(fExtent, -fExtent, fExtent);
+
+	glTexCoord3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(-fExtent, -fExtent, fExtent);
+
+	glTexCoord3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(-fExtent, fExtent, fExtent);
+
+	glTexCoord3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(fExtent, fExtent, fExtent);
+
+
+	//////////////////////////////////////////////////
+	// Positive Y
+	glTexCoord3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(-fExtent, fExtent, fExtent);
+
+	glTexCoord3f(1.0f, 1.0f, -1.0f);
+	glVertex3f(-fExtent, fExtent, -fExtent);
+
+	glTexCoord3f(-1.0f, 1.0f, -1.0f);
+	glVertex3f(fExtent, fExtent, -fExtent);
+
+	glTexCoord3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(fExtent, fExtent, fExtent);
+
+
+	///////////////////////////////////////////////////
+	// Negative Y
+	glTexCoord3f(1.0f, -1.0f, -1.0f);
+	glVertex3f(-fExtent, -fExtent, -fExtent);
+
+	glTexCoord3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(-fExtent, -fExtent, fExtent);
+
+	glTexCoord3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(fExtent, -fExtent, fExtent);
+
+	glTexCoord3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(fExtent, -fExtent, -fExtent);
+	glEnd();
 }
 
 

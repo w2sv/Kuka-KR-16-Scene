@@ -38,7 +38,7 @@ void setLights()
 	GLfloat l_diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat l_spec[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat l_spotdir[3] = { 0.0f, 0.0f, 1.0f };
-	GLfloat l_spotcutoff = 180.0f;
+	GLfloat l_spotcutoff = 360.0f;
 	GLfloat l_spotexp = 0.0f;
 	GLfloat l_att[3] = { 1.0f, 0.0f, 0.0f };
 
@@ -62,7 +62,7 @@ void setLights()
 
 // Standardeinstellung für Farbe und Beleuchtung
 void setDefaultLightAndMaterial(GLboolean lightMode) {
-	GLfloat color[4] = { 0.4, 0.4, 0.8, 1.0 };
+	GLfloat color[4] = { 1, 1, 1, 1 };
 
 	if (lightMode == GL_TRUE){
 		GLfloat m_amb[4] = { 0.2, 0.2, 0.2, 1.0 };

@@ -9,12 +9,12 @@
 
 namespace Cube {
 	enum Face {
-		Front = 0,
-		Back = 1,
-		Left = 2,
-		Right = 3,
-		Top = 4,
-		Bottom = 5,
+		Right = 0,
+		Left = 1,
+		Top = 2,
+		Bottom = 3,
+		Back = 4,
+		Front = 5,
 	};
 
 	void draw();
