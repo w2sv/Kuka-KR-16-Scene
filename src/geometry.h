@@ -21,8 +21,6 @@ namespace Cube {
 	void drawFace(Face face, bool texture3D);
 }
 
-void drawSquare();
-
 void drawCylinder(float startRadius, float endRadius, float height);
 
 class OctogonalPrism {

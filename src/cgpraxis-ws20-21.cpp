@@ -44,12 +44,12 @@ void drawScene(const Robot& robot){
 	Skybox::draw();
 
 	//// draw ground
-	setColor(.1, .1, .1);
-	drawPlane(groundMeasurements, groundMeasurements);
-	drawQuadraticGrid(groundMeasurements, 40, Color(.8, .0, .0));
-	
-	// draw robot
-	robot.draw();
+	//setColor(.1, .1, .1);
+	//drawPlane(groundMeasurements, groundMeasurements);
+	//drawQuadraticGrid(groundMeasurements, 40, Color(.8, .0, .0));
+	//
+	//// draw robot
+	//robot.draw();
 }
 
 
