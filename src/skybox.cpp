@@ -26,7 +26,7 @@ void Skybox::loadTextures() {
 	for (size_t i = 0; i < CubeMap::N_FACES; i++)
 		sideFilePaths[i] = joinPath(DIR_PATH, FILE_NAMES[i]);
 
-	cubeMap.load(sideFilePaths);
+	cubeMap.load(sideFilePaths, true);
 }
 
 

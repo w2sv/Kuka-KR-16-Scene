@@ -717,7 +717,7 @@ bool cg_image::loadBMP ( const char *fileName, bool verbose )
 /******************************************************************************/
 
 
-void CubeMap::load(SideFilePaths sideFilePaths) {
+void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
 	static const GLenum sideTarget[N_FACES] = {
 		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -733,7 +733,8 @@ void CubeMap::load(SideFilePaths sideFilePaths) {
 
 	for (size_t i = 0; i < N_FACES; i++) {
 		loadData(sideFilePaths[i]);
-		horizontalFlip();
+		if (applyHorizontalFlips)
+			horizontalFlip();
 
 		glTexImage2D(
 			sideTarget[i],
