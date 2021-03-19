@@ -745,7 +745,6 @@ void CubeMap::load(SideFilePaths sideFilePaths) {
 			GL_UNSIGNED_BYTE,
 			data
 		);
-
 		free();
 	}
 	glTex = tex;

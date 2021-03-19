@@ -32,13 +32,13 @@ void Skybox::loadTextures() {
 
 void Skybox::draw() {
 	glPushMatrix();
-		glScaleUniformly(5);
+		glScaleUniformly(400);
 	
 		glDepthMask(GL_FALSE);
 		glEnable(GL_TEXTURE_CUBE_MAP);
 
 			cubeMap.bind();
-			Cube::draw();
+			Cube::draw(true);
 
 		glDisable(GL_TEXTURE_CUBE_MAP);
 		glDepthMask(GL_TRUE);

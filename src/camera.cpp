@@ -13,7 +13,7 @@
 
 
 const float Camera::START_RADIUS = 40;
-const Extrema Camera::RADIUS_LIMITS(7.4, 500);
+const Extrema Camera::RADIUS_LIMITS(7.4, 400);
 
 
 Camera::Camera(Robot* robot) :

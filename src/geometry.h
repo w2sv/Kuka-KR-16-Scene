@@ -17,8 +17,8 @@ namespace Cube {
 		Front = 5,
 	};
 
-	void draw();
-	void drawFace(Face face);
+	void draw(bool texture3D = false);
+	void drawFace(Face face, bool texture3D);
 }
 
 void drawSquare();
