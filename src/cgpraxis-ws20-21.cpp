@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 void drawScene(const Robot& robot){
 	Skybox::draw();
 
-	//// draw ground
+	// draw ground
 	setColor(.1, .1, .1);
 	drawPlane(groundMeasurements, groundMeasurements);
 	drawQuadraticGrid(groundMeasurements, 40, Color(.8, .0, .0));

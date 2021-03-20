@@ -35,10 +35,11 @@ void Skybox::loadTextures() {
 * depicted by skybox thus appear tremendously far away
  */
 void enableParallaxeEffect() {
-	GLfloat modelViewMatrix[16];
+	static const size_t TRANSLATE_X_INDEX = 12;
+	
+	static GLfloat modelViewMatrix[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelViewMatrix);
 
-	static const size_t TRANSLATE_X_INDEX = 12;
 	for (size_t i = 0; i < 3; i++)
 		modelViewMatrix[TRANSLATE_X_INDEX + i] = 0.f;
 
@@ -47,18 +48,14 @@ void enableParallaxeEffect() {
 
 
 void Skybox::draw() {
-
 	glPushMatrix();
 		enableParallaxeEffect();
-
-		glScaleUniformly(400);
+		glScaleUniformly(64);
 	
 		glDepthMask(GL_FALSE);
-		glEnable(GL_TEXTURE_CUBE_MAP);
-			
+		glEnable(GL_TEXTURE_CUBE_MAP);	
 			cubeMap.bind();
 			Cube::draw(true);
-
 		glDisable(GL_TEXTURE_CUBE_MAP);
 		glDepthMask(GL_TRUE);
 	glPopMatrix();

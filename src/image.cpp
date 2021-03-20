@@ -731,14 +731,12 @@ void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 
-	glPixelStorei(GL_PACK_ALIGNMENT, 2);
-
 	for (size_t i = 0; i < N_FACES; i++) {
 		loadData(sideFilePaths[i]);
 		
 		if (applyHorizontalFlips)
 			horizontalFlip();
-
+		
 		/*glTexImage2D(
 			sideTarget[i],
 			0,
@@ -759,21 +757,22 @@ void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
 			data
 		);
 		free();
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+
+		// GL_CLAMP_TO_EDGE indispensable to prevent border artefacts
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
 	glTex = tex;
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 
 void CubeMap::bind() const {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, glTex);
-	
+
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 }
 

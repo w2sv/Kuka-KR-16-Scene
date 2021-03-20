@@ -98,6 +98,8 @@ void Cube::drawFace(Face face, bool texture3D) {
 		{0, 0, -1},
 	};
 
+	glBegin(GL_QUADS);
+
 	for (size_t i = 0; i < 2; i++) {
 		for (size_t j = 0; j < 2; j++) {
 			size_t vertexIndex = i * 2 + j;
@@ -130,14 +132,14 @@ void Cube::drawFace(Face face, bool texture3D) {
 			}
 		}
 	}
+
+	glEnd();
 }
 
 
 void Cube::draw(bool texture3D) {
-	glBegin(GL_QUADS);
-		for (size_t i = 0; i < 6; i++)
-			drawFace(Face(i), texture3D);
-	glEnd();
+	for (size_t i = 0; i < 6; i++)
+		drawFace(Face(i), texture3D);
 }
 
 
