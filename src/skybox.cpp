@@ -30,13 +30,32 @@ void Skybox::loadTextures() {
 }
 
 
+/* 
+* Strips any sort of zooming-based translation off of modelview matrix, making environment 
+* depicted by skybox thus appear tremendously far away
+ */
+void enableParallaxeEffect() {
+	GLfloat modelViewMatrix[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX, modelViewMatrix);
+
+	static const size_t TRANSLATE_X_INDEX = 12;
+	for (size_t i = 0; i < 3; i++)
+		modelViewMatrix[TRANSLATE_X_INDEX + i] = 0.f;
+
+	glLoadMatrixf(modelViewMatrix);
+}
+
+
 void Skybox::draw() {
+
 	glPushMatrix();
+		enableParallaxeEffect();
+
 		glScaleUniformly(400);
 	
 		glDepthMask(GL_FALSE);
 		glEnable(GL_TEXTURE_CUBE_MAP);
-
+			
 			cubeMap.bind();
 			Cube::draw(true);
 

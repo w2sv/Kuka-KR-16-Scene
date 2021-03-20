@@ -17,8 +17,9 @@ const unsigned int SLICES = 20;
 const unsigned int STACKS = 20;
 const unsigned int LOOPS = 1;
 
+
 const float PSEUDO_NULL = -0.01;
-const float SQUARE_VERTEX_COORD = 0.5;
+const float SQUARE_VERTEX_COORD = 0.5f;
 
 const GLfloat SQUARE_TEXTURE_COORDINATES[4][3] = {
 	{1., 0.},

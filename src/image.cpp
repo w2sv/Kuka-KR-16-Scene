@@ -731,12 +731,15 @@ void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 
+	glPixelStorei(GL_PACK_ALIGNMENT, 2);
+
 	for (size_t i = 0; i < N_FACES; i++) {
 		loadData(sideFilePaths[i]);
+		
 		if (applyHorizontalFlips)
 			horizontalFlip();
 
-		glTexImage2D(
+		/*glTexImage2D(
 			sideTarget[i],
 			0,
 			GL_RGBA,
@@ -745,13 +748,22 @@ void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
 			GL_RGBA,
 			GL_UNSIGNED_BYTE,
 			data
+		);*/
+
+		gluBuild2DMipmaps(
+			sideTarget[i],
+			GL_RGBA,
+			sizeX, sizeY,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			data
 		);
 		free();
 	}
 	glTex = tex;
 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
