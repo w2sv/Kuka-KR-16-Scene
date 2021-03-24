@@ -117,16 +117,19 @@ namespace Section {
 					"»Snap to random configuration",
 					"»Toggle infinite random config-"
 					}, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
-				Text::display(Vector2(-0.785, -0.26), "uration approach mode");
+				Text::display(Vector2(KEY_DESCRIPTION_COL_X + 0.018, -0.26), "uration approach mode");
 
-				displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, START_Y + 0.005), { "F1", "F2", "F2 Shift", "F3", "F3 Shift", "F4" }, VERTICAL_COL_SPACE, KEY_COLOR);
+				displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, START_Y + 0.005), { "F1", "F2", "F2 Shift", "F3", "F3 Shift", "F4"}, VERTICAL_COL_SPACE, KEY_COLOR);
+
+				Text::displayColored(Vector2(KEY_DESCRIPTION_COL_X, -0.32), "»Reset velocities", KEY_DESCRIPTION_COLOR);
+				Text::displayColored(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, -0.32), "F5", KEY_COLOR);
 			}
 		}
 
 		void camera() {
-			displaySectionTitle(Vector2(-0.53, -0.36), "Camera");
+			displaySectionTitle(Vector2(-0.53, -0.4), "Camera");
 
-			displayColumn(Vector2(KEY_DESCRIPTION_COL_X, -0.46), { "»Reset", "»Toggle orbit mode", "»Toggle tcp mode", "»Toggle reverse tcp mode" }, 0.06, KEY_DESCRIPTION_COLOR);
+			displayColumn(Vector2(KEY_DESCRIPTION_COL_X, -0.5), { "»Reset", "»Toggle orbit mode", "»Toggle tcp mode", "»Toggle reverse tcp mode" }, 0.06, KEY_DESCRIPTION_COLOR);
 			displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, -0.46), { "Left", "Right", "Up", "Down" }, 0.06, KEY_COLOR);
 		}
 	}

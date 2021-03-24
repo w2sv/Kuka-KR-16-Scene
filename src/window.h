@@ -88,5 +88,5 @@ public:
 	bool sufficientAmountOfTimePassed();
 private:
 	const unsigned long microsecondsThreshold;
-	std::chrono::steady_clock::time_point lastTimeCheckpoint;
+	std::chrono::steady_clock::time_point lastCheckpoint;
 };

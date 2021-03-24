@@ -67,7 +67,7 @@ void processInput(Robot& robot, Camera& camera) {
 	// home position
 	if (cg_key::specialKeyState(GLUT_KEY_F2) == 1) {
 		if (cg_key::specialKeyState(GLUT_KEY_SHIFT_L) != 0)
-			robot.reset();
+			robot.reset(true);
 		else
 			robot.initializeHomePositionApproach();
 	}
@@ -82,6 +82,9 @@ void processInput(Robot& robot, Camera& camera) {
 	// approach random configuration infinitely
 	else if (cg_key::specialKeyState(GLUT_KEY_F4) == 1)
 		robot.toggleInfiniteArbitraryAxisConfigurationApproachMode();
+
+	else if (cg_key::specialKeyState(GLUT_KEY_F5) == 1)
+		robot.reset(false);
 
 	/// ---------------------Camera----------------------
 

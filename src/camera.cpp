@@ -12,14 +12,15 @@
 
 
 
-const float Camera::START_RADIUS = 40;
+const float Camera::START_RADIUS = 50;
 const Extrema Camera::RADIUS_LIMITS(7.4, 400);
 
 
 Camera::Camera(Robot* robot) :
 	mode(Mode::Observer),
 	robot(robot),
-	radius(START_RADIUS)
+	radius(START_RADIUS),
+	orbitVelocityRegularizer(VelocityFpsRegularizer(5))
 {
 	resetPosition(); 
 }
@@ -134,7 +135,9 @@ void Camera::setOrbitMode() {
 	static const float X_POSITION_INCREMENT_PER_FRAME = 0.005;
 
 	updateRadiusViaScroll();
-	position.x -= int(X_POSITION_INCREMENT_PER_FRAME * GlobalState::screenSize[0]);
+
+	if (orbitVelocityRegularizer.sufficientAmountOfTimePassed())
+		position.x -= int(X_POSITION_INCREMENT_PER_FRAME * GlobalState::screenSize[0]);
 
 	setCameraParameterAccordingly();
 }

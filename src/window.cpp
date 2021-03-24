@@ -7,6 +7,8 @@
 #include "../dependencies/freeglut.h"
 #include "../dependencies/glext.h"
 
+#include <time.h>
+
 
 void init(int argc, char **argv){
 	int MainWin;		// Identifier vom Hauptfenster
@@ -24,7 +26,7 @@ void init(int argc, char **argv){
 	// OpenGL Initialisierung
 	glEnable(GL_DEPTH_TEST);	// Z-Buffer aktivieren
 
-	glClearColor(0.5, 0, 1, 1);
+	glClearColor(0, 0, 0, 0);
 
 	// Menue erzeugen
 	MainMenu = glutCreateMenu(menuFunc);
@@ -132,14 +134,14 @@ void toggleFullScreenMode() {
 /////////////////////////////////////////////////////////////////////////////////
 VelocityFpsRegularizer::VelocityFpsRegularizer(unsigned long microsecondsThreshold):
 	microsecondsThreshold(microsecondsThreshold),
-	lastTimeCheckpoint(std::chrono::steady_clock::now())
+	lastCheckpoint(std::chrono::steady_clock::now())
 {}
 
 
 bool VelocityFpsRegularizer::sufficientAmountOfTimePassed() {
 	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-	if (std::chrono::duration_cast<std::chrono::microseconds>(now - lastTimeCheckpoint).count() > microsecondsThreshold) {
-		lastTimeCheckpoint = now;
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCheckpoint).count() > microsecondsThreshold) {
+		lastCheckpoint = now;
 		return true;
 	}
 	return false;

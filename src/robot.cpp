@@ -109,10 +109,9 @@ void Axis::update() {
 }
 
 
-void Axis::reset() {
-	angle.reset();
-	velocity.reset();
-}
+void Axis::reset(bool angle) {
+	angle ? this->angle.reset() : velocity.reset();
+} 
 
 
 void Axis::updateVelocity() {
@@ -146,8 +145,8 @@ void Axis::updateAngle() {
 			else
 				return;
 
-			adjustAngle();
-			angle.updateLimitReached();
+		adjustAngle();
+		angle.updateLimitReached();
 	}
 }
 
@@ -294,7 +293,8 @@ Robot::Robot():
 	displayAxesStates_b(true),
 	approachArbitraryAxisConfiguration_b(false),
 	approachArbitraryAxisConfigurationInfinitely_b(false),
-	approachHomePosition_b(false)
+	approachHomePosition_b(false),
+	lastApproachCycle_b(false)
 {}
 
 
@@ -327,6 +327,9 @@ void Robot::update() {
 				approachHomePosition_b = false;
 			else
 				drawTCPCoordSystem_b = drawTCPCoordSystemPrevious_b;
+
+			if (lastApproachCycle_b)
+				lastApproachCycle_b = false;
 		}
 		// otherwise initialize new approach cycle
 		else
@@ -335,9 +338,9 @@ void Robot::update() {
 }
 
 
-void Robot::reset() {
+void Robot::reset(bool angle) {
 	for (Axis* axisPointer : axes)
-		axisPointer->reset();
+		axisPointer->reset(angle);
 }
 
 
@@ -390,6 +393,8 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 		drawTCPCoordSystemPrevious_b = drawTCPCoordSystem_b;
 		initializeArbitraryAxisConfigurationApproach();
 	}
+	else
+		lastApproachCycle_b = true;
 }
 
 
@@ -398,15 +403,20 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 ////////////////////////////////////////////////////////////
 
 bool Robot::textToBeDisplayed() const {
-	return approachArbitraryAxisConfigurationInfinitely_b || displayAxesStates_b;
+	return approachArbitraryAxisConfigurationInfinitely_b || approachArbitraryAxisConfiguration_b || approachHomePosition_b || displayAxesStates_b;
 }
 
 
 void Robot::displayText() const {
 	if (displayAxesStates_b)
 		displayAxesStates();
+
 	if (approachArbitraryAxisConfigurationInfinitely_b)
-		displayInfiniteAutomaticConfigurationApproachModeText();
+		displayApproachState("Infinite Random Configuration Approach Mode");
+	else if (approachHomePosition_b)
+		displayApproachState("Approaching home position");
+	else if (approachArbitraryAxisConfiguration_b && !lastApproachCycle_b)
+		displayApproachState("Approaching random configuration");
 }
 
 
@@ -437,8 +447,8 @@ void Robot::displayAxesStates() const {
 }
 
 
-void Robot::displayInfiniteAutomaticConfigurationApproachModeText() const {
-	Text::displayColored(Vector2(-0.9, 0.85), "Infinite Random Configuration Approach Mode", Color::fromUnnormalizedValues(214, 15, 38), GLUT_BITMAP_9_BY_15);
+void Robot::displayApproachState(const char* message) const {
+	Text::displayColored(Vector2(-0.9, 0.85), message, Color::fromUnnormalizedValues(214, 15, 38), GLUT_BITMAP_9_BY_15);
 }
 
 

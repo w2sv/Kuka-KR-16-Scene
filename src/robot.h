@@ -59,7 +59,7 @@ struct Axis {
 	virtual ~Axis();
 
 	void update();
-	void reset();
+	void reset(bool angle);
 
 	void adjustGLModelMatrixAccordingly() const;
 	void adjustGLModelMatrixInversely() const;
@@ -128,7 +128,7 @@ public:
 
 	void draw() const;
 	void update();
-	void reset();
+	void reset(bool angle);
 	void setArbitraryAxesConfiguration();
 
 	void initializeHomePositionApproach();
@@ -152,7 +152,7 @@ public:
 private:
 	static const Color BASE_COLOR;
 
-	bool approachArbitraryAxisConfigurationInfinitely_b;
+	bool approachArbitraryAxisConfigurationInfinitely_b, lastApproachCycle_b;
 	bool approachArbitraryAxisConfiguration_b;
 	bool approachHomePosition_b;
 
@@ -162,7 +162,7 @@ private:
 	/* -----------------TextDisplay----------------- */
 
 	void displayAxesStates() const;
-	void displayInfiniteAutomaticConfigurationApproachModeText() const;
+	void displayApproachState(const char* message) const;
 
 	/* -----------------CoordSystem----------------- */
 

@@ -3,6 +3,7 @@
 #include "robot.h"
 #include "glutils.h"
 #include "utils.h"
+#include "window.h"
 
 
 class Camera{
@@ -35,6 +36,8 @@ private:
 	void setTCPMode();
 	void setReverseTCPMode();
 	void setOrbitMode();
+	VelocityFpsRegularizer orbitVelocityRegularizer;
+
 
 	void setCameraParameterAccordingly();
 

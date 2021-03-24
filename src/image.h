@@ -119,6 +119,7 @@ protected:
 class CubeMap : public cg_image {
 public:
 	static const int N_FACES = 6;
+	// to be passed in the order right, left, top, bottom back, front
 	typedef std::array<const char*, N_FACES> SideFilePaths;
 
 	void load(SideFilePaths sideFilePaths, bool applyHorizontalFlips = false);
