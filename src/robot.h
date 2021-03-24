@@ -59,7 +59,6 @@ struct Axis {
 	virtual ~Axis();
 
 	void update();
-	void reset(bool angle);
 
 	void adjustGLModelMatrixAccordingly() const;
 	void adjustGLModelMatrixInversely() const;
@@ -128,7 +127,8 @@ public:
 
 	void draw() const;
 	void update();
-	void reset(bool angle);
+	void resetAngles();
+	void resetVelocities();
 	void setArbitraryAxesConfiguration();
 
 	void initializeHomePositionApproach();

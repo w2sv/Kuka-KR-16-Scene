@@ -109,11 +109,6 @@ void Axis::update() {
 }
 
 
-void Axis::reset(bool angle) {
-	angle ? this->angle.reset() : velocity.reset();
-} 
-
-
 void Axis::updateVelocity() {
 	static const float STEP = 0.01;
 
@@ -338,9 +333,15 @@ void Robot::update() {
 }
 
 
-void Robot::reset(bool angle) {
+void Robot::resetAngles() {
 	for (Axis* axisPointer : axes)
-		axisPointer->reset(angle);
+		axisPointer->angle.reset();
+}
+
+
+void Robot::resetVelocities() {
+	for (Axis* axisPointer : axes)
+		axisPointer->velocity.reset();
 }
 
 
