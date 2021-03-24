@@ -84,21 +84,17 @@ void cg_image::load ( const char * fileName, bool generateMipmaps )
 }
 
 void cg_image::loadData(const char* fileName) {
-	if (!fopen(fileName, "r")) {
+	if (!fopen(fileName, "r"))
 		printf("Couldn't find %s\n", fileName);
-	}
 
-	// Datei in Zwischenspeicher lesen
-	else if (!loadBMP(fileName, true)) {
-		if (!loadTGA(fileName, true)) {
-			if (!loadRGB(fileName, true)) {
-				printf("Unsupported image format!\n");
-			}
-		}
-	}
 	else {
-		this->fileName = fileName;
-		return;
+		if (loadBMP(fileName, true))
+			return;
+		else if (loadTGA(fileName, true))
+			return;
+		else if (loadRGB(fileName, true))
+			return;
+		printf("Unsupported image format!\n");
 	}
 
 	std::getchar();
@@ -736,26 +732,16 @@ void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
 		
 		if (applyHorizontalFlips)
 			horizontalFlip();
-		
-		/*glTexImage2D(
-			sideTarget[i],
-			0,
-			GL_RGBA,
-			sizeX, sizeY,
-			0,
-			GL_RGBA,
-			GL_UNSIGNED_BYTE,
-			data
-		);*/
 
 		gluBuild2DMipmaps(
 			sideTarget[i],
-			GL_RGBA,
+			GL_RGB,
 			sizeX, sizeY,
-			GL_RGBA,
+			GL_RGB,
 			GL_UNSIGNED_BYTE,
 			data
 		);
+
 		free();
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
