@@ -303,12 +303,89 @@ Robot::Robot():
 {
 	resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
 	resetDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
+	resetDisplayTimeLimit(velocitiesresetDisplayTimeLimit);
 }
 
 
 Robot::~Robot() {
 	for (size_t i = 0; i < N_AXES; i++)
 		delete axes[i];
+}
+
+
+////////////////////////////////////////////////////////////
+/// .Actions
+////////////////////////////////////////////////////////////
+
+void Robot::resetVelocities() {
+	if (velocitiesAtDefault()) {
+		setDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
+		return;
+	}
+
+	for (Axis* axisPointer : axes)
+		axisPointer->velocity.reset();
+	setDisplayTimeLimit(velocitiesresetDisplayTimeLimit);
+}
+
+
+void Robot::setArbitraryAxesConfiguration() {
+	for (Axis* axisPointer : axes)
+		axisPointer->angle.setArbitrarily();
+}
+
+
+void Robot::approachArbitraryAxisConfiguration() {
+	approachArbitraryAxisConfiguration_b = true;
+
+	if (!approachArbitraryAxisConfigurationInfinitely_b)
+		drawTCPCoordSystemPrevious_b = drawTCPCoordSystem_b;
+	drawTCPCoordSystem_b = true;
+
+	for (Axis* axisPointer : axes)
+		axisPointer->setTargetAngleParameters();
+}
+
+
+void Robot::assumeHomePosition(bool snap) {
+	if (atHomePosition())
+		setDisplayTimeLimit(athomepositionDisplayTimeLimit);
+
+	else if (snap)
+		for (Axis* axisPointer : axes)
+			axisPointer->angle.reset();
+	else {
+		approachArbitraryAxisConfiguration_b = approachHomePosition_b = true;
+		for (Axis* axisPointer : axes)
+			axisPointer->setTargetAngleParameters(true);
+	}
+}
+
+
+////////////////////////////////////////////////////////////
+/// .Toggling
+////////////////////////////////////////////////////////////
+
+void Robot::toggleTCPCoordSystem() {
+	if (!approachArbitraryAxisConfiguration_b || approachHomePosition_b)
+		drawTCPCoordSystem_b = !drawTCPCoordSystem_b;
+}
+
+
+void Robot::toggleAxesStatesDisplay() {
+	displayAxesStates_b = !displayAxesStates_b;
+}
+
+
+void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
+	approachArbitraryAxisConfigurationInfinitely_b = !approachArbitraryAxisConfigurationInfinitely_b;
+
+	if (approachArbitraryAxisConfigurationInfinitely_b) {
+		drawTCPCoordSystemPrevious_b = drawTCPCoordSystem_b;
+		approachArbitraryAxisConfiguration();
+	}
+	else
+		lastApproachCycle_b = true;
 }
 
 
@@ -346,109 +423,6 @@ void Robot::update() {
 }
 
 
-bool Robot::atHomePosition() {
-	for (Axis* axisPointer : axes)
-		if (!axisPointer->atHomePosition()) {
-			resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
-			return false;
-		}
-	return true;
-}
-
-
-bool Robot::velocitiesAtDefault() {
-	for (Axis* axisPointer : axes) {
-		if (axisPointer->velocity != axisPointer->velocity.startValue) {
-			resetDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
-			return false;
-		}
-	}
-	return true;
-}
-
-
-void Robot::setDisplayTimeLimit(time_t& timeLimit){
-	timeLimit = currentSecondsTimestamp() + 3;
-}
-
-
-void Robot::resetDisplayTimeLimit(time_t& timeLimit) {
-	timeLimit = -1;
-}
-
-
-void Robot::resetVelocities() {
-	if (velocitiesAtDefault()) {
-		setDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
-		return;
-	}
-
-	for (Axis* axisPointer : axes)
-		axisPointer->velocity.reset();
-}
-
-
-void Robot::setArbitraryAxesConfiguration() {
-	for (Axis* axisPointer : axes)
-		axisPointer->angle.setArbitrarily();
-}
-
-
-void Robot::approachArbitraryAxisConfiguration() {
-	approachArbitraryAxisConfiguration_b = true;
-	
-	if (!approachArbitraryAxisConfigurationInfinitely_b)
-		drawTCPCoordSystemPrevious_b = drawTCPCoordSystem_b;
-	drawTCPCoordSystem_b = true;
-
-	for (Axis* axisPointer : axes)
-		axisPointer->setTargetAngleParameters();
-}
-
-
-void Robot::assumeHomePosition(bool snap) {
-	if (atHomePosition())
-		setDisplayTimeLimit(athomepositionDisplayTimeLimit);
-
-	else if (snap)
-		for (Axis* axisPointer : axes)
-			axisPointer->angle.reset();
-	else {
-		approachArbitraryAxisConfiguration_b = approachHomePosition_b = true;
-		for (Axis* axisPointer : axes)
-			axisPointer->setTargetAngleParameters(true);
-	}
-}
-
-
-
-////////////////////////////////////////////////////////////
-/// ..Toggling
-////////////////////////////////////////////////////////////
-
-void Robot::toggleTCPCoordSystem() {
-	if (!approachArbitraryAxisConfiguration_b || approachHomePosition_b)
-		drawTCPCoordSystem_b = !drawTCPCoordSystem_b;
-}
-
-
-void Robot::toggleAxesStatesDisplay() {
-	displayAxesStates_b = !displayAxesStates_b;
-}
-
-
-void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
-	approachArbitraryAxisConfigurationInfinitely_b = !approachArbitraryAxisConfigurationInfinitely_b;
-
-	if (approachArbitraryAxisConfigurationInfinitely_b) {
-		drawTCPCoordSystemPrevious_b = drawTCPCoordSystem_b;
-		approachArbitraryAxisConfiguration();
-	}
-	else
-		lastApproachCycle_b = true;
-}
-
-
 ////////////////////////////////////////////////////////////
 /// .Text
 ////////////////////////////////////////////////////////////
@@ -458,39 +432,6 @@ void Robot::displayText() {
 		displayAxesStates();
 
 	displayStatus();
-}
-
-
-void Robot::displayStatus() {
-	static const float MESSAGE_POSITIONS_X = -0.9;
-	static const Vector2 MESSAGE_ROW_POSITIONS[2] = { Vector2(MESSAGE_POSITIONS_X, 0.85), Vector2(MESSAGE_POSITIONS_X, 0.8) };
-
-	time_t now = currentSecondsTimestamp();
-
-	// reset homePositionAlreadyReached stop time to prevent renewed display after display of different approach message
-	if (approachHomePosition_b || approachArbitraryAxisConfiguration_b)
-		resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
-
-	// display contravalent text to first message row if applicable
-	if (approachArbitraryAxisConfigurationInfinitely_b)
-		displayStatusMessage("Infinite Random Configuration Approach Mode", MESSAGE_ROW_POSITIONS[0]);
-	else if (approachHomePosition_b)
-		displayStatusMessage("Approaching home position", MESSAGE_ROW_POSITIONS[0]);
-	else if (approachArbitraryAxisConfiguration_b && !lastApproachCycle_b)
-		displayStatusMessage("Approaching random configuration", MESSAGE_ROW_POSITIONS[0]);
-	else if (athomepositionDisplayTimeLimit > now)
-		displayStatusMessage("Robot already at home position", MESSAGE_ROW_POSITIONS[0]);
-
-	// display velocities at default to second message row if applicable
-	if (velocitiesatdefaultDisplayTimeLimit > now)
-		displayStatusMessage("Velocities at default", MESSAGE_ROW_POSITIONS[1]);
-}
-
-
-void Robot::displayStatusMessage(const char* message, const Vector2& screenPosition) const {
-	static const Color color(Color::fromUnnormalizedValues(214, 15, 38));
-
-	Text::displayColored(screenPosition, message, color, GLUT_BITMAP_9_BY_15);
 }
 
 
@@ -518,6 +459,76 @@ void Robot::displayAxesStates() const {
 
 		Text::displayColored(Vector2(0.75, 0.8 - (i * 0.05)), oss.str().c_str(), Color(0.8f), GLUT_BITMAP_9_BY_15);
 	}
+}
+
+
+void Robot::displayStatus() {
+	static const float MESSAGE_POSITIONS_X = -0.9;
+	static const Vector2 MESSAGE_ROW_POSITIONS[2] = { Vector2(MESSAGE_POSITIONS_X, 0.85), Vector2(MESSAGE_POSITIONS_X, 0.8) };
+
+	time_t now = currentSecondsTimestamp();
+
+	// reset homePositionAlreadyReached stop time to prevent renewed display after display of different approach message
+	if (approachHomePosition_b || approachArbitraryAxisConfiguration_b)
+		resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
+
+	// display contravalent text to first message row if applicable
+	if (approachArbitraryAxisConfigurationInfinitely_b)
+		displayStatusMessage("Infinite Random Configuration Approach Mode", MESSAGE_ROW_POSITIONS[0]);
+	else if (approachHomePosition_b)
+		displayStatusMessage("Approaching home position", MESSAGE_ROW_POSITIONS[0]);
+	else if (approachArbitraryAxisConfiguration_b && !lastApproachCycle_b)
+		displayStatusMessage("Approaching random configuration", MESSAGE_ROW_POSITIONS[0]);
+	else if (athomepositionDisplayTimeLimit > now)
+		displayStatusMessage("Robot already at home position", MESSAGE_ROW_POSITIONS[0]);
+
+	// display velocities at default to second message row if applicable
+	if (velocitiesresetDisplayTimeLimit > now)
+		displayStatusMessage("Reset Velocities", MESSAGE_ROW_POSITIONS[1]);
+	else if (velocitiesatdefaultDisplayTimeLimit > now)
+		displayStatusMessage("Velocities at default", MESSAGE_ROW_POSITIONS[1]);
+}
+
+
+void Robot::displayStatusMessage(const char* message, const Vector2& screenPosition) const {
+	static const Color color(Color::fromUnnormalizedValues(214, 15, 38));
+
+	Text::displayColored(screenPosition, message, color, GLUT_BITMAP_9_BY_15);
+}
+
+
+////////////////////////////////////////////////////////////
+/// ..Fading Text
+////////////////////////////////////////////////////////////
+
+bool Robot::atHomePosition() {
+	for (Axis* axisPointer : axes)
+		if (!axisPointer->atHomePosition()) {
+			resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
+			return false;
+		}
+	return true;
+}
+
+
+bool Robot::velocitiesAtDefault() {
+	for (Axis* axisPointer : axes) {
+		if (axisPointer->velocity != axisPointer->velocity.startValue) {
+			resetDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
+			return false;
+		}
+	}
+	return true;
+}
+
+
+void Robot::setDisplayTimeLimit(time_t& timeLimit) {
+	timeLimit = currentSecondsTimestamp() + 3;
+}
+
+
+void Robot::resetDisplayTimeLimit(time_t& timeLimit) {
+	timeLimit = -1;
 }
 
 

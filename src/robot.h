@@ -7,7 +7,6 @@
 
 #include <map>
 #include <vector>
-#include <chrono>
 #include <time.h>
 
 
@@ -175,6 +174,7 @@ private:
 
 	time_t athomepositionDisplayTimeLimit;
 	time_t velocitiesatdefaultDisplayTimeLimit;
+	time_t velocitiesresetDisplayTimeLimit;
 
 	void setDisplayTimeLimit(time_t& timeLimit);
 	void resetDisplayTimeLimit(time_t& timeLimit);
