@@ -7,6 +7,9 @@
 
 #include <map>
 #include <vector>
+#include <chrono>
+#include <time.h>
+
 
 
 #pragma region AxisParameterState
@@ -59,6 +62,7 @@ struct Axis {
 	virtual ~Axis();
 
 	void update();
+	virtual bool atHomePosition() const = 0;
 
 	void adjustGLModelMatrixAccordingly() const;
 	void adjustGLModelMatrixInversely() const;
@@ -97,6 +101,8 @@ private:
 
 struct YawAxis : public Axis {
 	using Axis::Axis;
+
+	bool atHomePosition() const;
 private:
 	void determineTargetAngleApproachManner();
 	void adjustAngle();
@@ -105,6 +111,8 @@ private:
 
 struct TiltAxis : public Axis {
 	using Axis::Axis;
+	
+	bool atHomePosition() const;
 private:
 	void determineTargetAngleApproachManner();
 	void adjustAngle();
@@ -127,12 +135,11 @@ public:
 
 	void draw() const;
 	void update();
-	void resetAngles();
 	void resetVelocities();
 	void setArbitraryAxesConfiguration();
 
-	void initializeHomePositionApproach();
-	void initializeArbitraryAxisConfigurationApproach();
+	void assumeHomePosition(bool snap);
+	void approachArbitraryAxisConfiguration();
 
 	/* ------------Toggling----------------- */
 
@@ -147,8 +154,7 @@ public:
 
 	/* -------------Text----------------- */
 
-	bool textToBeDisplayed() const;
-	void displayText() const;
+	void displayText();
 private:
 	static const Color BASE_COLOR;
 
@@ -159,10 +165,19 @@ private:
 	bool drawTCPCoordSystem_b, drawTCPCoordSystemPrevious_b;
 	bool displayAxesStates_b;
 
+	time_t displayHomePositionAttainmentUntil;
+	time_t displayVelocityResetUntil;
+
+	void initializeAttainmentDisplay(time_t& stopTime);
+
+	bool atHomePosition();
+	bool velocitiesAtDefault();
+
 	/* -----------------TextDisplay----------------- */
 
 	void displayAxesStates() const;
-	void displayApproachState(const char* message) const;
+	void displayStatus();
+	void displayStatusMessage(const char* message, const Vector2& screenPosition) const;
 
 	/* -----------------CoordSystem----------------- */
 

@@ -476,7 +476,7 @@ void cg_object3D::load(const char* filepath, bool use_vbos)
 
 	if (!clusternormals)
 	{	// wir müssen interpolierte Normalen berechnen
-		// now let's continue with interpolated normals per vertex
+		// currentSecondsTimestamp let's continue with interpolated normals per vertex
 		p_normals = (GLfloat*)malloc(3 * npoints * sizeof(GLfloat));
 		memset(p_normals, 0, 3 * npoints * sizeof(GLfloat));
 		for (int i = 0; i < npoints; i++)

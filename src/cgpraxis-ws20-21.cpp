@@ -67,16 +67,16 @@ void processInput(Robot& robot, Camera& camera) {
 	// home position
 	if (cg_key::specialKeyState(GLUT_KEY_F2) == 1) {
 		if (cg_key::specialKeyState(GLUT_KEY_SHIFT_L) != 0)
-			robot.resetAngles();
+			robot.assumeHomePosition(true);
 		else
-			robot.initializeHomePositionApproach();
+			robot.assumeHomePosition(false);
 	}
 
 	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1) {
 		if (cg_key::specialKeyState(GLUT_KEY_SHIFT_L) != 0)
 			robot.setArbitraryAxesConfiguration();
 		else
-			robot.initializeArbitraryAxisConfigurationApproach();
+			robot.approachArbitraryAxisConfiguration();
 	}
 
 	// approach random configuration infinitely
@@ -184,18 +184,15 @@ void displayFunc(){
 	drawScene(robot);
 
 	// project text
-	if (GlobalState::displayHelp || GlobalState::displayFps || robot.textToBeDisplayed()) {
-		orthogonalProjection.activate(true);
+	orthogonalProjection.activate(true);
 
-		if (GlobalState::displayHelp)
-			displayHelp();
-		if (GlobalState::displayFps)
-			displayFps();
-		if (robot.textToBeDisplayed())
-			robot.displayText();
+	if (GlobalState::displayHelp)
+		displayHelp();
+	if (GlobalState::displayFps)
+		displayFps();
+	robot.displayText();
 
-		orthogonalProjection.deactivate(true);
-	}
+	orthogonalProjection.deactivate(true);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_CULL_FACE);

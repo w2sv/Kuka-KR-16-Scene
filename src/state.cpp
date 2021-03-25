@@ -1,6 +1,9 @@
 #include "state.h"
 
+#include "utils.h"
+
 #include <time.h>
+
 
 
 double GlobalState::screenSize[2] = { NULL };
@@ -18,9 +21,7 @@ void GlobalState::updateFps() {
 	static time_t lastTime = 0;
 	static int frames = 0;
 
-	time_t now;
-	time(&now);
-
+	time_t now = currentSecondsTimestamp();
 	if (now - lastTime >= 1) {
 		fps = ((float)frames) / (float)(now - lastTime);
 

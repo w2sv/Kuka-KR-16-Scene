@@ -193,3 +193,14 @@ int randInt(const Extrema& bounds) {
 
 	return distr(gen);
 }
+
+
+////////////////////////////////////////////////////////////
+/// Time
+////////////////////////////////////////////////////////////
+
+time_t& currentSecondsTimestamp() {
+	time_t now;
+	time(&now);
+	return now;
+}

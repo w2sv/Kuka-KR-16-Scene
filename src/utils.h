@@ -1,8 +1,10 @@
 #pragma once
 
+#include "../dependencies/freeglut.h"
+
 #include <iostream>
 #include <array>
-#include "../dependencies/freeglut.h"
+#include <time.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -14,12 +16,12 @@ template <typename T> struct ValueAbstraction {
 	ValueAbstraction(T value): value(value) {}
 	~ValueAbstraction(){}
 	
-	bool operator<(const ValueAbstraction& other) { return value < other.value; }
-	bool operator>(const ValueAbstraction& other) { return value > other.value; }
-	bool operator<=(const ValueAbstraction& other) { return value <= other.value; }
-	bool operator>=(const ValueAbstraction& other) { return value >= other.value; }
-	bool operator==(const ValueAbstraction& other) { return value == other.value; }
-	bool operator!=(const ValueAbstraction& other) { return value != other.value; }
+	bool operator<(const ValueAbstraction& other) const { return value < other.value; }
+	bool operator>(const ValueAbstraction& other) const { return value > other.value; }
+	bool operator<=(const ValueAbstraction& other) const { return value <= other.value; }
+	bool operator>=(const ValueAbstraction& other) const { return value >= other.value; }
+	bool operator==(const ValueAbstraction& other) const { return value == other.value; }
+	bool operator!=(const ValueAbstraction& other) const { return value != other.value; }
 	
 	void operator+=(const ValueAbstraction<T>& other) { value += other.value; }
 	void operator-=(const ValueAbstraction<T>& other) { value -= other.value; }
@@ -97,3 +99,9 @@ Vector3 normalVector(const Vector3& a, const Vector3& b, const Vector3& c);
 ////////////////////////////////////////////////////////////
 
 int randInt(const Extrema& bounds);
+
+////////////////////////////////////////////////////////////
+/// Time
+////////////////////////////////////////////////////////////
+
+time_t& currentSecondsTimestamp();
