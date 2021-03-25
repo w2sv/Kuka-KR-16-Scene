@@ -299,10 +299,11 @@ Robot::Robot():
 	approachArbitraryAxisConfiguration_b(false),
 	approachArbitraryAxisConfigurationInfinitely_b(false),
 	approachHomePosition_b(false),
-	lastApproachCycle_b(false),
-	displayHomePositionAttainmentUntil(-1),
-	displayVelocityResetUntil(-1)
-{}
+	lastApproachCycle_b(false)
+{
+	resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
+	resetDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
+}
 
 
 Robot::~Robot() {
@@ -348,7 +349,7 @@ void Robot::update() {
 bool Robot::atHomePosition() {
 	for (Axis* axisPointer : axes)
 		if (!axisPointer->atHomePosition()) {
-			displayHomePositionAttainmentUntil = -1;
+			resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
 			return false;
 		}
 	return true;
@@ -358,7 +359,7 @@ bool Robot::atHomePosition() {
 bool Robot::velocitiesAtDefault() {
 	for (Axis* axisPointer : axes) {
 		if (axisPointer->velocity != axisPointer->velocity.startValue) {
-			displayVelocityResetUntil = -1;
+			resetDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
 			return false;
 		}
 	}
@@ -366,15 +367,19 @@ bool Robot::velocitiesAtDefault() {
 }
 
 
-void Robot::initializeAttainmentDisplay(time_t& stopTime){
-	stopTime = currentSecondsTimestamp() + 3;
+void Robot::setDisplayTimeLimit(time_t& timeLimit){
+	timeLimit = currentSecondsTimestamp() + 3;
 }
 
+
+void Robot::resetDisplayTimeLimit(time_t& timeLimit) {
+	timeLimit = -1;
+}
 
 
 void Robot::resetVelocities() {
 	if (velocitiesAtDefault()) {
-		initializeAttainmentDisplay(displayVelocityResetUntil);
+		setDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
 		return;
 	}
 
@@ -403,7 +408,7 @@ void Robot::approachArbitraryAxisConfiguration() {
 
 void Robot::assumeHomePosition(bool snap) {
 	if (atHomePosition())
-		initializeAttainmentDisplay(displayHomePositionAttainmentUntil);
+		setDisplayTimeLimit(athomepositionDisplayTimeLimit);
 
 	else if (snap)
 		for (Axis* axisPointer : axes)
@@ -464,7 +469,7 @@ void Robot::displayStatus() {
 
 	// reset homePositionAlreadyReached stop time to prevent renewed display after display of different approach message
 	if (approachHomePosition_b || approachArbitraryAxisConfiguration_b)
-		displayHomePositionAttainmentUntil = -1;
+		resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
 
 	// display contravalent text to first message row if applicable
 	if (approachArbitraryAxisConfigurationInfinitely_b)
@@ -473,17 +478,19 @@ void Robot::displayStatus() {
 		displayStatusMessage("Approaching home position", MESSAGE_ROW_POSITIONS[0]);
 	else if (approachArbitraryAxisConfiguration_b && !lastApproachCycle_b)
 		displayStatusMessage("Approaching random configuration", MESSAGE_ROW_POSITIONS[0]);
-	else if (displayHomePositionAttainmentUntil > now)
+	else if (athomepositionDisplayTimeLimit > now)
 		displayStatusMessage("Robot already at home position", MESSAGE_ROW_POSITIONS[0]);
 
 	// display velocities at default to second message row if applicable
-	if (displayVelocityResetUntil > now)
+	if (velocitiesatdefaultDisplayTimeLimit > now)
 		displayStatusMessage("Velocities at default", MESSAGE_ROW_POSITIONS[1]);
 }
 
 
 void Robot::displayStatusMessage(const char* message, const Vector2& screenPosition) const {
-	Text::displayColored(screenPosition, message, Color::fromUnnormalizedValues(214, 15, 38), GLUT_BITMAP_9_BY_15);
+	static const Color color(Color::fromUnnormalizedValues(214, 15, 38));
+
+	Text::displayColored(screenPosition, message, color, GLUT_BITMAP_9_BY_15);
 }
 
 

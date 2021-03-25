@@ -165,19 +165,22 @@ private:
 	bool drawTCPCoordSystem_b, drawTCPCoordSystemPrevious_b;
 	bool displayAxesStates_b;
 
-	time_t displayHomePositionAttainmentUntil;
-	time_t displayVelocityResetUntil;
-
-	void initializeAttainmentDisplay(time_t& stopTime);
-
-	bool atHomePosition();
-	bool velocitiesAtDefault();
-
 	/* -----------------TextDisplay----------------- */
 
 	void displayAxesStates() const;
 	void displayStatus();
 	void displayStatusMessage(const char* message, const Vector2& screenPosition) const;
+
+		/* -----------------Fading Text----------------- */
+
+	time_t athomepositionDisplayTimeLimit;
+	time_t velocitiesatdefaultDisplayTimeLimit;
+
+	void setDisplayTimeLimit(time_t& timeLimit);
+	void resetDisplayTimeLimit(time_t& timeLimit);
+
+	bool atHomePosition();
+	bool velocitiesAtDefault();
 
 	/* -----------------CoordSystem----------------- */
 
