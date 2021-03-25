@@ -115,7 +115,7 @@ namespace Section {
 					"»Snap to home position",
 					"»Approach random configuration",
 					"»Snap to random configuration",
-					"»Toggle infinite random config-"
+					"»Toggle endless random config-"
 					}, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
 				Text::display(Vector2(KEY_DESCRIPTION_COL_X + 0.018, -0.26), "uration approach mode");
 

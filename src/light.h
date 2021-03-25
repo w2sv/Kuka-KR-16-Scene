@@ -1,5 +1,4 @@
-#ifndef LIGHT_H
-#define LIGHT_H
+#pragma once
 
 #include "../dependencies/freeglut.h"
 
@@ -15,5 +14,3 @@ void setLights();
 
 // Standardeinstellung für Farbe und Beleuchtung
 void setDefaultLightAndMaterial(GLboolean lightMode = false);
-
-#endif // LIGHT_H

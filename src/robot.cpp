@@ -474,7 +474,7 @@ void Robot::displayStatus() {
 
 	// display contravalent text to first message row if applicable
 	if (approachArbitraryAxisConfigurationInfinitely_b)
-		displayStatusMessage("Infinite Random Configuration Approach Mode", MESSAGE_ROW_POSITIONS[0]);
+		displayStatusMessage("Endless Random Configuration Approach Mode", MESSAGE_ROW_POSITIONS[0]);
 	else if (approachHomePosition_b)
 		displayStatusMessage("Approaching home position", MESSAGE_ROW_POSITIONS[0]);
 	else if (approachArbitraryAxisConfiguration_b && !lastApproachCycle_b)
@@ -498,7 +498,7 @@ void Robot::displayStatusMessage(const char* message, const Vector2& screenPosit
 
 
 ////////////////////////////////////////////////////////////
-/// ..Fading Text
+/// ..Persistent Text
 ////////////////////////////////////////////////////////////
 
 bool Robot::atHomePosition() {
@@ -562,7 +562,7 @@ void Robot::setObjectMaterials() {
 	objects[Object::ScrewHead].setMaterial(COLORS::GREY, 0.2, 0.5, 0);
 	objects[Object::TiltAxis1].setMaterial(BASE_COLOR, spec, shine, emis);
 	objects[Object::TiltAxis2].setMaterial(BASE_COLOR, spec, shine, emis);
-	objects[Object::KukaLogo].setMaterial(COLORS::BLACK, spec, shine, emis);
+	objects[Object::KukaLogo].setMaterial(COLORS::BLACK, spec, 50, emis);
 }
 
 
@@ -581,7 +581,7 @@ void Robot::loadTextures() {
 	for (size_t i = 0; i < Robot::N_TEXTURES; i++) {
 		textures[i].load(joinPath(DIR_PATH, FILE_NAMES[i]), true);
 
-		textures[i].setMinFilter(GL_NEAREST);
+		textures[i].setMinFilter(GL_LINEAR);
 		textures[i].setMagFilter(GL_LINEAR);
 		textures[i].setWrapMode(GL_CLAMP);
 		textures[i].setEnvMode(GL_MODULATE);
@@ -631,12 +631,11 @@ void Robot::drawShrunkCoordSystem() {
 void Robot::drawTargetAxesConfigurationCoordSystem() const {
 	glPushMatrix();
 
-		for (size_t i = 0; i < N_AXES + 1; i++) {
+		for (size_t i = 0; i < N_AXES; i++) {
 			glTranslateByVec(relativeAxesStartPositionShiftVectors[i]);
-			
-			if (i < N_AXES)
-				axes[i]->adjustGLModelMatrixTargetAngleAccordingly();
+			axes[i]->adjustGLModelMatrixTargetAngleAccordingly();
 		}
+		glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES + 1]);
 
 		drawShrunkCoordSystem();
 	glPopMatrix();
@@ -695,8 +694,9 @@ void Robot::drawPedestal() const {
 	glPushMatrix();
 		Z::translate(PEDASTEL_HEIGHT / 2);
 		glScalef(8, PEDASTEL_HEIGHT, 8);
-			
-		Color(.6f).render();
+
+		Color(.45f).render();
+
 		textures[Texture::Knobs].bind();
 		glEnable(GL_TEXTURE_2D);
 			Cube::draw();

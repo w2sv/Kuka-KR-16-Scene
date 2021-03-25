@@ -10,7 +10,6 @@ void setColor(GLfloat r, GLfloat g, GLfloat b) {
 
 
 void setMaterial(GLenum face, GLfloat amb[4], GLfloat diff[4], GLfloat spec[4], GLfloat shine, GLfloat emis[4])
-// Aktualisierung des OpenGL Materials
 {
 	glMaterialfv(face, GL_AMBIENT, amb);
 	glMaterialfv(face, GL_DIFFUSE, diff);
@@ -22,25 +21,24 @@ void setMaterial(GLenum face, GLfloat amb[4], GLfloat diff[4], GLfloat spec[4], 
 void setLights()
 {
 	// Parameter eines globalen Lichts
-	GLint g_localviewer = GL_TRUE;
 	GLfloat g_amb[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 	glEnable(GL_LIGHTING);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, g_localviewer);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, g_amb);
 
 	// Licht 0
 
 	// Paramaters fuer Lichtquelle 0
-	GLfloat l_pos[4] = { -1.0f, 1.0f, 1.0f, 0.0f };
+	GLfloat l_pos[4] = { 1.0f, 1.0f, 1.0f, 0.0f };
 	GLfloat l_amb[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
 	GLfloat l_diff[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat l_spec[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat l_spotdir[3] = { 0.0f, 0.0f, 1.0f };
 	GLfloat l_spotcutoff = 360.0f;
 	GLfloat l_spotexp = 0.0f;
-	GLfloat l_att[3] = { 1.0f, 0.0f, 0.0f };
+	GLfloat l_att[3] = { 1.0f, 5, 10 };
 
 	// Position
 	glLightfv(GL_LIGHT0, GL_POSITION, l_pos);
