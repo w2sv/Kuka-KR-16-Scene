@@ -541,9 +541,9 @@ void Robot::loadObjects() {
 	const static char* DIR_PATH = getResourceSubDirPath("objects");
 	const static char* FILE_NAMES[Robot::N_OBJECTS] = {
 		"rotation_axis_1.obj",
-		"screw_head.obj",
 		"tilt_axis_1.obj",
 		"tilt_axis_2.obj",
+		"screw_head.obj",
 		"kuka_logo.obj"
 	};
 
@@ -555,13 +555,13 @@ void Robot::loadObjects() {
 
 void Robot::setObjectMaterials() {
 	GLfloat spec = 200;  // 0 -> saturated color
-	GLfloat shine = 30;
+	GLfloat shine = 300;
 	GLfloat emis = 1; // 0 -> matt, 1->bright
 
 	objects[Object::YawAxis1].setMaterial(BASE_COLOR, spec, shine, emis);
-	objects[Object::ScrewHead].setMaterial(COLORS::GREY, 0.2, 0.5, 0);
 	objects[Object::TiltAxis1].setMaterial(BASE_COLOR, spec, shine, emis);
 	objects[Object::TiltAxis2].setMaterial(BASE_COLOR, spec, shine, emis);
+	objects[Object::ScrewHead].setMaterial(COLORS::GREY, 0.2, 0.5, 0);
 	objects[Object::KukaLogo].setMaterial(COLORS::BLACK, spec, 50, emis);
 }
 
@@ -578,13 +578,18 @@ void Robot::loadTextures() {
 		"warped-sheet-metal_roughness.bmp"
 	};
 
+	const static GLenum parameters[Robot::N_TEXTURES][4] = {
+		{GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_MODULATE},
+		{GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_BLEND}
+	};
+
 	for (size_t i = 0; i < Robot::N_TEXTURES; i++) {
 		textures[i].load(joinPath(DIR_PATH, FILE_NAMES[i]), true);
 
-		textures[i].setMinFilter(GL_LINEAR);
-		textures[i].setMagFilter(GL_LINEAR);
-		textures[i].setWrapMode(GL_CLAMP);
-		textures[i].setEnvMode(GL_MODULATE);
+		textures[i].setMinFilter(parameters[i][0]);
+		textures[i].setMagFilter(parameters[i][1]);
+		textures[i].setWrapMode(parameters[i][2]);
+		textures[i].setEnvMode(parameters[i][3]);
 	}
 }
 
@@ -635,7 +640,7 @@ void Robot::drawTargetAxesConfigurationCoordSystem() const {
 			glTranslateByVec(relativeAxesStartPositionShiftVectors[i]);
 			axes[i]->adjustGLModelMatrixTargetAngleAccordingly();
 		}
-		glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES + 1]);
+		glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES]);
 
 		drawShrunkCoordSystem();
 	glPopMatrix();
@@ -653,7 +658,7 @@ void Robot::drawAxisWeight() const {
 	const static float UPPER_CYLINDER_HEIGTH = 0.05;
 
 	glPushMatrix();
-		setDefaultLightAndMaterial(GlobalState::lightMode);
+		// setDefaultLightAndMaterial(GlobalState::lightMode);
 
 		// draw lower octPrism pedastel
 		Z::translate(PEDASTEL_HEIGHT / 2);

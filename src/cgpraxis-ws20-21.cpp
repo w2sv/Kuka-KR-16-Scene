@@ -41,6 +41,8 @@ int main(int argc, char** argv) {
 
 
 void drawScene(const Robot& robot){
+	// glShadeModel(GL_FLAT);
+
 	Skybox::draw();
 
 	// draw ground
@@ -118,7 +120,7 @@ void processInput(Robot& robot, Camera& camera) {
 	// full screen mode
 	else if (1 == cg_key::keyState('p'))
 		toggleFullScreenMode();
-	
+
 	/// ---------------------Display----------------------
 
 	// sufficientAmountOfTimePassed fps
@@ -146,6 +148,10 @@ void processInput(Robot& robot, Camera& camera) {
 	// backfaceculling
 	else if (1 == cg_key::keyState('c'))
 		GlobalState::cullMode = !GlobalState::cullMode;
+
+	// shading mode
+	else if (1 == cg_key::keyState('v'))
+		GlobalState::shadingMode = GlobalState::shadingMode == GL_FLAT ? GL_SMOOTH : GL_FLAT;
 }
 
 
@@ -179,6 +185,9 @@ void displayFunc(){
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 	GlobalState::cullMode ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
+
+	// Set Shading Model
+	glShadeModel(GlobalState::shadingMode);
 
 	// Modell zeichnen
 	drawScene(robot);

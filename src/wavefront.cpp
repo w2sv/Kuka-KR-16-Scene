@@ -7,7 +7,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <math.h>
-#include <iostream>
 
 
 #define EXPORT_EXT
@@ -161,7 +160,7 @@ void cg_object3D::load(const char* filepath, bool use_vbos)
 {
 	FILE* f = fopen(filepath, "r");
 	if (!f) {
-		std::cerr << filepath << " does not exist" << std::endl;
+		printf("%s does not exist", filepath);
 		std::getchar();
 		std::exit(1);
 	};

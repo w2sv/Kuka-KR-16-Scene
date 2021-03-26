@@ -160,8 +160,8 @@ namespace Section {
 			const float HEADER_Y = -0.2;
 			displaySectionTitle(Vector2(HEADER_X, HEADER_Y), "Graphics");
 
-			displayColumn(Vector2(DESCRIPTION_COL_X, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "»Toggle wireframe mode", "»Toggle light mode", "»Toggle backfaceculling" }, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
-			displayColumn(Vector2(DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "y", "x", "c" }, VERTICAL_COL_SPACE, KEY_COLOR);
+			displayColumn(Vector2(DESCRIPTION_COL_X, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "»Toggle wireframe mode", "»Toggle light mode", "»Toggle backfaceculling", "»Toggle shading mode" }, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
+			displayColumn(Vector2(DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "y", "x", "c", "v" }, VERTICAL_COL_SPACE, KEY_COLOR);
 		}
 	}
 }

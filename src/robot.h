@@ -204,9 +204,9 @@ private:
 
 	enum Object {
 		YawAxis1,
-		ScrewHead,
 		TiltAxis1,
 		TiltAxis2,
+		ScrewHead,
 		KukaLogo
 	};
 

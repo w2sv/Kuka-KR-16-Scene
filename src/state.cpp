@@ -8,6 +8,7 @@
 
 double GlobalState::screenSize[2] = { NULL };
 GLenum GlobalState::drawMode = GL_FILL;
+GLenum GlobalState::shadingMode = GL_SMOOTH;
 bool GlobalState::lightMode = true;
 int GlobalState::normalMode = 0;
 bool GlobalState::cullMode = false;
