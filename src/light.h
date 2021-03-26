@@ -8,8 +8,9 @@
 // Farbe setzen fuer Farb- und Beleuchtungsmodus
 void setColor(GLfloat r, GLfloat g, GLfloat b);
 
+typedef std::array<GLfloat, 4> RGBAParameter;
+
 struct Material {
-	typedef std::array<GLfloat, 4> RGBAParameter;
 
 	Material(RGBAParameter amb, RGBAParameter diff, RGBAParameter spec, GLfloat shine, RGBAParameter emis);
 

@@ -657,15 +657,16 @@ void Robot::drawAxisWeight() const {
 	const static float BLOCK_HEIGHT = 1;
 	const static float UPPER_CYLINDER_HEIGTH = 0.05;
 
-	/*GLfloat amb[4] = { 4 };
-	GLfloat diff[4] = { 5 };
-	GLfloat spec[4] = { 5 };
-	GLfloat shine = 3;
-	GLfloat emis[4] = { 2 };
-
-	setMaterial(GL_FRONT_AND_BACK, amb, diff, spec, shine, emis);*/
-
 	glPushMatrix();
+		static const Material MATERIAL(
+			RGBAParameter{ 0.4, 0.4, 0.4, 1.0 },
+			RGBAParameter{ 0.4, 0.4, 0.4, 1.0 },
+			RGBAParameter{ 1 },
+			32.f,
+			RGBAParameter{ 0, 0, 0, 1 }
+		);
+		MATERIAL.set();
+
 		// draw lower octPrism pedastel
 		Z::translate(PEDASTEL_HEIGHT / 2);
 		static const OctogonalPrism pedastel(PEDASTEL_HEIGHT, 0.5, 0.2);
@@ -874,9 +875,10 @@ void Robot::drawThirdAxis() const {
 		
 			glPopMatrix();
 
-		// Z::translate(WIDTH * 0.1);
+		glTranslatef(-0.05, WIDTH * 0.1, 0);
+
 		glScaleUniformly(1.4);
-		Z::rotate(180);
+		Z::rotate(181.5);  // for some reason logo not entirely parallel to axis
 		Y::rotate(90);
 			objects[KukaLogo].draw();
 	glPopMatrix();

@@ -68,15 +68,15 @@ void setLight(){
 
 
 void setDefaultLightAndMaterial(GLboolean lightMode) {
-	Material::RGBAParameter color{ 1 };
+	RGBAParameter color{ 1 };
 
 	if (lightMode == GL_TRUE){
 		static const Material DEFAULT_MATERIAL(
-			Material::RGBAParameter{ 0.2, 0.2, 0.2, 1.0 },
-			Material::RGBAParameter{ 0.2, 0.2, 0.2, 1.0 },
+			RGBAParameter{ 0.2, 0.2, 0.2, 1.0 },
+			RGBAParameter{ 0.2, 0.2, 0.2, 1.0 },
 			color,
 			32.f,
-			Material::RGBAParameter{ 0.0, 0.0, 0.0, 1.0 }
+			RGBAParameter{ 0.0, 0.0, 0.0, 1.0 }
 		);
 
 		DEFAULT_MATERIAL.set();
