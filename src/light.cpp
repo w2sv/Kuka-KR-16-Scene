@@ -9,18 +9,26 @@ void setColor(GLfloat r, GLfloat g, GLfloat b) {
 }
 
 
-void setMaterial(GLenum face, GLfloat amb[4], GLfloat diff[4], GLfloat spec[4], GLfloat shine, GLfloat emis[4])
-{
-	glMaterialfv(face, GL_AMBIENT, amb);
-	glMaterialfv(face, GL_DIFFUSE, diff);
-	glMaterialfv(face, GL_SPECULAR, spec);
-	glMaterialf(face, GL_SHININESS, shine);
-	glMaterialfv(face, GL_EMISSION, emis);
+Material::Material(RGBAParameter amb, RGBAParameter diff, RGBAParameter spec, GLfloat shine, RGBAParameter emis) :
+	amb(amb),
+	diff(diff),
+	spec(spec),
+	shine(shine),
+	emis(emis)
+{}
+
+
+void Material::set() const {
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb.data());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff.data());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec.data());
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emis.data());
 }
 
-void setLights()
-{
-	// Parameter eines globalen Lichts
+
+void setLight(){
+	// RGBAParameter eines globalen Lichts
 	GLfloat g_amb[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 	glEnable(GL_LIGHTING);
@@ -58,26 +66,28 @@ void setLights()
 	glEnable(GL_LIGHT0);
 }
 
-// Standardeinstellung für Farbe und Beleuchtung
+
 void setDefaultLightAndMaterial(GLboolean lightMode) {
-	GLfloat color[4] = { 1, 1, 1, 1 };
+	Material::RGBAParameter color{ 1 };
 
 	if (lightMode == GL_TRUE){
-		GLfloat m_amb[4] = { 0.2, 0.2, 0.2, 1.0 };
-		GLfloat* m_diff = color;
-		GLfloat m_spec[4] = { 0.2, 0.2, 0.2, 1.0 };
-		GLfloat m_shine = 32.0;
-		GLfloat m_emiss[4] = { 0.0, 0.0, 0.0, 1.0 };
+		static const Material DEFAULT_MATERIAL(
+			Material::RGBAParameter{ 0.2, 0.2, 0.2, 1.0 },
+			Material::RGBAParameter{ 0.2, 0.2, 0.2, 1.0 },
+			color,
+			32.f,
+			Material::RGBAParameter{ 0.0, 0.0, 0.0, 1.0 }
+		);
 
-		setMaterial(GL_FRONT_AND_BACK, m_amb, m_diff, m_spec, m_shine, m_emiss);
+		DEFAULT_MATERIAL.set();
 
-		setLights();
+		setLight();
 
 		glEnable(GL_NORMALIZE);
 		glEnable(GL_LIGHTING);
 	}
 	else {
 		glDisable(GL_LIGHTING);
-		glColor4fv(color);
+		glColor4fv(color.data());
 	}
 };

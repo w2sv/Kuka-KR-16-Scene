@@ -52,7 +52,7 @@ class cg_mouse
 {
 public:
 	// Aktuellen Status der Mausbuttons zurueck geben
-	// Parameter b ist eine der Konstanten: GLUT_LEFT_BUTTON, GLUT_MIDDLE_BUTTON, GLUT_RIGHT_BUTTON
+	// RGBAParameter b ist eine der Konstanten: GLUT_LEFT_BUTTON, GLUT_MIDDLE_BUTTON, GLUT_RIGHT_BUTTON
 	// Rueckgabewerte: 0 = nicht gedueckt, 1 = gerade eben runtergedrueckt, 2 = gedrueckt gehalten
 	static int buttonState(unsigned int b);
 	

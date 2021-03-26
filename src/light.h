@@ -2,15 +2,28 @@
 
 #include "../dependencies/freeglut.h"
 
+#include <array>
+
 
 // Farbe setzen fuer Farb- und Beleuchtungsmodus
 void setColor(GLfloat r, GLfloat g, GLfloat b);
 
-// Material setzen (nur fuer Beleuchtungsmodus)
-void setMaterial(GLenum face, GLfloat amb[4], GLfloat diff[4], GLfloat spec[4], GLfloat shine, GLfloat emis[4]);
+struct Material {
+	typedef std::array<GLfloat, 4> RGBAParameter;
+
+	Material(RGBAParameter amb, RGBAParameter diff, RGBAParameter spec, GLfloat shine, RGBAParameter emis);
+
+	void set() const;
+private:
+	RGBAParameter amb;
+	RGBAParameter diff;
+	RGBAParameter spec;
+	GLfloat shine;
+	RGBAParameter emis;
+};
 
 // Lichtquelle(n) setzen
-void setLights();
+void setLight();
 
 // Standardeinstellung für Farbe und Beleuchtung
 void setDefaultLightAndMaterial(GLboolean lightMode = false);

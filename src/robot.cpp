@@ -657,9 +657,15 @@ void Robot::drawAxisWeight() const {
 	const static float BLOCK_HEIGHT = 1;
 	const static float UPPER_CYLINDER_HEIGTH = 0.05;
 
-	glPushMatrix();
-		// setDefaultLightAndMaterial(GlobalState::lightMode);
+	/*GLfloat amb[4] = { 4 };
+	GLfloat diff[4] = { 5 };
+	GLfloat spec[4] = { 5 };
+	GLfloat shine = 3;
+	GLfloat emis[4] = { 2 };
 
+	setMaterial(GL_FRONT_AND_BACK, amb, diff, spec, shine, emis);*/
+
+	glPushMatrix();
 		// draw lower octPrism pedastel
 		Z::translate(PEDASTEL_HEIGHT / 2);
 		static const OctogonalPrism pedastel(PEDASTEL_HEIGHT, 0.5, 0.2);
@@ -777,6 +783,7 @@ void Robot::drawFirstAxis() const {
 	glPushMatrix();
 		Z::translate(0.35);  // height of cylinder bottom disk
 		glScaleUniformly(1.3);
+		
 			drawAxisWeight();
 	glPopMatrix();
 
