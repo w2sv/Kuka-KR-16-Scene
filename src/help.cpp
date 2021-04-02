@@ -36,12 +36,24 @@ void drawBackground() {
 namespace Section {
 	typedef const std::vector<char*>&& CharPtrs;
 
+	static const Color RED = Color::fromUnnormalizedValues(186, 34, 64);
+
 	////////////////////////////////////////////////////////////
 	/// Helpers
 	////////////////////////////////////////////////////////////
 
 	void displaySectionTitle(const Vector2& position, const char* title) {
-		Text::displayWithShadow(position, title, Color::fromUnnormalizedValues(186, 34, 64), 0.003, GLUT_BITMAP_HELVETICA_18);
+		Text::displayWithShadow(position, title, RED, 0.003, GLUT_BITMAP_HELVETICA_18);
+	}
+
+
+	void displayRow(Vector2& startPos, CharPtrs row, float horizontalSpace, const Color& color) {
+		color.render(false);
+
+		for (char* entry : row) {
+			Text::display(startPos, entry);
+			startPos.x += horizontalSpace;
+		}
 	}
 
 
@@ -55,14 +67,20 @@ namespace Section {
 	}
 
 
-	void displayRow(Vector2& startPos, CharPtrs row, float horizontalSpace, const Color& color) {
+	void displayKeyDescriptionColumn(Vector2& startPos, CharPtrs column, float verticalSpace, const Color& color) {
 		color.render(false);
 
-		for (char* entry : row) {
-			Text::display(startPos, entry);
-			startPos.x += horizontalSpace;
+		for (char* entry : column) {
+			RED.render(false);
+			Text::display(startPos, "»");
+
+			color.render(false);
+			Text::display(Vector2(startPos.x + 0.015, startPos.y), entry);
+
+			startPos.y -= verticalSpace;
 		}
 	}
+
 
 	////////////////////////////////////////////////////////////
 	/// Display
@@ -78,8 +96,10 @@ namespace Section {
 
 	static const float HEADER_TO_FIRST_ROW_VERTICAL_SPACE = 0.1;
 
+
 	namespace LeftHalf {
 		const float KEY_DESCRIPTION_COL_X = -0.8;
+
 
 		namespace Robot {
 			void control() {
@@ -110,23 +130,24 @@ namespace Section {
 				displayColumn(Vector2(VECLOCITY_PLUS_COL_X + PLUS_MIN_COL_SPACE, FIRST_ENTRY_ROW_Y), { "1-", "2-", "3-", "4-" }, VERTICAL_COL_SPACE, KEY_COLOR);
 			}
 
+
 			void functionality() {
 				static const float START_Y = 0.1;
 
-				displayColumn(Vector2(KEY_DESCRIPTION_COL_X, START_Y), {
-					"»Toggle tcp coord system",
-					"»Approach home position",
-					"»Snap to home position",
-					"»Approach random configuration",
-					"»Snap to random configuration",
-					"»Toggle endless random config-"
+				displayKeyDescriptionColumn(Vector2(KEY_DESCRIPTION_COL_X, START_Y), {
+					"Toggle tcp coord system",
+					"Approach home position",
+					"Snap to home position",
+					"Approach random configuration",
+					"Snap to random configuration",
+					"Toggle endless random config-"
 					}, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
 				Text::display(Vector2(KEY_DESCRIPTION_COL_X + 0.018, -0.26), "uration approach mode");
 
 				displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, START_Y + 0.005), { "F1", "F2", "F2 Shift", "F3", "F3 Shift", "F4"}, VERTICAL_COL_SPACE, KEY_COLOR);
 
 				// display surplus velocity resetting key description
-				Text::displayColored(Vector2(KEY_DESCRIPTION_COL_X, -0.32), "»Reset velocities", KEY_DESCRIPTION_COLOR);
+				displayKeyDescriptionColumn(Vector2(KEY_DESCRIPTION_COL_X, -0.32), { "Reset velocities" }, NULL, KEY_DESCRIPTION_COLOR);
 				Text::displayColored(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, -0.32), "F5", KEY_COLOR);
 			}
 		}
@@ -136,7 +157,7 @@ namespace Section {
 
 			displaySectionTitle(Vector2(-0.53, HEADER_Y), "Camera");
 
-			displayColumn(Vector2(KEY_DESCRIPTION_COL_X, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "»Reset", "»Toggle orbit mode", "»Toggle tcp mode", "»Toggle reverse tcp mode" }, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
+			displayKeyDescriptionColumn(Vector2(KEY_DESCRIPTION_COL_X, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "Reset", "Toggle orbit mode", "Toggle tcp mode", "Toggle reverse tcp mode" }, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
 			displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "Left", "Right", "Up", "Down" }, VERTICAL_COL_SPACE, KEY_COLOR);
 		}
 	}
@@ -152,24 +173,28 @@ namespace Section {
 			displaySectionTitle(Vector2(HEADER_X, headerY), title);
 
 			// display key description and key columns
-			displayColumn(Vector2(DESCRIPTION_COL_X, headerY - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), std::move(keyDescriptions), VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
+			displayKeyDescriptionColumn(Vector2(DESCRIPTION_COL_X, headerY - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), std::move(keyDescriptions), VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
 			displayColumn(Vector2(DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, headerY - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), std::move(keys), VERTICAL_COL_SPACE, KEY_COLOR);
 		}
 
+
 		void light() {
-			displaySection(0.65, "Light", { "»Toggle TCP spotlight", "»Toggle sunlight" }, { "i", "o" });
+			displaySection(0.65, "Light", { "Toggle TCP spotlight", "Toggle sunlight" }, { "i", "o" });
 		}
+
 
 		void generic() {
-			displaySection(0.35, "Generic", { "»Quit program", "»Toggle full screen" }, { "q", "p" });
+			displaySection(0.35, "Generic", { "Quit program", "Toggle full screen" }, { "q", "p" });
 		}
+
 
 		void display() {
-			displaySection(0.05, "Display", { "»Toggle fps", "»Toggle global coordinate system", "»Toggle axis states" }, { "b", "n", "m" });
+			displaySection(0.05, "Display", { "Toggle fps", "Toggle global coordinate system", "Toggle axis states" }, { "b", "n", "m" });
 		}
 
+
 		void graphics() {
-			displaySection(-0.3, "Graphics", { "»Toggle wireframe mode", "»Toggle light mode", "»Toggle backfaceculling", "»Toggle shading mode" }, { "y", "x", "c", "v" });
+			displaySection(-0.3, "Graphics", { "Toggle wireframe mode", "Toggle light mode", "Toggle backfaceculling", "Toggle shading mode" }, { "y", "x", "c", "v" });
 		}
 	}
 }
