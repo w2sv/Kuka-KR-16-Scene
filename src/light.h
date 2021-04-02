@@ -20,8 +20,9 @@ private:
 	RGBAParameter emis;
 };
 
-// Lichtquelle(n) setzen
 void setLight();
+
+void drawSunlight();
 
 // Standardeinstellung für Farbe und Beleuchtung
 void setDefaultLightAndMaterial(GLboolean lightMode = false);
@@ -53,6 +54,8 @@ public:
 	// Licht mit den bisher eingespeicherten Parametern rendern (falls es eingeschaltet ist)
 	void draw();
 
+	void disable() const;
+
 	// eine kleine Kugel in der Farbe des diffusen Lichtanteils an die Position der Lichtquelle zeichnen
 	void markLightPosition();
 
@@ -67,3 +70,5 @@ private:
 	float spec[4];
 	float att[3];
 };
+
+static cg_light sunlight(1);

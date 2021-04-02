@@ -16,6 +16,7 @@ bool GlobalState::drawCoordSystem = false;
 bool GlobalState::displayHelp = false;
 bool GlobalState::displayFps = true;
 float GlobalState::fps = NULL;
+bool GlobalState::sunlight = false;
 
 
 void GlobalState::updateFps() {

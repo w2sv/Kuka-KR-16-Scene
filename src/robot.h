@@ -4,6 +4,7 @@
 #include "glutils.h"
 #include "utils.h"
 #include "image.h"
+#include "light.h"
 
 #include <map>
 #include <vector>
@@ -244,6 +245,7 @@ private:
 
 	/* ------------------Light------------------- */
 
+	static cg_light tcpSpotlight;
 	bool drawTCPSpotlight_b;
 	void drawTCPSpotlight() const;
 };

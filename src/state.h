@@ -11,6 +11,8 @@ struct GlobalState {
 	static int normalMode;
 	static bool cullMode;
 
+	static bool sunlight;
+
 	static bool drawCoordSystem;
 	static bool displayHelp;
 	static bool displayFps;

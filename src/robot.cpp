@@ -4,7 +4,6 @@
 #include "input.h"
 #include "state.h"
 #include "text.h"
-#include "light.h"
 
 #include "../dependencies/freeglut.h"
 
@@ -278,6 +277,7 @@ std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 
 const Color Robot::BASE_COLOR = Color::fromUnnormalizedValues(230, 80, 21);
 const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
+cg_light Robot::tcpSpotlight(2);
 
 
 Robot::Robot():
@@ -392,6 +392,9 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 
 void Robot::toggleTCPSpotlight() {
 	drawTCPSpotlight_b = !drawTCPSpotlight_b;
+
+	if (!drawTCPSpotlight_b)
+		tcpSpotlight.disable();
 }
 
 
@@ -463,7 +466,7 @@ void Robot::displayAxesStates() const {
 		if (axes[i]->velocity.limitReached())
 			oss << "!";
 
-		Text::displayColored(Vector2(0.75, 0.8 - (i * 0.05)), oss.str().c_str(), Color(0.8f), GLUT_BITMAP_9_BY_15);
+		Text::displayColored(Vector2(0.75, 0.8 - (i * 0.05)), oss.str().c_str(), Color(0.05f), GLUT_BITMAP_9_BY_15);
 	}
 }
 
@@ -640,16 +643,14 @@ void Robot::draw() const {
 
 
 void Robot::drawTCPSpotlight() const {
-	static cg_light spot3(1);
+	tcpSpotlight.setPosition(0, 0, 0, 1);
+	tcpSpotlight.setSpotlight(1.f, 0.f, 0.0f, 25.0f, 2.f);
 
-	spot3.setPosition(0, 0, 0, 1);
-	spot3.setSpotlight(1.f, 0.f, 0.0f, 25.0f, 2.f);
+	tcpSpotlight.setAmbient(0.043, 0.109, 0.85, 1.0f);
+	tcpSpotlight.setDiffuse(0.043, 0.109, 0.85, 1.0f);
+	tcpSpotlight.setSpecular(0.043, 0.109, 0.85, 1.0f);
 
-	spot3.setAmbient(1, 1, 1, 1.0f);
-	spot3.setDiffuse(1.0f, 1.0f, 0.1f, 1.0f);
-	spot3.setSpecular(1.0f, 1.0f, 0.1f, 1.0f);
-
-	spot3.draw();
+	tcpSpotlight.draw();
 }
 
 

@@ -155,6 +155,13 @@ void processInput(Robot& robot, Camera& camera) {
 
 	else if (1 == cg_key::keyState('i'))
 		robot.toggleTCPSpotlight();
+
+	else if (1 == cg_key::keyState('o')) {
+		GlobalState::sunlight = !GlobalState::sunlight;
+
+		if (!GlobalState::sunlight)
+			sunlight.disable();
+	}
 }
 
 
@@ -194,6 +201,9 @@ void displayFunc(){
 
 	// Modell zeichnen
 	drawScene(robot);
+
+	if (GlobalState::sunlight)
+		drawSunlight();
 
 	// project text
 	orthogonalProjection.activate(true);

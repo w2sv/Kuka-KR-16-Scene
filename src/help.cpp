@@ -34,13 +34,7 @@ void drawBackground() {
 
 
 namespace Section {
-	const Color KEY_DESCRIPTION_COLOR(COLORS::WHITE);
-	const Color KEY_COLOR = Color::fromUnnormalizedValues(22, 201, 133);
-	
-	const float VERTICAL_COL_SPACE = 0.06;
-
-	const float FIRST_ENTRY_ROW_Y = 0.41;
-	const float HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE = 0.485;
+	typedef const std::vector<char*>&& CharPtrs;
 
 	////////////////////////////////////////////////////////////
 	/// Helpers
@@ -51,7 +45,7 @@ namespace Section {
 	}
 
 
-	void displayColumn(Vector2& startPos, const std::vector<char*>&& column, float verticalSpace, const Color& color) {
+	void displayColumn(Vector2& startPos, CharPtrs column, float verticalSpace, const Color& color) {
 		color.render(false);
 
 		for (char* entry : column) {
@@ -61,7 +55,7 @@ namespace Section {
 	}
 
 
-	void displayRow(Vector2& startPos, const std::vector<char*>&& row, float horizontalSpace, const Color& color) {
+	void displayRow(Vector2& startPos, CharPtrs row, float horizontalSpace, const Color& color) {
 		color.render(false);
 
 		for (char* entry : row) {
@@ -73,6 +67,16 @@ namespace Section {
 	////////////////////////////////////////////////////////////
 	/// Display
 	////////////////////////////////////////////////////////////
+
+	static const Color KEY_DESCRIPTION_COLOR(COLORS::WHITE);
+	static const Color KEY_COLOR = Color::fromUnnormalizedValues(22, 201, 133);
+
+	static const float VERTICAL_COL_SPACE = 0.06;
+
+	static const float FIRST_ENTRY_ROW_Y = 0.41;
+	static const float HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE = 0.485;
+
+	static const float HEADER_TO_FIRST_ROW_VERTICAL_SPACE = 0.1;
 
 	namespace LeftHalf {
 		const float KEY_DESCRIPTION_COL_X = -0.8;
@@ -121,47 +125,51 @@ namespace Section {
 
 				displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, START_Y + 0.005), { "F1", "F2", "F2 Shift", "F3", "F3 Shift", "F4"}, VERTICAL_COL_SPACE, KEY_COLOR);
 
+				// display surplus velocity resetting key description
 				Text::displayColored(Vector2(KEY_DESCRIPTION_COL_X, -0.32), "»Reset velocities", KEY_DESCRIPTION_COLOR);
 				Text::displayColored(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, -0.32), "F5", KEY_COLOR);
 			}
 		}
 
 		void camera() {
-			displaySectionTitle(Vector2(-0.53, -0.4), "Camera");
+			static const float HEADER_Y = -0.4;
 
-			displayColumn(Vector2(KEY_DESCRIPTION_COL_X, -0.5), { "»Reset", "»Toggle orbit mode", "»Toggle tcp mode", "»Toggle reverse tcp mode" }, 0.06, KEY_DESCRIPTION_COLOR);
-			displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, -0.46), { "Left", "Right", "Up", "Down" }, 0.06, KEY_COLOR);
+			displaySectionTitle(Vector2(-0.53, HEADER_Y), "Camera");
+
+			displayColumn(Vector2(KEY_DESCRIPTION_COL_X, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "»Reset", "»Toggle orbit mode", "»Toggle tcp mode", "»Toggle reverse tcp mode" }, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
+			displayColumn(Vector2(KEY_DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "Left", "Right", "Up", "Down" }, VERTICAL_COL_SPACE, KEY_COLOR);
 		}
 	}
 
 
 	namespace RightHalf {
-		const float DESCRIPTION_COL_X = 0.25;
+		void displaySection(float headerY, const char* title, CharPtrs keyDescriptions, CharPtrs keys) {
+			static const float HEADER_X = 0.4;
 
-		const float HEADER_X = 0.4;
-		const float HEADER_TO_FIRST_ROW_VERTICAL_SPACE = 0.15;
+			static const float DESCRIPTION_COL_X = 0.25;
+
+			// display title
+			displaySectionTitle(Vector2(HEADER_X, headerY), title);
+
+			// display key description and key columns
+			displayColumn(Vector2(DESCRIPTION_COL_X, headerY - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), std::move(keyDescriptions), VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
+			displayColumn(Vector2(DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, headerY - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), std::move(keys), VERTICAL_COL_SPACE, KEY_COLOR);
+		}
+
+		void light() {
+			displaySection(0.65, "Light", { "»Toggle TCP spotlight", "»Toggle sunlight" }, { "i", "o" });
+		}
 
 		void generic() {
-			displaySectionTitle(Vector2(HEADER_X, 0.65), "Generic");
-
-			displayColumn(Vector2(DESCRIPTION_COL_X, FIRST_ENTRY_ROW_Y), { "»Quit program", "»Toggle full screen" }, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
-			displayColumn(Vector2(DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, FIRST_ENTRY_ROW_Y), { "q", "p" }, VERTICAL_COL_SPACE, KEY_COLOR);
+			displaySection(0.35, "Generic", { "»Quit program", "»Toggle full screen" }, { "q", "p" });
 		}
 
 		void display() {
-			const float HEADER_Y = 0.2;
-			displaySectionTitle(Vector2(HEADER_X, HEADER_Y), "Display");
-
-			displayColumn(Vector2(DESCRIPTION_COL_X, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "»Toggle fps", "»Toggle global coordinate system", "»Toggle axis states" }, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
-			displayColumn(Vector2(DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "b", "n", "m" }, VERTICAL_COL_SPACE, KEY_COLOR);
+			displaySection(0.05, "Display", { "»Toggle fps", "»Toggle global coordinate system", "»Toggle axis states" }, { "b", "n", "m" });
 		}
 
 		void graphics() {
-			const float HEADER_Y = -0.2;
-			displaySectionTitle(Vector2(HEADER_X, HEADER_Y), "Graphics");
-
-			displayColumn(Vector2(DESCRIPTION_COL_X, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "»Toggle wireframe mode", "»Toggle light mode", "»Toggle backfaceculling", "»Toggle shading mode" }, VERTICAL_COL_SPACE, KEY_DESCRIPTION_COLOR);
-			displayColumn(Vector2(DESCRIPTION_COL_X + HORIZONTAL_DESCRIPTION_KEY_COLS_SPACE, HEADER_Y - HEADER_TO_FIRST_ROW_VERTICAL_SPACE), { "y", "x", "c", "v" }, VERTICAL_COL_SPACE, KEY_COLOR);
+			displaySection(-0.3, "Graphics", { "»Toggle wireframe mode", "»Toggle light mode", "»Toggle backfaceculling", "»Toggle shading mode" }, { "y", "x", "c", "v" });
 		}
 	}
 }
@@ -176,6 +184,7 @@ void displayHelp() {
 	Section::LeftHalf::Robot::functionality();
 	Section::LeftHalf::camera();
 
+	Section::RightHalf::light();
 	Section::RightHalf::generic();
 	Section::RightHalf::display();
 	Section::RightHalf::graphics();

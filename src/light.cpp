@@ -158,6 +158,11 @@ void cg_light::draw()
 }
 
 
+void cg_light::disable() const {
+	glDisable(id);
+}
+
+
 void cg_light::markLightPosition() {
 	// eine kleine Kugel an die Position der Lichtquelle zeichnen
 	glPushMatrix();
@@ -165,8 +170,19 @@ void cg_light::markLightPosition() {
 		glScalef(0.2, 0.2, 0.2);
 	glPushAttrib(GL_CURRENT_BIT | GL_LIGHTING_BIT);
 	glDisable(GL_LIGHTING);
-	glColor4fv(this->diff);
-	glutSolidSphere(0.5, 30, 30);
+	glColor4f(1, 0, 0, 1);
+	glutSolidSphere(20, 30, 30);
 	glPopAttrib();
 	glPopMatrix();
+}
+
+
+void drawSunlight() {
+	sunlight.setPosition(50, 50, 1.0f, 0.f);
+
+	sunlight.setAmbient(0.7, 0.7, 0.7, 1.);
+	sunlight.setDiffuse(0.921, 0.49, 0.184, 1.0f);
+	sunlight.setSpecular(0.921, 0.49, 0.184, 1.0f);
+
+	sunlight.draw();
 }
