@@ -147,6 +147,7 @@ public:
 	void toggleAxesStatesDisplay();
 	void toggleInfiniteArbitraryAxisConfigurationApproachMode();
 	void toggleTCPSpotlight();
+	void toggleTCPPointlight();
 
 	/* ------------Camera----------------- */
 
@@ -156,6 +157,9 @@ public:
 	/* -------------Text----------------- */
 
 	void displayText();
+
+	/* -------------Text----------------- */
+
 private:
 	static const Color BASE_COLOR;
 
@@ -183,7 +187,7 @@ private:
 
 	bool atHomePosition();
 	bool velocitiesAtDefault();
-
+	
 	/* -----------------CoordSystem----------------- */
 
 	static void drawShrunkCoordSystem();
@@ -245,7 +249,13 @@ private:
 
 	/* ------------------Light------------------- */
 
-	static cg_light tcpSpotlight;
+	void toggleLight(bool& flag, cg_light& light);
+
+	cg_light tcpSpotlight;
 	bool drawTCPSpotlight_b;
 	void drawTCPSpotlight() const;
+
+	cg_light tcpPointlight;
+	bool drawTCPPointlight_b;
+	void drawTCPPointlight() const;
 };

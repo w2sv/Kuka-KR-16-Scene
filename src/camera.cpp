@@ -22,7 +22,7 @@ Camera::Camera(Robot* robot) :
 	mode(Mode::Observer),
 	robot(robot),
 	radius(START_RADIUS),
-	orbitVelocityRegularizer(VelocityFpsRegularizer(5))
+	orbitVelocityRegularizer(VelocityFpsRegularizer(3))
 {
 	resetPosition(); 
 }

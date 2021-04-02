@@ -57,15 +57,24 @@ void processInput(Robot& robot, Camera& camera) {
 
 	// home position
 	if (cg_key::specialKeyState(GLUT_KEY_F2) == 1) {
+
+		// snap
 		if (cg_key::specialKeyState(GLUT_KEY_SHIFT_L) != 0)
 			robot.assumeHomePosition(true);
+
+		// approach
 		else
 			robot.assumeHomePosition(false);
 	}
 
+	// arbitrary axis configuration
 	else if (cg_key::specialKeyState(GLUT_KEY_F3) == 1) {
+
+		// snap
 		if (cg_key::specialKeyState(GLUT_KEY_SHIFT_L) != 0)
 			robot.setArbitraryAxesConfiguration();
+		
+		// approach
 		else
 			robot.approachArbitraryAxisConfiguration();
 	}
@@ -144,15 +153,13 @@ void processInput(Robot& robot, Camera& camera) {
 
 	/// ---------------------Light----------------------
 
+	// toggle tcp spotlight
 	else if (1 == cg_key::keyState('i'))
 		robot.toggleTCPSpotlight();
 
-	else if (1 == cg_key::keyState('o')) {
-		GlobalState::sunlight = !GlobalState::sunlight;
-
-		if (!GlobalState::sunlight)
-			sunlight.disable();
-	}
+	// toggle tcp pointlight
+	else if (1 == cg_key::keyState('o'))
+		robot.toggleTCPPointlight();
 }
 
 
@@ -192,9 +199,6 @@ void displayFunc(){
 
 	// Modell zeichnen
 	drawScene(robot);
-
-	if (GlobalState::sunlight)
-		drawSunlight();
 
 	// project text
 	orthogonalProjection.activate(true);

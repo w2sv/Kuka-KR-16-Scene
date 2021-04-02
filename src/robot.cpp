@@ -277,7 +277,6 @@ std::vector<Vector2> discrete2DCircleRadiusPoints(float radius, int nPoints) {
 
 const Color Robot::BASE_COLOR = Color::fromUnnormalizedValues(230, 80, 21);
 const std::vector<Vector2> Robot::SCREW_CIRCLE_POSITIONS = discrete2DCircleRadiusPoints(0.25, 12);
-cg_light Robot::tcpSpotlight(2);
 
 
 Robot::Robot():
@@ -295,12 +294,39 @@ Robot::Robot():
 	}),
 	drawTCPCoordSystem_b(false),
 	drawTCPCoordSystemPrevious_b(false),
+
 	displayAxesStates_b(true),
+
 	approachArbitraryAxisConfiguration_b(false),
 	approachArbitraryAxisConfigurationInfinitely_b(false),
 	approachHomePosition_b(false),
 	lastApproachCycle_b(false),
-	drawTCPSpotlight_b(false)
+
+	drawTCPSpotlight_b(false),
+	drawTCPPointlight_b(false),
+
+	tcpSpotlight(
+		1,
+		RGBAParameter{ 0, 0, 0, 1 },
+		RGBAParameter{ 0.043, 0.109, 0.85, 1.0f },
+		RGBAParameter{ 0.043, 0.109, 0.85, 1.0f },
+		RGBAParameter{ 0.043, 0.109, 0.85, 1.0f },
+		XYZParameter{ 1, 0, 0 },
+		XYZParameter{ 1, 0, 0 },
+		25,
+		0
+	),
+	tcpPointlight(
+		2,
+		RGBAParameter{ 0, 0, 0, 1 },
+		RGBAParameter{ 0.619, 0.192, 0.27, 1.0f },
+		RGBAParameter{ 0.619, 0.192, 0.27, 1.0f },
+		RGBAParameter{ 0.619, 0.192, 0.27, 1.0f },
+		XYZParameter{ 1, 0, 0 },
+		XYZParameter{0, 1, 0},
+		180,
+		0
+	)
 {
 	resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
 	resetDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
@@ -391,10 +417,20 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 
 
 void Robot::toggleTCPSpotlight() {
-	drawTCPSpotlight_b = !drawTCPSpotlight_b;
+	toggleLight(drawTCPSpotlight_b, tcpSpotlight);
+}
 
-	if (!drawTCPSpotlight_b)
-		tcpSpotlight.disable();
+
+void Robot::toggleTCPPointlight() {
+	toggleLight(drawTCPPointlight_b, tcpPointlight);
+}
+
+
+void Robot::toggleLight(bool& flag, cg_light& light) {
+	flag = !flag;
+
+	if (!flag)
+		light.disable();
 }
 
 
@@ -563,9 +599,9 @@ void Robot::loadObjects() {
  
 
 void Robot::setObjectMaterials() {
-	GLfloat spec = 200;  // 0 -> saturated color
+	GLfloat spec = 200;
 	GLfloat shine = 300;
-	GLfloat emis = 1; // 0 -> matt, 1->bright
+	GLfloat emis = 1;
 
 	objects[Object::YawAxis1].setMaterial(BASE_COLOR, spec, shine, emis);
 	objects[Object::TiltAxis1].setMaterial(BASE_COLOR, spec, shine, emis);
@@ -627,30 +663,30 @@ void Robot::draw() const {
 		}
 
 		// tcp coord system if applicable
-		if (drawTCPCoordSystem_b || drawTCPSpotlight_b) {
+		if (drawTCPCoordSystem_b || drawTCPSpotlight_b || drawTCPPointlight_b) {
 			glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES]);
 
 			if (drawTCPCoordSystem_b)
 				drawShrunkCoordSystem();
+
 			if (drawTCPSpotlight_b)
 				drawTCPSpotlight();
+			if (drawTCPPointlight_b)
+				drawTCPPointlight();
+			
 		}
-
-		glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES]);
 
 	glPopMatrix();
 }
 
 
 void Robot::drawTCPSpotlight() const {
-	tcpSpotlight.setPosition(0, 0, 0, 1);
-	tcpSpotlight.setSpotlight(1.f, 0.f, 0.0f, 25.0f, 2.f);
-
-	tcpSpotlight.setAmbient(0.043, 0.109, 0.85, 1.0f);
-	tcpSpotlight.setDiffuse(0.043, 0.109, 0.85, 1.0f);
-	tcpSpotlight.setSpecular(0.043, 0.109, 0.85, 1.0f);
-
 	tcpSpotlight.draw();
+}
+
+
+void Robot::drawTCPPointlight() const {
+	tcpPointlight.draw();
 }
 
 
@@ -686,14 +722,13 @@ void Robot::drawAxisWeight() const {
 	const static float UPPER_CYLINDER_HEIGTH = 0.05;
 
 	glPushMatrix();
-		static const Material MATERIAL(
+		Material(
+			RGBAParameter{ 0.2, 0.2, 0.2, 1 },
 			RGBAParameter{ 0.4, 0.4, 0.4, 1.0 },
 			RGBAParameter{ 0.4, 0.4, 0.4, 1.0 },
-			RGBAParameter{ 1, 1, 1, 1 },
-			32.f,
+			16,
 			RGBAParameter{ 0, 0, 0, 1 }
-		);
-		MATERIAL.set();
+		).set();
 
 		// draw lower octPrism pedastel
 		Z::translate(PEDASTEL_HEIGHT / 2);

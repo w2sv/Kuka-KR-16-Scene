@@ -179,7 +179,7 @@ namespace Section {
 
 
 		void light() {
-			displaySection(0.65, "Light", { "Toggle TCP spotlight", "Toggle sunlight" }, { "i", "o" });
+			displaySection(0.65, "Light", { "Toggle TCP spotlight", "Toggle TCP pointlight" }, { "i", "o" });
 		}
 
 

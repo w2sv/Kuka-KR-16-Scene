@@ -17,8 +17,8 @@ const unsigned int SLICES = 20;
 const unsigned int STACKS = 20;
 const unsigned int LOOPS = 1;
 
-
 const float SQUARE_VERTEX_COORD = 0.5f;
+const float PSEUDO_ZERO = -0.01;
 
 const GLfloat SQUARE_TEXTURE_COORDINATES[4][3] = {
 	{1., 0.},
@@ -32,21 +32,21 @@ const GLfloat SQUARE_TEXTURE_COORDINATES[4][3] = {
 /// Pseudo 2D
 ////////////////////////////////////////////////////////////
 
-void drawQuadraticGrid(const Extrema& extrema, int tiles, float z) {
+void drawSquareGrid(const Extrema& extrema, int tiles) {
 	
 	glBegin(GL_LINES);
 	for (float v = extrema.min; v <= extrema.max; v += extrema.spread() / tiles) {
-		glVertex3f(v, z, extrema.min);
-		glVertex3f(v, z, extrema.max);
+		glVertex3f(v, PSEUDO_ZERO, extrema.min);
+		glVertex3f(v, PSEUDO_ZERO, extrema.max);
 
-		glVertex3f(extrema.min, z, v);
-		glVertex3f(extrema.max, z, v);
+		glVertex3f(extrema.min, PSEUDO_ZERO, v);
+		glVertex3f(extrema.max, PSEUDO_ZERO, v);
 	};
 	glEnd();
 }
 
 
-void drawQuadraticPlane(const Extrema& extrema, int nSubSquares, float z) {
+void drawSquarePlane(const Extrema& extrema, int nSubSquares) {
 	float step = (extrema.max - extrema.min) / nSubSquares;
 
 	glNormal3f(0, 1, 0);
@@ -54,10 +54,10 @@ void drawQuadraticPlane(const Extrema& extrema, int nSubSquares, float z) {
 	glBegin(GL_QUADS);
 	for (size_t xStepCoeff = 0; xStepCoeff < nSubSquares; xStepCoeff++) {
 		for (size_t yStepCoeff = 0; yStepCoeff < nSubSquares; yStepCoeff++) {
-			glVertex3f(extrema.min + step * xStepCoeff, z, extrema.min + step * yStepCoeff);
-			glVertex3f(extrema.min + step * (xStepCoeff + 1), z, extrema.min + step * yStepCoeff);
-			glVertex3f(extrema.min + step * (xStepCoeff + 1), z, extrema.min + step * (yStepCoeff + 1));
-			glVertex3f(extrema.min + step * xStepCoeff, z, extrema.min + step * (yStepCoeff + 1));
+			glVertex3f(extrema.min + step * xStepCoeff, PSEUDO_ZERO, extrema.min + step * yStepCoeff);
+			glVertex3f(extrema.min + step * (xStepCoeff + 1), PSEUDO_ZERO, extrema.min + step * yStepCoeff);
+			glVertex3f(extrema.min + step * (xStepCoeff + 1), PSEUDO_ZERO, extrema.min + step * (yStepCoeff + 1));
+			glVertex3f(extrema.min + step * xStepCoeff, PSEUDO_ZERO, extrema.min + step * (yStepCoeff + 1));
 		}
 	}
 	glEnd();
