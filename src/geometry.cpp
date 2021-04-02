@@ -105,6 +105,8 @@ void Cube::drawFace(Face face, bool texture3D) {
 		{0, 0, -1},
 	};
 
+	glNormal3fv(NORMAL_VECTORS[face]);
+
 	glBegin(GL_QUADS);
 
 	for (size_t i = 0; i < 2; i++) {
@@ -113,10 +115,8 @@ void Cube::drawFace(Face face, bool texture3D) {
 
 			if (texture3D)
 				glTexCoord3fv(TEX_COORDS_3D[face][vertexIndex]);
-			else {
+			else
 				glTexCoord2fv(SQUARE_TEXTURE_COORDINATES[vertexIndex]);
-				glNormal3fv(NORMAL_VECTORS[face]);
-			}
 
 			switch (face) {
 				case Front:
