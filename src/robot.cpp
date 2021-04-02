@@ -495,7 +495,7 @@ void Robot::displayStatus() {
 	if (velocitiesresetDisplayTimeLimit > now)
 		displayStatusMessage("Reset Velocities", MESSAGE_ROW_POSITIONS[1]);
 	else if (velocitiesatdefaultDisplayTimeLimit > now)
-		displayStatusMessage("Velocities at default", MESSAGE_ROW_POSITIONS[1]);
+		displayStatusMessage("Velocities already at default", MESSAGE_ROW_POSITIONS[1]);
 }
 
 

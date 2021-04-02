@@ -9,11 +9,13 @@
 
 #include "input.h"
 #include "state.h"
+#include "skybox.h"
+#include "platform.h"
 
 
 
 const float Camera::START_RADIUS = 50;
-const Extrema Camera::RADIUS_LIMITS(7.4, 400);
+const Extrema Camera::RADIUS_LIMITS(7.4, (Skybox::EXTENT - Platform::MEASUREMENTS.spread()) / 2);
 
 
 Camera::Camera(Robot* robot) :

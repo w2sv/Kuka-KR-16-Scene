@@ -50,7 +50,7 @@ void enableParallaxeEffect() {
 void Skybox::draw() {
 	glPushMatrix();
 		enableParallaxeEffect();
-		glScaleUniformly(64);
+		glScaleUniformly(EXTENT);
 	
 		glDepthMask(GL_FALSE);
 		glEnable(GL_TEXTURE_CUBE_MAP);	

@@ -1,7 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <iostream>  // !
-
 #include "state.h"
 #include "help.h"
 #include "window.h"
@@ -14,12 +12,11 @@
 #include "image.h"
 #include "text.h"
 #include "skybox.h"
+#include "platform.h"
 
 #include "../dependencies/freeglut.h"
 #include "../dependencies/glext.h"
 
-
-const Extrema groundMeasurements(-20, 20);
 
 
 int main(int argc, char** argv) {
@@ -40,19 +37,10 @@ int main(int argc, char** argv) {
 }
 
 
-void drawPlatform() {
-	Color(.1).render();
-	drawQuadraticPlane(groundMeasurements, 150, -0.01);
-
-	Color(.8, .0, .0).render();
-	drawQuadraticGrid(groundMeasurements, 40, 0.01);
-}
-
-
 void drawScene(const Robot& robot){
-	Skybox::draw();
-	drawPlatform();
+	Platform::draw();
 	robot.draw();
+	Skybox::draw();
 }
 
 
@@ -189,7 +177,7 @@ void displayFunc(){
 
 	// Koordinatensystem zeichnen
 	if (GlobalState::drawCoordSystem)
-		drawCoordSystem(groundMeasurements, groundMeasurements, groundMeasurements);
+		drawCoordSystem(Platform::MEASUREMENTS, Platform::MEASUREMENTS, Platform::MEASUREMENTS);
 
 	// Zeichenmodus einstellen (Wireframe on/off)
 	glPolygonMode(GL_FRONT_AND_BACK, GlobalState::drawMode);

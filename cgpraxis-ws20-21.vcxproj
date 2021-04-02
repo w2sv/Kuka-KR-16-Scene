@@ -19,6 +19,7 @@
     <ClCompile Include="src\image.cpp" />
     <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\light.cpp" />
+    <ClCompile Include="src\platform.cpp" />
     <ClCompile Include="src\robot.cpp" />
     <ClCompile Include="src\skybox.cpp" />
     <ClCompile Include="src\state.cpp" />
@@ -35,6 +36,7 @@
     <ClInclude Include="src\image.h" />
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\light.h" />
+    <ClInclude Include="src\platform.h" />
     <ClInclude Include="src\robot.h" />
     <ClInclude Include="src\skybox.h" />
     <ClInclude Include="src\state.h" />

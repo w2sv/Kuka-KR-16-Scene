@@ -264,51 +264,50 @@ OctogonalPrism::UprightFaceNormalVectors OctogonalPrism::calculateUprightFacesNo
 void OctogonalPrism::draw(const Color& corpusColor, const Color* cageColor) const {
 	corpusColor.render();
 
-	// Flat Faces
-	{
-		const static GLdouble NORMAL_VECTORS[2][3] = {
-			{0, -1, 0},
-			{0, 1, 0}
-		};
+	// -----------------Flat Faces-----------------
 
-		//draw upper and lower plane
+	const static GLdouble NORMAL_VECTORS[2][3] = {
+		{0, -1, 0},
+		{0, 1, 0}
+	};
+
+	//draw upper and lower plane
+	for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
+		glBegin(GL_POLYGON);
+		glNormal3dv(NORMAL_VECTORS[zPolarityIndex]);
+		for (size_t i = 0; i < 9; i++) {
+			glTexCoord2fv(flatFaceTextureVertices[i % 8].data());
+			glVertex3fv(vertices[zPolarityIndex][i % 8].data());
+		}
+		glEnd();
+	}
+
+	// -----------------Upright Faces-----------------
+
+	const static std::array<TextureVertex, 4> TEXTURE_VERTICES{
+		{
+			TextureVertex{0, 0},
+			TextureVertex{1, 0},
+			TextureVertex{1, 1},
+			TextureVertex{0, 1},
+		}
+	};
+
+	// connect vertices opposing each other across xz-plane
+	for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
+		glBegin(GL_POLYGON);
+		glNormal3dv((GLdouble*)uprightFacesNormalVectors[faceIndex].data());
 		for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-			glBegin(GL_POLYGON);
-			glNormal3dv(NORMAL_VECTORS[zPolarityIndex]);
-			for (size_t i = 0; i < 9; i++) {
-				glTexCoord2fv(flatFaceTextureVertices[i % 8].data());
-				glVertex3fv(vertices[zPolarityIndex][i % 8].data());
+			for (size_t i = 0; i < 2; i++) {
+				glTexCoord2fv(TEXTURE_VERTICES[zPolarityIndex * 2 + i].data());
+				glVertex3fv(vertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
 			}
-			glEnd();
 		}
+		glEnd();
 	}
 
-	// Upright Faces
-	{
-		const static std::array<TextureVertex, 4> TEXTURE_VERTICES{
-			{
-				TextureVertex{0, 0},
-				TextureVertex{1, 0},
-				TextureVertex{1, 1},
-				TextureVertex{0, 1},
-			}
-		};
+	// -----------------Cage-----------------
 
-		// connect vertices opposing each other across xz-plane
-		for (size_t faceIndex = 0; faceIndex < 8; faceIndex++) {
-			glBegin(GL_POLYGON);
-			glNormal3dv((GLdouble*)uprightFacesNormalVectors[faceIndex].data());
-			for (size_t zPolarityIndex = 0; zPolarityIndex < 2; zPolarityIndex++) {
-				for (size_t i = 0; i < 2; i++) {
-					glTexCoord2fv(TEXTURE_VERTICES[zPolarityIndex * 2 + i].data());
-					glVertex3fv(vertices[zPolarityIndex][(faceIndex + i + zPolarityIndex - (zPolarityIndex && i) * 2) % 8].data());
-				}
-			}
-			glEnd();
-		}
-	}
-
-	// Cage
 	if (cageColor) {
 		cageColor->render();
 
