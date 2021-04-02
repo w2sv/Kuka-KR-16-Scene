@@ -145,6 +145,7 @@ public:
 	void toggleTCPCoordSystem();
 	void toggleAxesStatesDisplay();
 	void toggleInfiniteArbitraryAxisConfigurationApproachMode();
+	void toggleTCPSpotlight();
 
 	/* ------------Camera----------------- */
 
@@ -240,4 +241,9 @@ private:
 	/* ------------------Camera------------------- */
 
 	void approachSpatialTCPConfigurationInversely() const;
+
+	/* ------------------Light------------------- */
+
+	bool drawTCPSpotlight_b;
+	void drawTCPSpotlight() const;
 };

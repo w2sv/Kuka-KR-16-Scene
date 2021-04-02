@@ -41,13 +41,11 @@ int main(int argc, char** argv) {
 
 
 void drawScene(const Robot& robot){
-	// glShadeModel(GL_FLAT);
-
 	Skybox::draw();
 
 	// draw ground
-	setColor(.1, .1, .1);
-	drawPlane(groundMeasurements, groundMeasurements);
+	Color(.1).render();
+	drawQuadraticPlane(groundMeasurements, 150);
 	drawQuadraticGrid(groundMeasurements, 40, Color(.8, .0, .0));
 	
 	// draw robot
@@ -113,7 +111,7 @@ void processInput(Robot& robot, Camera& camera) {
 	else if (cg_key::keyState('q'))
 		exit(0); // Escape -> Programm beenden
 
-	// sufficientAmountOfTimePassed help
+	// toggle help
 	else if (1 == cg_key::keyState(27))
 		GlobalState::displayHelp = !GlobalState::displayHelp;
 
@@ -123,7 +121,7 @@ void processInput(Robot& robot, Camera& camera) {
 
 	/// ---------------------Display----------------------
 
-	// sufficientAmountOfTimePassed fps
+	// toggle fps
 	else if (1 == cg_key::keyState('b'))
 		GlobalState::displayFps = !GlobalState::displayFps;
 
@@ -131,7 +129,7 @@ void processInput(Robot& robot, Camera& camera) {
 	else if (1 == cg_key::keyState('n'))
 		GlobalState::drawCoordSystem = !GlobalState::drawCoordSystem;
 
-	// sufficientAmountOfTimePassed axes states text
+	// toggle axes states text
 	else if (cg_key::keyState('m') == 1)
 		robot.toggleAxesStatesDisplay();
 
@@ -152,6 +150,11 @@ void processInput(Robot& robot, Camera& camera) {
 	// shading mode
 	else if (1 == cg_key::keyState('v'))
 		GlobalState::shadingMode = GlobalState::shadingMode == GL_FLAT ? GL_SMOOTH : GL_FLAT;
+
+	/// ---------------------Light----------------------
+
+	else if (1 == cg_key::keyState('i'))
+		robot.toggleTCPSpotlight();
 }
 
 

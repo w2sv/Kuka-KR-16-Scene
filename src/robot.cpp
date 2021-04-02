@@ -299,7 +299,8 @@ Robot::Robot():
 	approachArbitraryAxisConfiguration_b(false),
 	approachArbitraryAxisConfigurationInfinitely_b(false),
 	approachHomePosition_b(false),
-	lastApproachCycle_b(false)
+	lastApproachCycle_b(false),
+	drawTCPSpotlight_b(false)
 {
 	resetDisplayTimeLimit(athomepositionDisplayTimeLimit);
 	resetDisplayTimeLimit(velocitiesatdefaultDisplayTimeLimit);
@@ -386,6 +387,11 @@ void Robot::toggleInfiniteArbitraryAxisConfigurationApproachMode() {
 	}
 	else
 		lastApproachCycle_b = true;
+}
+
+
+void Robot::toggleTCPSpotlight() {
+	drawTCPSpotlight_b = !drawTCPSpotlight_b;
 }
 
 
@@ -618,11 +624,32 @@ void Robot::draw() const {
 		}
 
 		// tcp coord system if applicable
-		if (drawTCPCoordSystem_b) {
+		if (drawTCPCoordSystem_b || drawTCPSpotlight_b) {
 			glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES]);
-			drawShrunkCoordSystem();
+
+			if (drawTCPCoordSystem_b)
+				drawShrunkCoordSystem();
+			if (drawTCPSpotlight_b)
+				drawTCPSpotlight();
 		}
+
+		glTranslateByVec(relativeAxesStartPositionShiftVectors[N_AXES]);
+
 	glPopMatrix();
+}
+
+
+void Robot::drawTCPSpotlight() const {
+	static cg_light spot3(1);
+
+	spot3.setPosition(0, 0, 0, 1);
+	spot3.setSpotlight(1.f, 0.f, 0.0f, 25.0f, 2.f);
+
+	spot3.setAmbient(1, 1, 1, 1.0f);
+	spot3.setDiffuse(1.0f, 1.0f, 0.1f, 1.0f);
+	spot3.setSpecular(1.0f, 1.0f, 0.1f, 1.0f);
+
+	spot3.draw();
 }
 
 
@@ -661,7 +688,7 @@ void Robot::drawAxisWeight() const {
 		static const Material MATERIAL(
 			RGBAParameter{ 0.4, 0.4, 0.4, 1.0 },
 			RGBAParameter{ 0.4, 0.4, 0.4, 1.0 },
-			RGBAParameter{ 1 },
+			RGBAParameter{ 1, 1, 1, 1 },
 			32.f,
 			RGBAParameter{ 0, 0, 0, 1 }
 		);

@@ -46,7 +46,7 @@ private:
 
 void drawQuadraticGrid(const Extrema& limits, int tiles, const Color& color);
 
-void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema);
+void drawQuadraticPlane(const Extrema& extrema, int nSubSquares);
 
 ////////////////////////////////////////////////////////////
 /// Dev functions

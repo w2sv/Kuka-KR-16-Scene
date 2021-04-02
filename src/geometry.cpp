@@ -50,15 +50,22 @@ void drawQuadraticGrid(const Extrema& extrema, int tiles, const Color& color) {
 }
 
 
-void drawPlane(const Extrema& xExtrema, const Extrema& yExtrema) {
+void drawQuadraticPlane(const Extrema& extrema, int nSubSquares) {
+	float step = (extrema.max - extrema.min) / nSubSquares;
+
+	glNormal3f(0, 1, 0);
+
 	glBegin(GL_QUADS);
-		glVertex3f(xExtrema.min, PSEUDO_NULL, yExtrema.min);
-		glVertex3f(xExtrema.max, PSEUDO_NULL, yExtrema.min);
-		glVertex3f(xExtrema.max, PSEUDO_NULL, yExtrema.max);
-		glVertex3f(xExtrema.min, PSEUDO_NULL, yExtrema.max);
+	for (size_t xStepCoeff = 0; xStepCoeff < nSubSquares; xStepCoeff++) {
+		for (size_t yStepCoeff = 0; yStepCoeff < nSubSquares; yStepCoeff++) {
+			glVertex3f(extrema.min + step * xStepCoeff, PSEUDO_NULL, extrema.min + step * yStepCoeff);
+			glVertex3f(extrema.min + step * (xStepCoeff + 1), PSEUDO_NULL, extrema.min + step * yStepCoeff);
+			glVertex3f(extrema.min + step * (xStepCoeff + 1), PSEUDO_NULL, extrema.min + step * (yStepCoeff + 1));
+			glVertex3f(extrema.min + step * xStepCoeff, PSEUDO_NULL, extrema.min + step * (yStepCoeff + 1));
+		}
+	}
 	glEnd();
 }
-
 
 ////////////////////////////////////////////////////////////
 /// 3D
