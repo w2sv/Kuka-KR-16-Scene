@@ -40,15 +40,18 @@ int main(int argc, char** argv) {
 }
 
 
+void drawPlatform() {
+	Color(.1).render();
+	drawQuadraticPlane(groundMeasurements, 150, -0.01);
+
+	Color(.8, .0, .0).render();
+	drawQuadraticGrid(groundMeasurements, 40, 0.01);
+}
+
+
 void drawScene(const Robot& robot){
 	Skybox::draw();
-
-	// draw ground
-	Color(.1).render();
-	drawQuadraticPlane(groundMeasurements, 150);
-	drawQuadraticGrid(groundMeasurements, 40, Color(.8, .0, .0));
-	
-	// draw robot
+	drawPlatform();
 	robot.draw();
 }
 

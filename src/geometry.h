@@ -44,9 +44,9 @@ private:
 	FlatFaceTextureVertices calculateFlatFaceTextureVertices(float lateralLength, float intermediateCoordinate);
 };
 
-void drawQuadraticGrid(const Extrema& limits, int tiles, const Color& color);
+void drawQuadraticGrid(const Extrema& limits, int tiles, float z);
 
-void drawQuadraticPlane(const Extrema& extrema, int nSubSquares);
+void drawQuadraticPlane(const Extrema& extrema, int nSubSquares, float z);
 
 ////////////////////////////////////////////////////////////
 /// Dev functions
