@@ -4,17 +4,17 @@
 
 #include <iostream>
 #include <array>
+#include <vector>
 #include <time.h>
 
 
-////////////////////////////////////////////////////////////
-/// ValueAbstraction Baseclass
-////////////////////////////////////////////////////////////
-
+/*
+* Class allowing for abstraction of numeric value by enabling object usage in conjunction with
+* entirety of comparison, as well as arithmetic operators
+*/
 template <typename T> struct ValueAbstraction {
 	T value;
 	ValueAbstraction(T value): value(value) {}
-	~ValueAbstraction(){}
 	
 	bool operator<(const ValueAbstraction& other) const { return value < other.value; }
 	bool operator>(const ValueAbstraction& other) const { return value > other.value; }
@@ -38,13 +38,33 @@ template <typename T> struct ValueAbstraction {
 /// File System
 ////////////////////////////////////////////////////////////
 
-char* concatenatedCharPtr(const char* a, const char* b);
+typedef const char* CharPtr;
+typedef std::vector<CharPtr> CharPtrVec;
+
+/*
+* Abstraction of file path collection the elements of which are
+* accessible via [size_t] and assuring respective base paths to be set to repo root
+*/
+struct AbsolutePaths {
+	AbsolutePaths(CharPtr relativeDirPath, CharPtrVec fileNames);
+	CharPtr operator[](size_t index) const;
+
+	size_t size() const;
+private:
+	CharPtrVec absolutePaths;
+};
+
+/*
+* Assures base level of created relative file path to be set to repository root
+* 
+* @return rootSubDirPath if current workDir == repo root, otherwise ..\\{rootSubDirPath}
+*/
+char* repoRootSubDirPath(CharPtr rootSubDirPath);
 
 /// Concatenates passed path components whilst adding \\ in between 
-char* joinPath(const char* a, const char* b);
+char* joinPath(CharPtr a, CharPtr b);
 
-/// Assures base level of created relative file path to be set to repository root
-char* getResourceSubDirPath(char* subDirTitle);
+char* concatenatedCharPtr(CharPtr a, CharPtr b);
 
 ////////////////////////////////////////////////////////////
 /// Math

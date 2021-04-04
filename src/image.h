@@ -21,8 +21,9 @@ typedef unsigned int UINT;
 	typedef unsigned long DWORD;
 #endif
 
+#include "utils.h"
+
 #include <string>
-#include <array>
 
 
 struct rawImageRec;
@@ -118,11 +119,8 @@ protected:
 
 class CubeMap : public cg_image {
 public:
-	static const int N_FACES = 6;
-	// to be passed in the order right, left, top, bottom back, front
-	typedef std::array<const char*, N_FACES> SideFilePaths;
-
-	void load(SideFilePaths sideFilePaths, bool applyHorizontalFlips = false);
+	// file paths to be passed in the order right, left, top, bottom, back, front
+	void load(const AbsolutePaths& textureFilePaths, bool applyHorizontalFlips = false);
 	void bind() const;
 };
 

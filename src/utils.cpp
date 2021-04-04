@@ -12,7 +12,47 @@
 /// File System
 ////////////////////////////////////////////////////////////
 
-char* concatenatedCharPtr(const char* a, const char* b) {
+AbsolutePaths::AbsolutePaths(CharPtr relativeDirPath, CharPtrVec fileNames) {
+	CharPtr absDirPath = repoRootSubDirPath(relativeDirPath);
+
+	for (CharPtr fileName : fileNames)
+		absolutePaths.push_back(joinPath(absDirPath, fileName));
+}
+
+
+size_t AbsolutePaths::size() const {
+	return absolutePaths.size();
+}
+
+
+CharPtr AbsolutePaths::operator[](size_t index) const {
+	return absolutePaths[index];
+}
+
+
+char* repoRootSubDirPath(CharPtr rootSubDirPath) {
+	static CharPtr TARGET_WKDIR_TAIL = "cgpraxis-ws20-21";
+
+	// create copy of rootSubDirPath
+	char* absSubDirPath = (char*)calloc(strlen(rootSubDirPath) + 1, sizeof(char));
+	strcpy(absSubDirPath, rootSubDirPath);
+
+	// retrieve current work dir
+	std::string workDir(_getcwd(NULL, 0));
+
+	// prepend absSubDirPath by ..\\ if workDir tail != TARGET_WKDIR_TAIL
+	if (workDir.substr(workDir.size() - strlen(TARGET_WKDIR_TAIL)) != TARGET_WKDIR_TAIL)
+		return concatenatedCharPtr("..\\", absSubDirPath);
+	return absSubDirPath;
+}
+
+
+char* joinPath(CharPtr a, CharPtr b) {
+	return concatenatedCharPtr(concatenatedCharPtr(a, "\\"), b);
+}
+
+
+char* concatenatedCharPtr(CharPtr a, CharPtr b) {
 	// Reference: https://stackoverflow.com/a/1995057
 
 	char* result = (char*)calloc(strlen(a) + strlen(b) + 1, sizeof(char));
@@ -20,23 +60,6 @@ char* concatenatedCharPtr(const char* a, const char* b) {
 	strcat(result, b);
 
 	return result;
-}
-
-
-char* joinPath(const char* a, const char* b) {
-	return concatenatedCharPtr(concatenatedCharPtr(a, "\\"), b);
-}
-
-
-char* getResourceSubDirPath(char* subDirTitle){
-	static const char* TARGET_WKDIR_TAIL = "cgpraxis-ws20-21";
-
-	char* subDirPath = joinPath("resources", subDirTitle);
-	std::string workDir(_getcwd(NULL, 0));
-
-	if (workDir.substr(workDir.size() - strlen(TARGET_WKDIR_TAIL)) != TARGET_WKDIR_TAIL)
-		return concatenatedCharPtr("..\\", subDirPath);
-	return subDirPath;
 }
 
 

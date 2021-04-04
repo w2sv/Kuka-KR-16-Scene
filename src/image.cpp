@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <assert.h>
 
 #ifdef _WIN32
 	#include <io.h>
@@ -713,7 +714,8 @@ bool cg_image::loadBMP ( const char *fileName, bool verbose )
 /******************************************************************************/
 
 
-void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
+void CubeMap::load(const AbsolutePaths& textureFilePaths, bool applyHorizontalFlips) {
+	static const unsigned int N_FACES = 6;
 	static const GLenum sideTarget[N_FACES] = {
 		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -722,13 +724,17 @@ void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
 		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 	};
+
+	assert(textureFilePaths.size() == N_FACES);
 	
+	// generate and bind GL_TEXTURE_CUBE_MAP object
 	GLuint tex;
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 
+	// load textures as mipmaps
 	for (size_t i = 0; i < N_FACES; i++) {
-		loadData(sideFilePaths[i]);
+		loadData(textureFilePaths[i]);
 		
 		if (applyHorizontalFlips)
 			horizontalFlip();
@@ -742,16 +748,18 @@ void CubeMap::load(SideFilePaths sideFilePaths, bool applyHorizontalFlips) {
 			data
 		);
 
+		// free temporary image data
 		free();
 
+		// set parameters
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 
-		// GL_CLAMP_TO_EDGE indispensable to prevent border artefacts
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
+
 	glTex = tex;
 }
 

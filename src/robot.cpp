@@ -583,18 +583,18 @@ void Robot::resetDisplayTimeLimit(time_t& timeLimit) {
 
 cg_object3D Robot::objects[Robot::N_OBJECTS] = {};
 void Robot::loadObjects() {
-	const static char* DIR_PATH = getResourceSubDirPath("objects");
-	const static char* FILE_NAMES[Robot::N_OBJECTS] = {
-		"rotation_axis_1.obj",
-		"tilt_axis_1.obj",
-		"tilt_axis_2.obj",
-		"screw_head.obj",
-		"kuka_logo.obj"
-	};
+	const AbsolutePaths filePaths(
+		"resources\\objects", {
+			"rotation_axis_1.obj",
+			"tilt_axis_1.obj",
+			"tilt_axis_2.obj",
+			"screw_head.obj",
+			"kuka_logo.obj"
+		}
+	);
 
-	for (size_t i = 0; i < Robot::N_OBJECTS; i++) {
-		Robot::objects[i].load(joinPath(DIR_PATH, FILE_NAMES[i]), false);
-	}
+	for (size_t i = 0; i < Robot::N_OBJECTS; i++)
+		Robot::objects[i].load(filePaths[i], false);
 }
  
 
@@ -617,11 +617,12 @@ void Robot::setObjectMaterials() {
 
 cg_image Robot::textures[Robot::N_TEXTURES] = {};
 void Robot::loadTextures() {
-	const static char* DIR_PATH = getResourceSubDirPath("textures");
-	const static char* FILE_NAMES[Robot::N_TEXTURES] = {
-		"smoothed-square-textured-metal.bmp",
-		"warped-sheet-metal_roughness.bmp"
-	};
+	const AbsolutePaths filePaths(
+		"resources\\textures", {
+			"smoothed-square-textured-metal.bmp",
+			"warped-sheet-metal_roughness.bmp"
+		}
+	);
 
 	const static GLenum parameters[Robot::N_TEXTURES][4] = {
 		{GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_MODULATE},
@@ -629,7 +630,7 @@ void Robot::loadTextures() {
 	};
 
 	for (size_t i = 0; i < Robot::N_TEXTURES; i++) {
-		textures[i].load(joinPath(DIR_PATH, FILE_NAMES[i]), true);
+		textures[i].load(filePaths[i], true);
 
 		textures[i].setMinFilter(parameters[i][0]);
 		textures[i].setMagFilter(parameters[i][1]);
