@@ -1,6 +1,5 @@
 #include "camera.h"
 
-
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <limits>
@@ -19,12 +18,10 @@ const Extrema Camera::RADIUS_LIMITS(7.4, (Skybox::EXTENT - Platform::MEASUREMENT
 
 
 Camera::Camera(Robot* robot) :
-	mode(Mode::Observer),
 	robot(robot),
-	radius(START_RADIUS),
 	orbitVelocityRegularizer(VelocityFpsRegularizer(3))
 {
-	resetPosition(); 
+	reset(); 
 }
 
 
@@ -49,7 +46,7 @@ void Camera::set() {
 
 void Camera::reset() {
 	mode = Observer;
-	resetPosition();
+	position.set(0, GlobalState::screenSize[1] * 0.5);
 	radius = START_RADIUS;
 }
 
@@ -58,12 +55,7 @@ void Camera::reset() {
 /// Parameter Updating
 ////////////////////////////////////////////////////////////
 
-void Camera::resetPosition() {
-	position.set(0, GlobalState::screenSize[1] * 0.5);
-}
-
-
-void Camera::setCameraParameterAccordingly() {
+void Camera::setParameterAccordingly() {
 	double phi = 0.2 * position.x / GlobalState::screenSize[0] * M_PI + M_PI * 0.5;
 	double theta = 0.2 * position.y / GlobalState::screenSize[1] * M_PI;
 
@@ -91,7 +83,7 @@ void Camera::updateRadiusViaScroll() {
 }
 
 
-void Camera::updateRadiusViaWheelPressing() {
+void Camera::updateRadiusViaWheelPress() {
 	if (cg_mouse::buttonState(GLUT_MIDDLE_BUTTON)) {
 		radius = std::max<float>(radius + 0.1 * cg_mouse::moveY(), 1.0);
 		clipRadius();
@@ -117,9 +109,9 @@ void Camera::setObserverMode() {
 	}
 	
 	updateRadiusViaScroll();
-	updateRadiusViaWheelPressing();
+	updateRadiusViaWheelPress();
 	
-	setCameraParameterAccordingly();
+	setParameterAccordingly();
 }
 
 
@@ -141,5 +133,5 @@ void Camera::setOrbitMode() {
 	if (orbitVelocityRegularizer.sufficientAmountOfTimePassed())
 		position.x -= int(X_POSITION_INCREMENT_PER_FRAME * GlobalState::screenSize[0]);
 
-	setCameraParameterAccordingly();
+	setParameterAccordingly();
 }

@@ -30,18 +30,16 @@ private:
 	float radius;
 	Robot* robot;
 
-	void resetPosition();
-
 	void setObserverMode();
 	void setTCPMode();
 	void setReverseTCPMode();
 	void setOrbitMode();
 	VelocityFpsRegularizer orbitVelocityRegularizer;
 
+	void setParameterAccordingly();
 
-	void setCameraParameterAccordingly();
-
+	/// -------------------Radius-------------------
 	void updateRadiusViaScroll();
-	void updateRadiusViaWheelPressing();
+	void updateRadiusViaWheelPress();
 	void clipRadius();
 };
